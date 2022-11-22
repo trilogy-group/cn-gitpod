@@ -9,6 +9,7 @@ require (
 	github.com/gitpod-io/gitpod/agent-smith v0.0.0-00010101000000-000000000000
 	github.com/gitpod-io/gitpod/blobserve v0.0.0-00010101000000-000000000000
 	github.com/gitpod-io/gitpod/common-go v0.0.0-00010101000000-000000000000
+	github.com/gitpod-io/gitpod/components/gitpod-db/go v0.0.0-00010101000000-000000000000
 	github.com/gitpod-io/gitpod/components/public-api/go v0.0.0-00010101000000-000000000000
 	github.com/gitpod-io/gitpod/content-service/api v0.0.0-00010101000000-000000000000
 	github.com/gitpod-io/gitpod/ide-metrics-api v0.0.0-00010101000000-000000000000
@@ -32,7 +33,7 @@ require (
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
 	gopkg.in/op/go-logging.v1 v1.0.0-20160211212156-b2cb9fa56473
-	helm.sh/helm/v3 v3.9.3
+	helm.sh/helm/v3 v3.9.4
 	k8s.io/api v0.24.4
 	k8s.io/apimachinery v0.24.4
 	k8s.io/client-go v0.24.4
@@ -107,7 +108,6 @@ require (
 	github.com/felixge/httpsnoop v1.0.2 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/fvbommel/sortorder v1.0.1 // indirect
-	github.com/gitpod-io/gitpod/components/gitpod-db/go v0.0.0-00010101000000-000000000000 // indirect
 	github.com/gitpod-io/gitpod/content-service v0.0.0-00010101000000-000000000000 // indirect
 	github.com/gitpod-io/gitpod/registry-facade v0.0.0-00010101000000-000000000000 // indirect
 	github.com/gitpod-io/gitpod/usage-api v0.0.0-00010101000000-000000000000 // indirect
