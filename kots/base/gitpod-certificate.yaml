@@ -1,0 +1,27 @@
+# Copyright (c) 2022 Gitpod GmbH. All rights reserved.
+# Licensed under the MIT License. See License-MIT.txt in the project root for license information.
+
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: https-certificates
+  labels:
+    app: gitpod
+    component: gitpod-installer
+  annotations:
+    kots.io/when: 'true'
+spec:
+  secretName: https-certificates
+  issuerRef:
+    name: 'gitpod-issuer'
+    kind: 'ClusterIssuer'
+  dnsNames:
+    - 'gitpod-infra-test.k8.devfactory.com'
+    - '*.gitpod-infra-test.k8.devfactory.com'
+    - '*.ws.gitpod-infra-test.k8.devfactory.com'
+  secretTemplate:
+    labels:
+      app: gitpod
+      component: gitpod-installer
+      kots.io/app-slug: 'gitpod'
+      kots.io/backup: velero

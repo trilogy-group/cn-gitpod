@@ -1,0 +1,91 @@
+apiVersion: kots.io/v1beta1
+kind: Installation
+metadata:
+  creationTimestamp: null
+  name: gitpod
+spec:
+  channelID: 259YYBILXTa30S1Soli9YcWcPTb
+  channelName: Stable
+  knownImages:
+  - image: docker.io/bitnami/minio:2022.4.29-debian-10-r0
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/goland:latest
+  - image: eu.gcr.io/gitpod-core-dev/build/ws-manager:commit-c73212d2767b8501b7714d9929264bb869bcb0f6
+  - image: docker.io/bitnami/minio:2022.5.26-debian-10-r0
+  - image: eu.gcr.io/gitpod-core-dev/build/dashboard:commit-c54b3bf6f17cc68c4f32c8301e8aa8620d6194d3
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:commit-05c6b3fbe3b5cd716332cbac94c68865766cd5aa
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/webstorm:latest
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/intellij:latest
+  - image: eu.gcr.io/gitpod-core-dev/build/ws-daemon:commit-3e4f0002fdc215cfc3cef34eea83631ffdc7c66c
+  - image: eu.gcr.io/gitpod-core-dev/build/shiftfs-module-loader:commit-313e75e99d5db6f5ac4eb71ecc25b8807fdd8366
+  - image: eu.gcr.io/gitpod-core-dev/build/docker-up:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: docker.io/library/mysql:5.7.34
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/pycharm:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: eu.gcr.io/gitpod-core-dev/build/installer:release-2022.10.2.1
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/rubymine:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: alpine/curl
+  - image: alpine/semver
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/phpstorm:latest
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/code-desktop:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/phpstorm:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: quay.io/brancz/kube-rbac-proxy:v0.12.0
+  - image: eu.gcr.io/gitpod-core-dev/build/kots-config-check/certificate:mrsimonemms-add-kots-support-bundle-11865.7
+  - image: eu.gcr.io/gitpod-core-dev/build/ws-manager-bridge:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: eu.gcr.io/gitpod-core-dev/build/image-builder-mk3:commit-c73212d2767b8501b7714d9929264bb869bcb0f6
+  - image: busybox:latest
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/goland:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: eu.gcr.io/gitpod-core-dev/build/ide-proxy:commit-b20d03af53d9d89316a8603387b81e85cb003229
+  - image: eu.gcr.io/gitpod-core-dev/build/image-builder-mk3/bob:73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: eu.gcr.io/gitpod-core-dev/build/registry-facade:commit-8c12d52ee98b03fd0864a8709aaf65999f150904
+  - image: docker.io/bitnami/mysql:5.7.34-debian-10-r55
+  - image: eu.gcr.io/gitpod-core-dev/build/service-waiter:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: eu.gcr.io/gitpod-core-dev/build/ide-metrics:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/pycharm:latest
+  - image: eu.gcr.io/gitpod-core-dev/build/ide-service:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: eu.gcr.io/gitpod-core-dev/build/proxy:commit-be66c7b26c19a659278e7f86b46593623be57992
+  - image: eu.gcr.io/gitpod-core-dev/build/kots-config-check/storage:sje-kots-storage-check.9
+  - image: docker.io/bitnami/bitnami-shell:10-debian-10-r431
+  - image: docker.io/library/alpine:3.16
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/code-desktop-insiders:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: eu.gcr.io/gitpod-core-dev/build/seccomp-profile-installer:commit-313e75e99d5db6f5ac4eb71ecc25b8807fdd8366
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/intellij:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: eu.gcr.io/gitpod-core-dev/build/agent-smith:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/code:commit-96916c5a955b991a94b23aabe5cdbd9fd7881dba
+  - image: eu.gcr.io/gitpod-core-dev/build/openvsx-proxy:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: eu.gcr.io/gitpod-core-dev/build/kots-config-check/database:sje-kots-config-check.9
+  - image: eu.gcr.io/gitpod-core-dev/build/kots-config-check/registry:sje-kots-registry-check.16
+  - image: docker.io/library/ubuntu:20.04
+  - image: eu.gcr.io/gitpod-core-dev/build/server:commit-9599a0246fe9bc480c7abc6efa2c4d3c250cba0d
+  - image: eu.gcr.io/gitpod-core-dev/build/supervisor:commit-96916c5a955b991a94b23aabe5cdbd9fd7881dba
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/rubymine:latest
+  - image: eu.gcr.io/gitpod-core-dev/build/installation-telemetry:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: cr.fluentbit.io/fluent/fluent-bit:1.9.4
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/webstorm:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: docker.io/bitnami/rabbitmq:3.10.2-debian-10-r7
+  - image: docker.io/gitpod/workspace-full:latest
+  - image: eu.gcr.io/gitpod-core-dev/build/ca-updater:commit-313e75e99d5db6f5ac4eb71ecc25b8807fdd8366
+  - image: eu.gcr.io/gitpod-core-dev/build/ws-proxy:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: docker.io/library/redis:6.2
+  - image: eu.gcr.io/gitpod-core-dev/build/blobserve:commit-8c12d52ee98b03fd0864a8709aaf65999f150904
+  - image: busybox:1
+  - image: eu.gcr.io/gitpod-core-dev/build/workspacekit:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: eu.gcr.io/gitpod-core-dev/build/ide/code:nightly
+  - image: docker.io/library/registry:2.7.1
+  - image: b.gcr.io/cloudsql-docker/gce-proxy:1.11
+  - image: eu.gcr.io/gitpod-core-dev/build/content-service:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  - image: eu.gcr.io/gitpod-core-dev/build/db-migrations:commit-73ea49bec3ed43432a96d8abb3e2824b7218152a
+  releaseNotes: |-
+    ## October 2022 hotfix release of the Gitpod Installer
+
+    Docker image: `eu.gcr.io/gitpod-core-dev/build/installer:release-2022.10.2.1`
+
+    Refer to the [self-hosted documentation](https://www.gitpod.io/docs/self-hosted/latest) to know more about how to setup Gitpod.
+
+    ## What's Changed
+    * [kots] merge custom docker config correctly by @Pothulapati https://github.com/gitpod-io/gitpod/pull/14432
+    * [kots]: set emptyDir and allow timeout configuration by @MrSimonEmms https://github.com/gitpod-io/gitpod/pull/14500
+
+    **Full Changelog**: https://github.com/gitpod-io/gitpod/compare/2022.10.0...2022.10.2-rc0
+  updateCursor: "24"
+  versionLabel: 2022.10.2
+status: {}

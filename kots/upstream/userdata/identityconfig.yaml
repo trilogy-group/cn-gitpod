@@ -1,0 +1,15 @@
+apiVersion: kots.io/v1beta1
+kind: IdentityConfig
+metadata:
+  creationTimestamp: null
+  name: identity
+spec:
+  clientID: gitpod
+  clientSecret:
+    valueEncrypted: cylFIg6RvbhC8CQuW0Srdgt0nHXUvPDvMv7xqtxUfvg+Hv4heKEsFjwg4A==
+  dexConnectors:
+    valueEncrypted: LxRbB+QAvrtX6dR0P0ru9U/Tk34=
+  enabled: false
+  ingressConfig:
+    enabled: false
+status: {}

@@ -1,0 +1,94 @@
+apiVersion: kots.io/v1beta1
+kind: ConfigValues
+metadata:
+  creationTimestamp: null
+  name: gitpod
+spec:
+  values:
+    advanced_mode_enabled:
+      default: "0"
+      value: "1"
+    cert_manager_enabled:
+      default: "1"
+      value: "1"
+    cert_manager_issuer:
+      default: ClusterIssuer
+    cert_manager_issuer_name:
+      value: gitpod-issuer
+    component_proxy_service_serviceType: {}
+    config_patch: {}
+    customization_patch: {}
+    db_cloudsql_enabled:
+      default: "0"
+    db_cloudsql_instance: {}
+    db_encryption_keys:
+      value: '[{"name":"general","version":1,"primary":true,"material":"4uGh1q8y2DYryJwrVMHs0kWXJlqvHWWt/KJuNi04edI="}]'
+    db_gcp_credentials: {}
+    db_host: {}
+    db_incluster:
+      default: "1"
+    db_password:
+      value: Rjc4/pvTm/aA/nNQpvGGoA==
+    db_port:
+      value: "3306"
+    db_username:
+      value: gitpod
+    domain:
+      value: gitpod-infra-test.k8.devfactory.com
+    enable_proxy_settings:
+      default: "0"
+    installer_timeout:
+      default: 5m
+    openVsxUrl:
+      value: https://open-vsx.org
+    reg_docker_config: {}
+    reg_docker_config_enable:
+      default: "0"
+    reg_incluster:
+      default: "1"
+    reg_incluster_storage:
+      default: none
+      value: none
+    reg_incluster_storage_s3_accesskey: {}
+    reg_incluster_storage_s3_bucketname: {}
+    reg_incluster_storage_s3_endpoint:
+      value: s3.us-east-1.amazonaws.com
+    reg_incluster_storage_s3_region:
+      value: us-east-1
+    reg_incluster_storage_s3_secretkey:
+      value: Rjc4/pvTm/aA/nNQpvGGoA==
+    reg_password:
+      value: Rjc4/pvTm/aA/nNQpvGGoA==
+    reg_server: {}
+    reg_url: {}
+    reg_username: {}
+    ssh_gateway:
+      default: "0"
+    store_azure_access_key:
+      value: Rjc4/pvTm/aA/nNQpvGGoA==
+    store_azure_account_name: {}
+    store_gcp_credentials: {}
+    store_gcp_project: {}
+    store_provider:
+      default: incluster
+      value: s3
+    store_region:
+      value: us-east-1
+    store_s3_access_key_id:
+      value: AKIAVBR4MIGBYSXIQG7M
+    store_s3_bucket:
+      value: bucket-gitpod-infra-test
+    store_s3_endpoint:
+      value: s3.amazonaws.com
+    store_s3_secret_access_key:
+      value: MRZBIhL2g4Amj0M4VCX8VxRyr0+n6/b+NtHKVNd7fGkiGRA0dplfdDW90Kly07wAvoPjdu0uqUw=
+    tls_ca_crt: {}
+    tls_crt: {}
+    tls_key: {}
+    tls_self_signed_enabled:
+      default: "0"
+    user_management_block_enabled:
+      default: "0"
+      value: "0"
+    user_management_block_passlist: {}
+status: {}

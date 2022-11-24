@@ -1,0 +1,81 @@
+# Copyright (c) 2022 Gitpod GmbH. All rights reserved.
+# Licensed under the MIT License. See License-MIT.txt in the project root for license information.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitpod-kots-config
+  labels:
+    app: gitpod
+    component: gitpod-installer
+data:
+  # KOTS settings
+  GITPOD_INSTALLER_CONFIG: /tmp/gitpod-config.yaml
+  GITPOD_OBJECTS: /tmp/gitpod
+
+  # General settings
+  CURSOR: "24"
+  DISTRIBUTION: "eks"
+  DOMAIN: "gitpod-infra-test.k8.devfactory.com"
+  NAMESPACE: "gitpod-infra-test"
+  OPEN_VSX_URL: "https://open-vsx.org"
+  SSH_GATEWAY: "0"
+
+  # Secret names
+  HTTP_PROXY_NAME: ''
+  LICENSE_NAME: gitpod-license
+  SSH_GATEWAY_HOST_KEY_NAME: ssh-gateway-host-key
+
+  # Database settings
+  DB_INCLUSTER_ENABLED: "1"
+  DB_CLOUDSQL_ENABLED: "0"
+  DB_CLOUDSQL_INSTANCE: ""
+  DB_CLOUDSQL_SERVICE_ACCOUNT_NAME: cloudsql
+  DB_EXTERNAL_CERTIFICATE_NAME: database
+
+  # Airgap settings
+  HAS_LOCAL_REGISTRY: "false"
+  LOCAL_REGISTRY_ADDRESS: ""
+  LOCAL_REGISTRY_HOST: ""
+  IMAGE_PULL_SECRET_NAME: "gitpod-registry"
+
+  # Registry settings
+  REGISTRY_INCLUSTER_ENABLED: "1"
+  REGISTRY_URL: ""
+  REGISTRY_INCLUSTER_STORAGE: "none"
+  REGISTRY_INCLUSTER_STORAGE_S3_REGION: "us-east-1"
+  REGISTRY_INCLUSTER_STORAGE_S3_ENDPOINT: "s3.us-east-1.amazonaws.com"
+  REGISTRY_INCLUSTER_STORAGE_S3_BUCKET_NAME: ""
+  REGISTRY_INCLUSTER_STORAGE_S3_CERTIFICATE_NAME: container-registry-s3-backend
+  REGISTRY_DOCKER_CONFIG_ENABLED: "0"
+  REGISTRY_EXTERNAL_CERTIFICATE_NAME: container-registry
+
+  # Storage settings
+  STORE_PROVIDER: "s3"
+  STORE_REGION: "us-east-1"
+  STORE_GCP_PROJECT: ""
+  STORE_S3_ENDPOINT: "s3.amazonaws.com"
+  STORE_S3_BUCKET: "bucket-gitpod-infra-test"
+  STORE_AZURE_CREDENTIALS_NAME: storage-azure
+  STORE_GCP_SERVICE_ACCOUNT_NAME: storage-gcp
+  STORE_S3_CREDENTIALS_NAME: storage-s3
+
+  # TLS certificate settings
+  CERT_MANAGER_ENABLED: "1"
+  TLS_SELF_SIGNED_ENABLED: "0"
+  TLS_CUSTOM_CA_CRT_ENABLED: "false" # Use comparison not value
+  TLS_CUSTOM_CA_CRT_CREDENTIALS_NAME: ca-certificate
+
+  # User management settings
+  USER_MANAGEMENT_BLOCK_ENABLED: "0"
+  USER_MANAGEMENT_BLOCK_PASSLIST: ""
+
+  # Advanced settings
+  ADVANCED_MODE_ENABLED: "1"
+  COMPONENT_PROXY_SERVICE_TYPE: ""
+  CUSTOMIZATION_PATCH_ENABLED: "false" # Use comparison not value
+  INSTALLER_TIMEOUT: "5m"
+
+  # Customizations
+  CONFIG_PATCH: ""
+  CUSTOMIZATION_PATCH: ""
