@@ -1,0 +1,45 @@
+name: Build Docker image for dashboard
+on:
+  push:
+    branches:
+      - "gitops-test"
+
+jobs:
+  publish:
+    name: Build dashboard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: gitops-test
+      - name: Set up golang
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.19'
+      - name: Set up node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.17.0
+      - name: Download leeway
+        run: cd /usr/bin && curl -fsSL https://github.com/gitpod-io/leeway/releases/download/v0.4.1/leeway_0.4.1_Linux_x86_64.tar.gz | sudo tar xz
+      - name: Download golangci-lint
+        run: cd /usr/local && curl -fsSL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.49.0
+      - name: Setup yarn
+        run: npm install --global yarn
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-region: ${{secrets.AWS_REGION}}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        run: |
+          leeway build components/dashboard:docker -Dversion=latest
+        continue-on-error: true
+        env:
+          CI: false
