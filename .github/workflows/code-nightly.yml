@@ -15,7 +15,7 @@ jobs:
         with:
           go-version: '1.19'
       - name: Download leeway
-        run: cd /usr/bin && curl -fsSL https://github.com/gitpod-io/leeway/releases/download/v0.4.1/leeway_0.4.1_Linux_x86_64.tar.gz | sudo tar xz
+        run: cd /usr/bin && curl -fsSL https://github.com/gitpod-io/leeway/releases/download/v0.7.1/leeway_0.7.1_Linux_x86_64.tar.gz | sudo tar xz
       - name: Download golangci-lint
         run: cd /usr/local && curl -fsSL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.49.0
       - name: Download GoKart
@@ -31,7 +31,7 @@ jobs:
       - run: |
           gcloud auth configure-docker --quiet
           export LEEWAY_WORKSPACE_ROOT=$(pwd)
-          headCommit=$(curl -H 'Accept: application/vnd.github.VERSION.sha' https://api.github.com/repos/gitpod-io/openvscode-server/commits/gp-code/release/1.74)
+          headCommit=$(curl -H 'Accept: application/vnd.github.VERSION.sha' https://api.github.com/repos/gitpod-io/openvscode-server/commits/gp-code/main)
           cd components/ide/code
           codeVersion=$(curl https://raw.githubusercontent.com/gitpod-io/openvscode-server/$headCommit/package.json | jq .version)
           leeway build -Dversion=nightly -DimageRepoBase=eu.gcr.io/gitpod-core-dev/build -DcodeCommit=$headCommit -DcodeVersion=$codeVersion -DcodeQuality=insider .:docker

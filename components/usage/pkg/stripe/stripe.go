@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package stripe
 
@@ -234,6 +234,7 @@ func (c *Client) GetCustomer(ctx context.Context, customerID string) (customer *
 	customer, err = c.sc.Customers.Get(customerID, &stripe.CustomerParams{
 		Params: stripe.Params{
 			Context: ctx,
+			Expand:  []*string{stripe.String("tax")},
 		},
 	})
 	if err != nil {

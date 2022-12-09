@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2022 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 import { useState, useContext, useEffect } from "react";
@@ -290,7 +290,7 @@ export default function UsageBasedBillingConfig({ attributionId }: Props) {
                             <div className="flex flex-col">
                                 <span>
                                     {currency === "EUR" ? "€" : "$"}0.36 for 10 credits or 1 hour of Standard workspace
-                                    usage.{" "}
+                                    usage, excluding VAT.{" "}
                                     <a
                                         className="gp-link"
                                         href="https://www.gitpod.io/docs/configure/billing/usage-based-billing"
@@ -343,7 +343,7 @@ export default function UsageBasedBillingConfig({ attributionId }: Props) {
                                     <span className="font-bold">Pay-as-you-go after 1,000 credits</span>
                                     <span>
                                         {currency === "EUR" ? "€" : "$"}0.36 for 10 credits or 1 hour of Standard
-                                        workspace usage.
+                                        workspace usage, excluding VAT.
                                     </span>
                                 </div>
                             </div>
@@ -389,7 +389,7 @@ export default function UsageBasedBillingConfig({ attributionId }: Props) {
                                             </span>
                                             <span>
                                                 {currency === "EUR" ? "€" : "$"}0.36 for 10 credits or 1 hour of
-                                                Standard workspace usage.
+                                                Standard workspace usage, excluding VAT.
                                             </span>
                                         </div>
                                     </div>
@@ -404,7 +404,7 @@ export default function UsageBasedBillingConfig({ attributionId }: Props) {
                                         <div className="flex flex-col">
                                             <span>
                                                 {currency === "EUR" ? "€" : "$"}0.36 for 10 credits or 1 hour of
-                                                Standard workspace usage.{" "}
+                                                Standard workspace usage, excluding VAT.{" "}
                                                 <a
                                                     className="gp-link"
                                                     href="https://www.gitpod.io/docs/configure/billing/usage-based-billing"

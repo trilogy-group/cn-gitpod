@@ -1,6 +1,10 @@
 # Change Log
 
 ## December 2022
+- Quote Gitpod prices as excluding VAT. ([#15255](https://github.com/gitpod-io/gitpod/pull/15255)) - [@jldec](https://github.com/jldec)
+- Remove beta and early access labels for Teams, Projects, and Billing ([#15247](https://github.com/gitpod-io/gitpod/pull/15247)) - [@gtsiolis](https://github.com/gtsiolis)
+- Make code available as AGPL ([#15241](https://github.com/gitpod-io/gitpod/pull/15241)) - [@csweichel](https://github.com/csweichel)
+- Fixed an issue where a stopped workspace could not be restarted ([#15216](https://github.com/gitpod-io/gitpod/pull/15216)) - [@Furisto](https://github.com/Furisto)
 - Added versions of all the suppoerted IDEs to the Preferences page ([#15139](https://github.com/gitpod-io/gitpod/pull/15139)) - [@filiptronicek](https://github.com/filiptronicek)
 - Always allow running new prebuilds, regardless of any previous prebuild state ([#15147](https://github.com/gitpod-io/gitpod/pull/15147)) - [@jankeromnes](https://github.com/jankeromnes)
 - [gitpod.io] Disable upgrades to fixed-price monthly plans (Chargebee) for individuals and teams who have pay-as-you-go enabled (Stripe) ([#15092](https://github.com/gitpod-io/gitpod/pull/15092)) - [@jankeromnes](https://github.com/jankeromnes)
