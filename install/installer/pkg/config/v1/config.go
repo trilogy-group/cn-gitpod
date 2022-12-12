@@ -258,9 +258,7 @@ type ObjectStorageS3 struct {
 	Endpoint    string    `json:"endpoint" validate:"required"`
 	Credentials ObjectRef `json:"credentials" validate:"required"`
 
-	// BucketName sets the name of an existing bucket to enable the "single bucket mode"
-	// If no name is configured, the old "one bucket per user" behaviour kicks in.
-	BucketName string `json:"bucket"`
+	BucketName string `json:"bucket" validate:"required"`
 
 	AllowInsecureConnection bool `json:"allowInsecureConnection"`
 }

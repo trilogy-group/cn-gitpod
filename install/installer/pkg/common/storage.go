@@ -46,16 +46,11 @@ func StorageConfig(context *RenderContext) storageconfig.StorageConfig {
 
 	if context.Config.ObjectStorage.S3 != nil {
 		res = &storageconfig.StorageConfig{
-			Kind: storageconfig.MinIOStorage,
-			MinIOConfig: storageconfig.MinIOConfig{
-				Endpoint:            context.Config.ObjectStorage.S3.Endpoint,
-				AccessKeyIdFile:     filepath.Join(storageMount, "accessKeyId"),
-				SecretAccessKeyFile: filepath.Join(storageMount, "secretAccessKey"),
-				Secure:              !context.Config.ObjectStorage.S3.AllowInsecureConnection,
-				Region:              context.Config.Metadata.Region,
-				ParallelUpload:      100,
-
-				BucketName: context.Config.ObjectStorage.S3.BucketName,
+			Kind: storageconfig.S3Storage,
+			S3Config: &storageconfig.S3Config{
+				Region:          context.Config.Metadata.Region,
+				Bucket:          context.Config.ObjectStorage.S3.BucketName,
+				CredentialsFile: filepath.Join(storageMount, "credentials"),
 			},
 		}
 	}

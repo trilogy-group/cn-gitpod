@@ -1318,22 +1318,24 @@ data:
       },
       "storage": {
         "stage": "",
-        "kind": "minio",
+        "kind": "s3",
         "gcloud": {
           "credentialsFile": "",
           "region": "",
           "projectId": ""
         },
         "minio": {
-          "endpoint": "s3.amazonaws.com",
+          "endpoint": "",
           "accessKey": "",
-          "accessKeyFile": "/mnt/secrets/storage/accessKeyId",
+          "accessKeyFile": "",
           "secretKey": "",
-          "secretKeyFile": "/mnt/secrets/storage/secretAccessKey",
-          "secure": true,
+          "secretKeyFile": "",
+          "region": ""
+        },
+        "s3": {
+          "bucket": "s3-bucket",
           "region": "eu-west-2",
-          "parallelUpload": 100,
-          "bucket": "s3-bucket"
+          "credentialsFile": "/mnt/secrets/storage/credentials"
         },
         "blobQuota": 5368709120
       }
@@ -4397,67 +4399,6 @@ data:
                 "defaultValue": ""
               }
             ]
-          },
-          {
-            "name": "grpc_client_started_total",
-            "help": "Total number of RPCs started on the client.",
-            "labels": [
-              {
-                "name": "grpc_method",
-                "allowValues": [
-                  "*"
-                ],
-                "defaultValue": ""
-              },
-              {
-                "name": "grpc_service",
-                "allowValues": [
-                  "*"
-                ],
-                "defaultValue": ""
-              },
-              {
-                "name": "grpc_type",
-                "allowValues": [
-                  "*"
-                ],
-                "defaultValue": ""
-              }
-            ]
-          },
-          {
-            "name": "grpc_client_handled_total",
-            "help": "Total number of RPCs completed by the client, regardless of success or failure.",
-            "labels": [
-              {
-                "name": "grpc_method",
-                "allowValues": [
-                  "*"
-                ],
-                "defaultValue": ""
-              },
-              {
-                "name": "grpc_service",
-                "allowValues": [
-                  "*"
-                ],
-                "defaultValue": ""
-              },
-              {
-                "name": "grpc_type",
-                "allowValues": [
-                  "*"
-                ],
-                "defaultValue": ""
-              },
-              {
-                "name": "grpc_code",
-                "allowValues": [
-                  "*"
-                ],
-                "defaultValue": ""
-              }
-            ]
           }
         ],
         "histogramMetrics": [
@@ -4608,42 +4549,6 @@ data:
               536870912,
               1073741824,
               2147483648
-            ]
-          },
-          {
-            "name": "grpc_client_handling_seconds",
-            "help": "Histogram of response latency (seconds) of the gRPC until it is finished by the application.",
-            "labels": [
-              {
-                "name": "grpc_type",
-                "allowValues": [
-                  "*"
-                ],
-                "defaultValue": ""
-              },
-              {
-                "name": "grpc_service",
-                "allowValues": [
-                  "*"
-                ],
-                "defaultValue": ""
-              },
-              {
-                "name": "grpc_method",
-                "allowValues": [
-                  "*"
-                ],
-                "defaultValue": ""
-              }
-            ],
-            "buckets": [
-              0.1,
-              0.2,
-              0.5,
-              1,
-              2,
-              5,
-              10
             ]
           }
         ],
@@ -5303,22 +5208,24 @@ data:
           "tempDir": "/tmp",
           "storage": {
             "stage": "",
-            "kind": "minio",
+            "kind": "s3",
             "gcloud": {
               "credentialsFile": "",
               "region": "",
               "projectId": ""
             },
             "minio": {
-              "endpoint": "s3.amazonaws.com",
+              "endpoint": "",
               "accessKey": "",
-              "accessKeyFile": "/mnt/secrets/storage/accessKeyId",
+              "accessKeyFile": "",
               "secretKey": "",
-              "secretKeyFile": "/mnt/secrets/storage/secretAccessKey",
-              "secure": true,
+              "secretKeyFile": "",
+              "region": ""
+            },
+            "s3": {
+              "bucket": "s3-bucket",
               "region": "eu-west-2",
-              "parallelUpload": 100,
-              "bucket": "s3-bucket"
+              "credentialsFile": "/mnt/secrets/storage/credentials"
             },
             "blobQuota": 5368709120
           },
@@ -5489,22 +5396,24 @@ data:
       "content": {
         "storage": {
           "stage": "",
-          "kind": "minio",
+          "kind": "s3",
           "gcloud": {
             "credentialsFile": "",
             "region": "",
             "projectId": ""
           },
           "minio": {
-            "endpoint": "s3.amazonaws.com",
+            "endpoint": "",
             "accessKey": "",
-            "accessKeyFile": "/mnt/secrets/storage/accessKeyId",
+            "accessKeyFile": "",
             "secretKey": "",
-            "secretKeyFile": "/mnt/secrets/storage/secretAccessKey",
-            "secure": true,
+            "secretKeyFile": "",
+            "region": ""
+          },
+          "s3": {
+            "bucket": "s3-bucket",
             "region": "eu-west-2",
-            "parallelUpload": 100,
-            "bucket": "s3-bucket"
+            "credentialsFile": "/mnt/secrets/storage/credentials"
           },
           "blobQuota": 5368709120
         }
@@ -7677,7 +7586,7 @@ spec:
   template:
     metadata:
       annotations:
-        gitpod.io/checksum_config: 7c6a9adef1549c1cec440988670ae8f96809e39e3764e499121f1369afdb33bc
+        gitpod.io/checksum_config: b409f63d3d077a410f4e6595ed16879126c55ae65d9301397bff846d89011cab
         seccomp.security.alpha.kubernetes.io/shiftfs-module-loader: unconfined
       creationTimestamp: null
       labels:
@@ -7821,6 +7730,15 @@ spec:
               - /app/ready-probe-labeler
               - --label=gitpod.io/ws-daemon_ready_ns_default
               - --shutdown
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /ready
+            port: 9501
+          initialDelaySeconds: 5
+          periodSeconds: 2
+          successThreshold: 1
+          timeoutSeconds: 1
         name: node-labeler
         resources: {}
         securityContext:
@@ -8453,7 +8371,7 @@ spec:
   template:
     metadata:
       annotations:
-        gitpod.io/checksum_config: 8a160b6e8470e7a514961a4530576b4fa6bfb60eae6a275d05f2b488542a9e9b
+        gitpod.io/checksum_config: 598a09af7abd0a586af5d21b998f85977fc567f464cf45e0d5b4f43ed0b1c028
       creationTimestamp: null
       labels:
         app: gitpod
@@ -8852,7 +8770,7 @@ spec:
   template:
     metadata:
       annotations:
-        gitpod.io/checksum_config: d42da55c46ab5e8278c46a30a13e4f2c614ad4f340863a57c91fc6183a1068fc
+        gitpod.io/checksum_config: cc52e275885690e10f10dac466a0ffd1e4a4551efa2ee5dcbb5c4c824d987f95
       creationTimestamp: null
       labels:
         app: gitpod
@@ -10054,7 +9972,7 @@ spec:
   template:
     metadata:
       annotations:
-        gitpod.io/checksum_config: 37d8f5cc70aa4e1bb9cdf77175c535a7b00e4d9276b171a7c4ef2e82a74aa1ca
+        gitpod.io/checksum_config: bb6aec55bf0e44661ecc50247619e050b0b765292acb33f6ba18a706092443d2
       creationTimestamp: null
       labels:
         app: gitpod
