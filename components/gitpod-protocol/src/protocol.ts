@@ -778,6 +778,16 @@ export interface VSCodeConfig {
     extensions?: string[];
 }
 
+// Devspaces-specific
+export interface WindowsAWSConfig {
+    amiName?: string;
+    amiId?: string;
+    instanceType?: string;
+    subnetId?: string;
+    securityGroupIds?: string[];
+}
+// End devspaces-specific
+
 export interface JetBrainsConfig {
     intellij?: JetBrainsProductConfig;
     goland?: JetBrainsProductConfig;
@@ -811,6 +821,7 @@ export interface WorkspaceConfig {
     mainConfiguration?: string;
     additionalRepositories?: RepositoryCloneInformation[];
     image?: ImageConfig;
+    windowsConfig?: WindowsAWSConfig; // Devspaces-specific config
     ports?: PortConfig[];
     tasks?: TaskConfig[];
     checkoutLocation?: string;

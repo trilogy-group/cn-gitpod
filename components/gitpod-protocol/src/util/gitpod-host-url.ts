@@ -13,7 +13,7 @@ export interface UrlChange {
 export type UrlUpdate = UrlChange | Partial<URL>;
 
 const baseWorkspaceIDRegex =
-    "(([a-f][0-9a-f]{7}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|([0-9a-z]{2,16}-[0-9a-z]{2,16}-[0-9a-z]{8,11}))";
+    "(([a-f][0-9a-f]{7}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|([0-9a-z]{2,16}-[0-9a-z]{2,16}-[0-9a-z]{8,11})|(windows-[0-9]{1,3}-[0-9]{1,3}-[0-9]{1,3}-[0-9]{1,3}))"; // windows part is Devspaces-specific
 
 // this pattern matches v4 UUIDs as well as the new generated workspace ids (e.g. pink-panda-ns35kd21)
 const workspaceIDRegex = RegExp(`^${baseWorkspaceIDRegex}$`);

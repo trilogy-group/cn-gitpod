@@ -59,6 +59,36 @@
                 "additionalProperties": false
             }
         },
+        "windowsConfig": {
+            "type": "object",
+            "description": "Configurable parameters for launching Windows devspaces",
+            "properties": {
+                "amiName": {
+                    "type": "string",
+                    "description": "Name of AMI to use"
+                },
+                "amiId": {
+                    "type": "string",
+                    "description": "Id of AMI to use"
+                },
+                "instanceType": {
+                    "type": "string",
+                    "description": "InstanceType to use"
+                },
+                "subnetId": {
+                    "type": "string",
+                    "description": "SubnetID (VPC) to use"
+                },
+                "securityGroupIds": {
+                    "type": "array",
+                    "description": "List of security group ids to use",
+                    "items": {
+                        "type": "string",
+                        "description": "AWS security group id"
+                    }
+                }
+            }
+        },
         "tasks": {
             "type": "array",
             "description": "List of tasks to run on start. Each task will open a terminal in the IDE.",
