@@ -4,8 +4,8 @@
  * See License.AGPL.txt in the project root for license information.
  */
 
-import { useContext, useEffect, useState } from "react";
-import { useLocation } from "react-router";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { useLocation, useHistory } from "react-router";
 import { Project, ProjectSettings, Team } from "@gitpod/gitpod-protocol";
 import CheckBox from "../components/CheckBox";
 import { getGitpodService } from "../service/service";
@@ -17,6 +17,7 @@ import SelectWorkspaceClass from "../settings/selectClass";
 import { BillingMode } from "@gitpod/gitpod-protocol/lib/billing-mode";
 import Alert from "../components/Alert";
 import { Link } from "react-router-dom";
+import { RemoveProjectModal } from "./RemoveProjectModal";
 
 export function getProjectSettingsMenu(project?: Project, team?: Team) {
     const teamOrUserSlug = !!team ? "t/" + team.slug : "projects";
@@ -51,8 +52,11 @@ export function ProjectSettingsPage(props: { project?: Project; children?: React
 export default function () {
     const { project, setProject } = useContext(ProjectContext);
     const [billingMode, setBillingMode] = useState<BillingMode | undefined>(undefined);
+    const [showRemoveModal, setShowRemoveModal] = useState(false);
     const { teams } = useContext(TeamsContext);
     const team = getCurrentTeam(useLocation(), teams);
+    const history = useHistory();
+
     useEffect(() => {
         if (team) {
             getGitpodService().server.getBillingModeForTeam(team.id).then(setBillingMode);
@@ -61,33 +65,52 @@ export default function () {
         }
     }, [team]);
 
+    const updateProjectSettings = useCallback(
+        (settings: ProjectSettings) => {
+            if (!project) return;
+
+            const newSettings = { ...project.settings, ...settings };
+            getGitpodService().server.updateProjectPartial({ id: project.id, settings: newSettings });
+            setProject({ ...project, settings: newSettings });
+        },
+        [project, setProject],
+    );
+
+    const setWorkspaceClass = useCallback(
+        async (value: string) => {
+            if (!project) {
+                return value;
+            }
+            const before = project.settings?.workspaceClasses?.regular;
+            updateProjectSettings({ workspaceClasses: { ...project.settings?.workspaceClasses, regular: value } });
+            return before;
+        },
+        [project, updateProjectSettings],
+    );
+
+    const setWorkspaceClassForPrebuild = useCallback(
+        async (value: string) => {
+            if (!project) {
+                return value;
+            }
+            const before = project.settings?.workspaceClasses?.prebuild;
+            updateProjectSettings({ workspaceClasses: { ...project.settings?.workspaceClasses, prebuild: value } });
+            return before;
+        },
+        [project, updateProjectSettings],
+    );
+
+    const onProjectRemoved = useCallback(() => {
+        // if there's a current team, navigate to team projects
+        if (team) {
+            history.push(`/t/${team.slug}/projects`);
+        } else {
+            history.push("/projects");
+        }
+    }, [history, team]);
+
+    // TODO: Render a generic error screen for when an entity isn't found
     if (!project) return null;
-
-    const updateProjectSettings = (settings: ProjectSettings) => {
-        if (!project) return;
-
-        const newSettings = { ...project.settings, ...settings };
-        getGitpodService().server.updateProjectPartial({ id: project.id, settings: newSettings });
-        setProject({ ...project, settings: newSettings });
-    };
-
-    const setWorkspaceClass = async (value: string) => {
-        if (!project) {
-            return value;
-        }
-        const before = project.settings?.workspaceClasses?.regular;
-        updateProjectSettings({ workspaceClasses: { ...project.settings?.workspaceClasses, regular: value } });
-        return before;
-    };
-
-    const setWorkspaceClassForPrebuild = async (value: string) => {
-        if (!project) {
-            return value;
-        }
-        const before = project.settings?.workspaceClasses?.prebuild;
-        updateProjectSettings({ workspaceClasses: { ...project.settings?.workspaceClasses, prebuild: value } });
-        return before;
-    };
 
     return (
         <ProjectSettingsPage project={project}>
@@ -237,6 +260,22 @@ export default function () {
                     </Alert>
                 )}
             </div>
+            <div>
+                <h3 className="mt-12">Delete Project</h3>
+                <p className="text-base text-gray-500 dark:text-gray-400 pb-4">
+                    Removing the project from this team will also remove team members access to it.
+                </p>
+                <button className="danger secondary" onClick={() => setShowRemoveModal(true)}>
+                    Delete Project
+                </button>
+            </div>
+            {showRemoveModal && (
+                <RemoveProjectModal
+                    project={project}
+                    onRemoved={onProjectRemoved}
+                    onClose={() => setShowRemoveModal(false)}
+                />
+            )}
         </ProjectSettingsPage>
     );
 }
