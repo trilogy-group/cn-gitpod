@@ -108,6 +108,15 @@
 	}
 }
 
+# Devspaces-specific
+(http_workspace_transport) {
+	transport http {
+		keepalive 60s
+		keepalive_idle_conns 100
+	}
+}
+# End devspaces-specific
+
 (google_storage_headers) {
 	header {
 		-x-guploader-uploadid
@@ -352,8 +361,35 @@ https://*.*.{$GITPOD_DOMAIN} {
 	import enable_log
 	import workspace_security_headers
 	import remove_server_header
-	import ssl_configuration
 	import debug_headers
+
+	# Devspaces-specific
+	# Windows workspaces are HTTP backends. Do not configure anything to do with TLS or caddy will try to connect with HTTPS protocol
+	@workspace_windows header_regexp host Host ^windows-(?P<workspaceAddress>{$WINDOWS_WORKSPACE_REGEX}).ws(?P<location>-[a-z0-9]+)?.{$GITPOD_DOMAIN}
+	handle @workspace_windows {
+		reverse_proxy {$WINDOWS_INSTANCE_PREFIX}{re.host.workspaceAddress}{$WINDOWS_INSTANCE_SUFFIX}:{$WINDOWS_INSTANCE_PORT} {
+			import http_workspace_transport
+			import upstream_headers
+
+			header_up X-Gitpod-WorkspaceId {re.host.workspaceAddress}
+			header_up X-WSProxy-Host       {http.request.host}
+		}
+	}
+
+	@workspace_port_windows header_regexp host Host ^(?P<workspacePort>[0-9]{2,5})-windows-(?P<workspaceAddress>{$WINDOWS_WORKSPACE_REGEX}).ws(?P<location>-[a-z0-9]+)?.{$GITPOD_DOMAIN}
+	handle @workspace_port_windows {
+		reverse_proxy {$WINDOWS_INSTANCE_PREFIX}{re.host.workspaceAddress}{$WINDOWS_INSTANCE_SUFFIX}:{re.host.workspacePort} {
+			import http_workspace_transport
+			import upstream_headers
+
+			header_up X-Gitpod-WorkspaceId {re.host.workspaceAddress}
+			header_up X-WSProxy-Host       {http.request.host}
+		}
+	}
+
+	# The other workspace types require SSL
+	import ssl_configuration
+	# End devspaces-specific
 
 	# foreign content route used by vscode to serve webview and webworker resources of the form
 	# https://{{hash_base_32}}.<cluster>.<gitpod_domain> or https://v--{{hash_base_32}}.<cluster>.<gitpod_domain>
