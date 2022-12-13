@@ -243,7 +243,6 @@ export class WorkspaceStarter {
                         conditions: {},
                         phase: "pending",
                     },
-                    orgName,
                 };
                 await this.workspaceDb.trace({ span }).storeInstance(instance);
 
