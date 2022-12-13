@@ -27,6 +27,8 @@
     "/dist"
   ],
   "dependencies": {
+    "@aws-sdk/client-ec2": "^3.39.0",
+    "@aws-sdk/client-ssm": "^3.48.0",
     "@gitbeaker/node": "^35.7.0",
     "@gitpod/content-service": "0.1.5",
     "@gitpod/gitpod-db": "0.1.5",
@@ -63,6 +65,7 @@
     "google-protobuf": "^3.19.1",
     "heapdump": "^0.3.15",
     "inversify": "^5.0.1",
+    "js-base64": "^3.7.2",
     "is-reachable": "^5.2.1",
     "js-yaml": "^3.10.0",
     "json-stream": "^1.0.0",

@@ -127,6 +127,11 @@ import { AttributionId } from "@gitpod/gitpod-protocol/lib/attribution";
 import { LogContext } from "@gitpod/gitpod-protocol/lib/util/logging";
 import { repeat } from "@gitpod/gitpod-protocol/lib/util/repeat";
 
+// Devspaces-specific
+import { EC2WorkspaceManager } from "./ec2-workspace-manager";
+import { ImageConfigString } from "@gitpod/gitpod-protocol";
+// End devspaces-specific
+
 export interface StartWorkspaceOptions {
     rethrow?: boolean;
     forceDefaultImage?: boolean;
@@ -197,6 +202,9 @@ export class WorkspaceStarter {
     @inject(TeamDB) protected readonly teamDB: TeamDB;
     @inject(EntitlementService) protected readonly entitlementService: EntitlementService;
     @inject(BillingModes) protected readonly billingModes: BillingModes;
+    // Devspaces-specific
+    @inject(EC2WorkspaceManager) protected ec2WorkspaceManager: EC2WorkspaceManager;
+    // End devspaces-specific
 
     public async startWorkspace(
         ctx: TraceContext,
@@ -220,6 +228,32 @@ export class WorkspaceStarter {
         options = options || {};
         let instanceId: string | undefined = undefined;
         try {
+            // Devspaces-specific. Start windows workspaces using the ec2 workspace manager
+            if (ImageConfigString.is(workspace.config.image) && workspace.config.image.startsWith("windows")) {
+                const now = new Date().toISOString();
+                const instance: WorkspaceInstance = {
+                    id: uuidv4(),
+                    workspaceId: workspace.id,
+                    creationTime: now,
+                    deployedTime: now,
+                    ideUrl: "", // Initially empty, filled during starting process
+                    region: "", // Initially empty, filled during starting process
+                    workspaceImage: workspace.config.image, // So we know it is windows
+                    status: {
+                        conditions: {},
+                        phase: "pending",
+                    },
+                    orgName,
+                };
+                await this.workspaceDb.trace({ span }).storeInstance(instance);
+
+                const git = (
+                    await this.createGitInitializer({ span }, workspace, workspace.context as CommitContext, user)
+                ).initializer;
+                this.ec2WorkspaceManager.startWorkspace(ctx, workspace, user, instance.id, git);
+                return { instanceID: instance.id };
+            }
+            // End devspaces-specific
             await this.checkBlockedRepository(user, workspace.contextURL);
 
             // Some workspaces do not have an image source.

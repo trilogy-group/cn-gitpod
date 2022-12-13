@@ -115,6 +115,10 @@ import { UsageService, UsageServiceImpl } from "./user/usage-service";
 import { OpenPrebuildPrefixContextParser } from "./workspace/open-prebuild-prefix-context-parser";
 import { contentServiceBinder } from "./util/content-service-sugar";
 
+// Devspaces-specific
+import { EC2WorkspaceManager } from "./workspace/ec2-workspace-manager";
+// End devspaces-specific
+
 export const productionContainerModule = new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(Config).toConstantValue(ConfigFile.fromFile());
     bind(IDEService).toSelf().inSingletonScope();
@@ -140,6 +144,9 @@ export const productionContainerModule = new ContainerModule((bind, unbind, isBo
     bind(ConfigProvider).toSelf().inSingletonScope();
     bind(ConfigurationService).toSelf().inSingletonScope();
 
+    // Devspaces-specific
+    bind(EC2WorkspaceManager).toSelf().inSingletonScope();
+    // End devspaces-specific
     bind(WorkspaceFactory).toSelf().inSingletonScope();
     bind(WorkspaceDeletionService).toSelf().inSingletonScope();
     bind(WorkspaceStarter).toSelf().inSingletonScope();

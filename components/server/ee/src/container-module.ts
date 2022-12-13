@@ -27,6 +27,9 @@ import { IPrefixContextParser } from "../../src/workspace/context-parser";
 import { StartPrebuildContextParser } from "./prebuilds/start-prebuild-context-parser";
 import { WorkspaceFactory } from "../../src/workspace/workspace-factory";
 import { WorkspaceFactoryEE } from "./workspace/workspace-factory";
+// Devspaces-specific
+import { EC2WorkspaceManager } from "../../src/workspace/ec2-workspace-manager";
+// End devspaces-specific
 import { MonitoringEndpointsAppEE } from "./monitoring-endpoint-ee";
 import { MonitoringEndpointsApp } from "../../src/monitoring-endpoints";
 import { AccountService } from "@gitpod/gitpod-payment-endpoint/lib/accounting/account-service";
@@ -102,6 +105,10 @@ export const productionEEContainerModule = new ContainerModule((bind, unbind, is
 
     bind(UserDeletionServiceEE).toSelf().inSingletonScope();
     rebind(UserDeletionService).to(UserDeletionServiceEE).inSingletonScope();
+
+    // Devspaces-specific
+    bind(EC2WorkspaceManager).toSelf().inSingletonScope();
+    // End devspaces-specific
 
     // acounting
     bind(AccountService).to(AccountServiceImpl).inSingletonScope();

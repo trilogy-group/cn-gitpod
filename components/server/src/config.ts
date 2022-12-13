@@ -231,6 +231,30 @@ export interface ConfigSerialized {
      * This is the same signing key used by Public API
      */
     patSigningKeyFile?: string;
+
+    /**
+     * Devspaces-specific
+     */
+    restrictGithubOrg: string;
+    requireDevspacesReady: string;
+    workspaceSharing: string;
+    extendTimeout: string;
+
+    windows: {
+        accessKey: string;
+        secretKey: string;
+        region: string;
+
+        amiName: string;
+        instanceType: string;
+        subnetId: string;
+        securityGroupIds: string;
+        vscodePort: number;
+        instanceRole: string;
+    };
+    /**
+     * End devspaces-specific
+     */
 }
 
 export namespace ConfigFile {

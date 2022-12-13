@@ -15,6 +15,10 @@ import { TraceContext } from "@gitpod/gitpod-protocol/lib/util/tracing";
 import { Config } from "../config";
 import { repeat } from "@gitpod/gitpod-protocol/lib/util/repeat";
 
+// Devspaces-specific
+import { EC2WorkspaceManager } from "./ec2-workspace-manager";
+// End devspaces-specific
+
 /**
  * The WorkspaceGarbageCollector has two tasks:
  *  - mark old, unused workspaces as 'softDeleted = "gc"' after a certain period (initially: 21)
@@ -26,6 +30,9 @@ export class WorkspaceGarbageCollector {
     @inject(WorkspaceDeletionService) protected readonly deletionService: WorkspaceDeletionService;
     @inject(TracedWorkspaceDB) protected readonly workspaceDB: DBWithTracing<WorkspaceDB>;
     @inject(Config) protected readonly config: Config;
+    // Devspaces-specific
+    @inject(EC2WorkspaceManager) protected readonly ec2WorkspaceManager: EC2WorkspaceManager;
+    // End devspaces-specific
 
     public async start(): Promise<Disposable> {
         if (this.config.workspaceGarbageCollection.disabled) {
@@ -95,7 +102,16 @@ export class WorkspaceGarbageCollector {
                     this.config.workspaceGarbageCollection.contentChunkLimit,
                 );
             const deletes = await Promise.all(
-                workspaces.map((ws) => this.deletionService.garbageCollectWorkspace({ span }, ws)),
+                workspaces.map((ws) => {
+                    // Devspaces-specific conditioning
+                    this.ec2WorkspaceManager.isEC2WorkspaceId(ws.id).then((isEC2) => {
+                        if (isEC2) {
+                            this.ec2WorkspaceManager.deleteWorkspace(ws.id);
+                        } else {
+                            this.deletionService.garbageCollectWorkspace({ span }, ws);
+                        }
+                    });
+                }),
             );
 
             log.info(`wsgc: successfully deleted the content of ${deletes.length} workspaces`);

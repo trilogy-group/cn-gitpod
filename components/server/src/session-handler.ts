@@ -23,6 +23,8 @@ export class SessionHandlerProvider {
 
     public sessionHandler: express.RequestHandler;
 
+    public store: any | undefined; // Devspaces-specific variable
+
     @postConstruct()
     public init() {
         const options: SessionOptions = {} as SessionOptions;
@@ -37,7 +39,7 @@ export class SessionHandlerProvider {
         options.secret = this.config.session.secret;
         options.saveUninitialized = false; // Do not save new cookie without content (uninitialized)
 
-        options.store = this.createStore();
+        options.store = this.store = this.createStore(); // Devspaces needs this.store
 
         this.sessionHandler = session(options);
     }
@@ -88,6 +90,50 @@ export class SessionHandlerProvider {
         delete options.maxAge;
         res.clearCookie(name, options);
     }
+
+    // Devspaces-specific calls
+    public getSessionData(sessionID: string): Promise<any> {
+        return new Promise<any>((resolve) => {
+            if (!this.store) resolve(null);
+            this.store.get(sessionID, (error: any, session: any) => {
+                if (error) resolve(null);
+                resolve(session);
+            });
+        });
+    }
+
+    public createAPISession(userID: string): string {
+        log.debug(`Requested new API session for user with ID ${userID}`);
+
+        const options = this.getCookieOptions(this.config);
+        const sessionID = uuidv4();
+
+        let expires = new Date();
+        expires.setTime(new Date().getTime() + options.maxAge!);
+
+        const cookieData = {
+            cookie: {
+                originalMaxAge: options.maxAge!,
+                expires: expires,
+                secure: false,
+                httpOnly: true,
+                domain: options.domain!,
+                path: options.path!,
+                sameSite: options.sameSite!,
+            },
+            passport: {
+                user: userID,
+            },
+        };
+
+        this.store.set(sessionID, cookieData, (error: any) => {
+            if (error) {
+                log.error("Error creating API session: ", error);
+            }
+        });
+        return sessionID;
+    }
+    // End devspaces-specific calls
 
     protected createStore(): any | undefined {
         const options = {

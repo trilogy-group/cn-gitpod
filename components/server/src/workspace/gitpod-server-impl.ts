@@ -181,7 +181,9 @@ import { AttributionId } from "@gitpod/gitpod-protocol/lib/attribution";
 import * as grpc from "@grpc/grpc-js";
 import { CachingBlobServiceClientProvider } from "../util/content-service-sugar";
 import { CostCenterJSON } from "@gitpod/gitpod-protocol/lib/usage";
-
+// Devspaces-specific
+import { EC2WorkspaceManager } from "./ec2-workspace-manager";
+// End devspaces-specific
 // shortcut
 export const traceWI = (ctx: TraceContext, wi: Omit<LogContext, "userId">) => TraceContext.setOWI(ctx, wi); // userId is already taken care of in WebsocketConnectionManager
 export const traceAPIParams = (ctx: TraceContext, params: { [key: string]: any }) =>
@@ -252,6 +254,9 @@ export class GitpodServerImpl implements GitpodServerWithTracing, Disposable {
     @inject(VerificationService) protected readonly verificationService: VerificationService;
     @inject(EntitlementService) protected readonly entitlementService: EntitlementService;
     @inject(MessageBusIntegration) protected readonly messageBus: MessageBusIntegration;
+    // Devspaces-specific
+    @inject(EC2WorkspaceManager) protected ec2WorkspaceManager: EC2WorkspaceManager;
+    // End devspaces-specific
 
     /** Id the uniquely identifies this server instance */
     public readonly uuid: string = uuidv4();
@@ -793,6 +798,13 @@ export class GitpodServerImpl implements GitpodServerWithTracing, Disposable {
                 await this.guardAccess({ kind: "workspaceInstance", subject: instance, workspace }, "update");
             }
         }
+        // Devspaces-specific
+        if (this.ec2WorkspaceManager.isEC2WorkspaceInstance(instance)) {
+            const user = await this.getLoggedInUser(ctx);
+            await this.ec2WorkspaceManager.stopWorkspace(ctx, instance, user);
+            return;
+        }
+        // End devspaces-specific
 
         await this.workspaceStarter.stopWorkspaceInstance(ctx, instance.id, instance.region, reason, policy);
     }
@@ -929,6 +941,12 @@ export class GitpodServerImpl implements GitpodServerWithTracing, Disposable {
 
             const wasClosed = !!(options && options.wasClosed);
             await this.workspaceDb.trace(ctx).updateLastHeartbeat(instanceId, user.id, new Date(), wasClosed);
+
+            // Devspaces-specific
+            if (this.ec2WorkspaceManager.isEC2WorkspaceInstance(wsi)) {
+                return;
+            }
+            // End devspaces-specific
 
             const req = new MarkActiveRequest();
             req.setId(instanceId);
