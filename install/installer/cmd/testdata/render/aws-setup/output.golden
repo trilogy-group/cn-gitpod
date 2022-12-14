@@ -1602,6 +1602,9 @@ data:
               },
               "jbBackendPluginLatest": {
                 "version": "test"
+              },
+              "jbLauncher": {
+                "version": "test"
               }
             }
           },
@@ -2154,7 +2157,7 @@ data:
     kind: Deployment
     metadata:
       annotations:
-        gitpod.io/checksum_config: cb4cc24849de9562a8146bc14338c6a2298f3056b17f1cee5f08c1475327ff57
+        gitpod.io/checksum_config: 7346723d23891c253f282241ed24e225e16dd2ddafa9b7c90d1da928a4923f4b
       creationTimestamp: null
       labels:
         app: gitpod
@@ -3498,7 +3501,8 @@ data:
             "address": "0.0.0.0:9002"
           }
         }
-      }
+      },
+      "databaseConfigPath": "/secrets/database-config"
     }
 kind: ConfigMap
 metadata:
@@ -3525,7 +3529,15 @@ data:
             "image": "eu.gcr.io/gitpod-core-dev/build/ide/clion:test",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/clion:latest",
             "pluginImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
-            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest"
+            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+            "imageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ],
+            "latestImageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ]
           },
           "code": {
             "orderKey": "00",
@@ -3552,7 +3564,15 @@ data:
             "image": "eu.gcr.io/gitpod-core-dev/build/ide/goland:test",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/goland:latest",
             "pluginImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
-            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest"
+            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+            "imageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ],
+            "latestImageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ]
           },
           "intellij": {
             "orderKey": "04",
@@ -3562,7 +3582,15 @@ data:
             "image": "eu.gcr.io/gitpod-core-dev/build/ide/intellij:test",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/intellij:latest",
             "pluginImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
-            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest"
+            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+            "imageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ],
+            "latestImageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ]
           },
           "phpstorm": {
             "orderKey": "07",
@@ -3572,7 +3600,15 @@ data:
             "image": "eu.gcr.io/gitpod-core-dev/build/ide/phpstorm:test",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/phpstorm:latest",
             "pluginImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
-            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest"
+            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+            "imageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ],
+            "latestImageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ]
           },
           "pycharm": {
             "orderKey": "06",
@@ -3582,7 +3618,15 @@ data:
             "image": "eu.gcr.io/gitpod-core-dev/build/ide/pycharm:test",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/pycharm:latest",
             "pluginImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
-            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest"
+            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+            "imageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ],
+            "latestImageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ]
           },
           "rider": {
             "orderKey": "10",
@@ -3592,7 +3636,15 @@ data:
             "image": "eu.gcr.io/gitpod-core-dev/build/ide/rider:test",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/rider:latest",
             "pluginImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
-            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest"
+            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+            "imageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ],
+            "latestImageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ]
           },
           "rubymine": {
             "orderKey": "08",
@@ -3602,7 +3654,15 @@ data:
             "image": "eu.gcr.io/gitpod-core-dev/build/ide/rubymine:test",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/rubymine:latest",
             "pluginImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
-            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest"
+            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+            "imageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ],
+            "latestImageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ]
           },
           "webstorm": {
             "orderKey": "09",
@@ -3612,7 +3672,15 @@ data:
             "image": "eu.gcr.io/gitpod-core-dev/build/ide/webstorm:test",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/webstorm:latest",
             "pluginImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
-            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest"
+            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+            "imageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ],
+            "latestImageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ]
           }
         },
         "defaultIde": "code",
@@ -5003,6 +5071,7 @@ data:
       "stripeConfigFile": "",
       "enablePayment": false,
       "patSigningKeyFile": "",
+      "withoutWorkspaceComponents": false,
       "workspaceHeartbeat": {
         "intervalSeconds": 60,
         "timeoutSeconds": 300
@@ -5127,7 +5196,15 @@ data:
             "image": "eu.gcr.io/gitpod-core-dev/build/ide/clion:test",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/clion:latest",
             "pluginImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
-            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest"
+            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+            "imageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ],
+            "latestImageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ]
           },
           "code": {
             "orderKey": "00",
@@ -5154,7 +5231,15 @@ data:
             "image": "eu.gcr.io/gitpod-core-dev/build/ide/goland:test",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/goland:latest",
             "pluginImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
-            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest"
+            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+            "imageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ],
+            "latestImageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ]
           },
           "intellij": {
             "orderKey": "04",
@@ -5164,7 +5249,15 @@ data:
             "image": "eu.gcr.io/gitpod-core-dev/build/ide/intellij:test",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/intellij:latest",
             "pluginImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
-            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest"
+            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+            "imageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ],
+            "latestImageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ]
           },
           "phpstorm": {
             "orderKey": "07",
@@ -5174,7 +5267,15 @@ data:
             "image": "eu.gcr.io/gitpod-core-dev/build/ide/phpstorm:test",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/phpstorm:latest",
             "pluginImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
-            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest"
+            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+            "imageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ],
+            "latestImageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ]
           },
           "pycharm": {
             "orderKey": "06",
@@ -5184,7 +5285,15 @@ data:
             "image": "eu.gcr.io/gitpod-core-dev/build/ide/pycharm:test",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/pycharm:latest",
             "pluginImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
-            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest"
+            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+            "imageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ],
+            "latestImageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ]
           },
           "rider": {
             "orderKey": "10",
@@ -5194,7 +5303,15 @@ data:
             "image": "eu.gcr.io/gitpod-core-dev/build/ide/rider:test",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/rider:latest",
             "pluginImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
-            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest"
+            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+            "imageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ],
+            "latestImageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ]
           },
           "rubymine": {
             "orderKey": "08",
@@ -5204,7 +5321,15 @@ data:
             "image": "eu.gcr.io/gitpod-core-dev/build/ide/rubymine:test",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/rubymine:latest",
             "pluginImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
-            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest"
+            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+            "imageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ],
+            "latestImageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ]
           },
           "webstorm": {
             "orderKey": "09",
@@ -5214,7 +5339,15 @@ data:
             "image": "eu.gcr.io/gitpod-core-dev/build/ide/webstorm:test",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/webstorm:latest",
             "pluginImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
-            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest"
+            "pluginLatestImage": "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+            "imageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:test",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ],
+            "latestImageLayers": [
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-backend-plugin:latest",
+              "eu.gcr.io/gitpod-core-dev/build/ide/jb-launcher:test"
+            ]
           }
         },
         "defaultIde": "code",
@@ -8657,7 +8790,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    gitpod.io/checksum_config: cb4cc24849de9562a8146bc14338c6a2298f3056b17f1cee5f08c1475327ff57
+    gitpod.io/checksum_config: 7346723d23891c253f282241ed24e225e16dd2ddafa9b7c90d1da928a4923f4b
   creationTimestamp: null
   labels:
     app: gitpod
@@ -8771,6 +8904,9 @@ spec:
           name: config
           readOnly: true
           subPath: config.json
+        - mountPath: /secrets/database-config
+          name: database-config
+          readOnly: true
       - args:
         - --logtostderr
         - --insecure-listen-address=[$(IP)]:9500
@@ -8841,6 +8977,9 @@ spec:
       - configMap:
           name: iam
         name: config
+      - name: database-config
+        secret:
+          secretName: aws-database
 status: {}
 ---
 # apps/v1/Deployment ide-metrics
@@ -9790,7 +9929,7 @@ spec:
   template:
     metadata:
       annotations:
-        gitpod.io/checksum_config: b32c163fe13c4dd3dbabb7512d3fea34e61192c7b703a882669b339922630979
+        gitpod.io/checksum_config: 8b2dddff40256f6233f1fcdbf9fcc9f048ff3485aef5a2656f61735559bdefbb
       creationTimestamp: null
       labels:
         app: gitpod
@@ -9923,11 +10062,11 @@ spec:
         - mountPath: /ide-config
           name: ide-config
           readOnly: true
-        - mountPath: /ws-manager-client-tls-certs
-          name: ws-manager-client-tls-certs
-          readOnly: true
         - mountPath: /twilio-config
           name: twilio-secret-volume
+          readOnly: true
+        - mountPath: /ws-manager-client-tls-certs
+          name: ws-manager-client-tls-certs
           readOnly: true
       - args:
         - --logtostderr
@@ -10036,13 +10175,13 @@ spec:
       - configMap:
           name: server-ide-config
         name: ide-config
-      - name: ws-manager-client-tls-certs
-        secret:
-          secretName: ws-manager-client-tls
       - name: twilio-secret-volume
         secret:
           optional: true
           secretName: twilio-secret
+      - name: ws-manager-client-tls-certs
+        secret:
+          secretName: ws-manager-client-tls
 status: {}
 ---
 # apps/v1/Deployment ws-manager
@@ -10529,11 +10668,11 @@ spec:
         - mountPath: /config
           name: config
           readOnly: true
+        - mountPath: /mnt/certificates
+          name: config-certificates
         - mountPath: /ws-manager-client-tls-certs
           name: ws-manager-client-tls-certs
           readOnly: true
-        - mountPath: /mnt/certificates
-          name: config-certificates
       - args:
         - --logtostderr
         - --insecure-listen-address=[$(IP)]:9500
@@ -10575,12 +10714,12 @@ spec:
       - configMap:
           name: ws-proxy
         name: config
-      - name: ws-manager-client-tls-certs
-        secret:
-          secretName: ws-manager-client-tls
       - name: config-certificates
         secret:
           secretName: https-certificates
+      - name: ws-manager-client-tls-certs
+        secret:
+          secretName: ws-manager-client-tls
 status: {}
 ---
 # batch/v1/Job dbinit-session
