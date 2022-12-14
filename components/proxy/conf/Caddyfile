@@ -108,7 +108,8 @@
 	}
 }
 
-# Devspaces-specific
+
+# TODO: check if you can separate out the devspaces-specific Caddy-code in a different file and import them here.
 (http_workspace_transport) {
 	transport http {
 		keepalive 60s
