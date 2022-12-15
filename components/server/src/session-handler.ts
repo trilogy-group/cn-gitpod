@@ -39,7 +39,11 @@ export class SessionHandlerProvider {
         options.secret = this.config.session.secret;
         options.saveUninitialized = false; // Do not save new cookie without content (uninitialized)
 
-        options.store = this.store = this.createStore(); // Devspaces needs this.store
+        options.store = this.createStore();
+
+        // Devspaces-specific
+        this.store = options.store;
+        // End devspaces-specific
 
         this.sessionHandler = session(options);
     }
