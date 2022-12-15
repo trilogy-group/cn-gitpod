@@ -19,11 +19,15 @@ import {
     AdditionalContentContext,
 } from "@gitpod/gitpod-protocol";
 import { createHash } from "crypto";
+// Devspaces-specific
+import { ec2ImageSource } from "./ec2-workspace-decorators";
+// End devspaces-specific
 
 @injectable()
 export class ImageSourceProvider {
     @inject(HostContextProvider) protected readonly hostContextProvider: HostContextProvider;
 
+    @ec2ImageSource // Devspaces-specific
     public async getImageSource(
         ctx: TraceContext,
         user: User,

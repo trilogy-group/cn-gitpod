@@ -28,10 +28,6 @@ import { RepoURL } from "../repohost";
 import { ConfigProvider } from "./config-provider";
 import { ImageSourceProvider } from "./image-source-provider";
 
-// Devspaces-specific
-import { ImageConfigString, WorkspaceImageSource } from "@gitpod/gitpod-protocol";
-// End devspaces-specific
-
 @injectable()
 export class WorkspaceFactory {
     @inject(TracedWorkspaceDB) protected readonly db: DBWithTracing<WorkspaceDB>;
@@ -120,13 +116,7 @@ export class WorkspaceFactory {
 
         try {
             const { config, literalConfig } = await this.configProvider.fetchConfig({ span }, user, context);
-            var imageSource: WorkspaceImageSource;
-            // Devspaces-specific conditioning
-            if (config.image && ImageConfigString.is(config.image) && config.image.startsWith("windows")) {
-                imageSource = { baseImageResolved: config.image };
-            } else {
-                imageSource = await this.imageSourceProvider.getImageSource(ctx, user, context, config);
-            }
+            const imageSource = await this.imageSourceProvider.getImageSource(ctx, user, context, config);
             if (config._origin === "derived" && literalConfig) {
                 (context as any as AdditionalContentContext).additionalFiles = { ...literalConfig };
             }
