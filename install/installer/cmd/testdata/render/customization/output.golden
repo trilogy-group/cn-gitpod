@@ -1485,7 +1485,7 @@ data:
           "maxSizeBytes": 1073741824
         }
       },
-      "dockerAuth": "/mnt/pull-secret.json",
+      "dockerAuth": "/mnt/pull-secret/pull-secret.json",
       "pprofAddr": "127.0.0.1:6060",
       "prometheusAddr": "127.0.0.1:9500",
       "readinessProbeAddr": ":8086"
@@ -1734,6 +1734,9 @@ data:
             "version": "test"
           },
           "public-api-server": {
+            "version": "test"
+          },
+          "refreshCredential": {
             "version": "test"
           },
           "registryFacade": {
@@ -4325,7 +4328,7 @@ data:
             "type": "browser",
             "logo": "https://ide.gitpod.example.com/image/ide-logo/vscode.svg",
             "label": "Browser",
-            "image": "eu.gcr.io/gitpod-core-dev/build/ide/code:commit-8335b0de46d748b9d12119bc7cbdf8554a9e121c",
+            "image": "eu.gcr.io/gitpod-core-dev/build/ide/code:commit-73b9682c5040a9fec5a02e066aa48faa635f5ca5",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/code:nightly"
           },
           "code-desktop": {
@@ -5577,7 +5580,7 @@ data:
           }
         },
         "pullSecret": "builtin-registry-auth",
-        "pullSecretFile": "/config/pull-secret.json",
+        "pullSecretFile": "/config/pull-secret/pull-secret.json",
         "baseImageRepository": "registry.gitpod.example.com/base-images",
         "workspaceImageRepository": "registry.gitpod.example.com/workspace-images",
         "builderImage": "eu.gcr.io/gitpod-core-dev/build/image-builder-mk3/bob:test"
@@ -5887,7 +5890,7 @@ data:
           "key": "/mnt/certificates/tls.key"
         }
       },
-      "dockerAuth": "/mnt/pull-secret.json",
+      "dockerAuth": "/mnt/pull-secret/pull-secret.json",
       "pprofAddr": "127.0.0.1:6060",
       "prometheusAddr": "127.0.0.1:9500",
       "readinessProbeAddr": ":8086"
@@ -6083,7 +6086,7 @@ data:
             "type": "browser",
             "logo": "https://ide.gitpod.example.com/image/ide-logo/vscode.svg",
             "label": "Browser",
-            "image": "eu.gcr.io/gitpod-core-dev/build/ide/code:commit-8335b0de46d748b9d12119bc7cbdf8554a9e121c",
+            "image": "eu.gcr.io/gitpod-core-dev/build/ide/code:commit-73b9682c5040a9fec5a02e066aa48faa635f5ca5",
             "latestImage": "eu.gcr.io/gitpod-core-dev/build/ide/code:nightly"
           },
           "code-desktop": {
@@ -8732,7 +8735,7 @@ spec:
     metadata:
       annotations:
         gitpod.io: hello
-        gitpod.io/checksum_config: 9e5f1a3b0ad0175c34b4be5f0d0a1f0b8c2727eab17bd9548976255a54916e64
+        gitpod.io/checksum_config: fd416b9d91d5650b8ddab533d0b39983c0169716448f74ad056ed5dbc5227aa7
         hello: world
       creationTimestamp: null
       labels:
@@ -8823,9 +8826,8 @@ spec:
         - mountPath: /ws-manager-client-tls-certs
           name: ws-manager-client-tls-certs
           readOnly: true
-        - mountPath: /mnt/pull-secret.json
+        - mountPath: /mnt/pull-secret
           name: pull-secret
-          subPath: .dockerconfigjson
         - mountPath: /mnt/certificates
           name: config-certificates
       - args:
@@ -8914,6 +8916,9 @@ spec:
           secretName: ws-manager-client-tls
       - name: pull-secret
         secret:
+          items:
+          - key: .dockerconfigjson
+            path: pull-secret.json
           secretName: builtin-registry-auth
       - hostPath:
           path: /
@@ -9773,7 +9778,7 @@ spec:
     metadata:
       annotations:
         gitpod.io: hello
-        gitpod.io/checksum_config: 83fa4918a8a3e509e417c17dfe176f340594b9e93560245fcf94fea159f23617
+        gitpod.io/checksum_config: f53bfe17888be51da5fce1993c73c75420a1ea22a48ae12c1a1b1ba218ca416c
         hello: world
       creationTimestamp: null
       labels:
@@ -9851,9 +9856,8 @@ spec:
           readOnly: true
         - mountPath: /mnt/cache
           name: cache
-        - mountPath: /mnt/pull-secret.json
+        - mountPath: /mnt/pull-secret
           name: pull-secret
-          subPath: .dockerconfigjson
       - args:
         - --logtostderr
         - --insecure-listen-address=[$(IP)]:9500
@@ -9888,6 +9892,9 @@ spec:
         name: config
       - name: pull-secret
         secret:
+          items:
+          - key: .dockerconfigjson
+            path: pull-secret.json
           secretName: builtin-registry-auth
 status: {}
 ---
@@ -10704,7 +10711,7 @@ spec:
     metadata:
       annotations:
         gitpod.io: hello
-        gitpod.io/checksum_config: bd4f1ac3b1b2e11f92bb14a55bf98ffb4eb011356e6330fde5b37d2f2de95d28
+        gitpod.io/checksum_config: 3bbe78a00b2f3aebbeb9914eeb8c5e4fed6f3f71646fe10d5c5d6eb61063c719
         hello: world
       creationTimestamp: null
       labels:
@@ -10767,9 +10774,8 @@ spec:
         - mountPath: /wsman-certs
           name: wsman-tls-certs
           readOnly: true
-        - mountPath: /config/pull-secret.json
+        - mountPath: /config/pull-secret
           name: pull-secret
-          subPath: .dockerconfigjson
       - args:
         - --logtostderr
         - --insecure-listen-address=[$(IP)]:9500
@@ -10824,6 +10830,9 @@ spec:
           secretName: ws-manager-client-tls
       - name: pull-secret
         secret:
+          items:
+          - key: .dockerconfigjson
+            path: pull-secret.json
           secretName: builtin-registry-auth
       - emptyDir: {}
         name: gitpod-ca-certificate

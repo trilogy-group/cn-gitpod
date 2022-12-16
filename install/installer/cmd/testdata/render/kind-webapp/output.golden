@@ -868,6 +868,9 @@ data:
           "public-api-server": {
             "version": "test"
           },
+          "refreshCredential": {
+            "version": "test"
+          },
           "registryFacade": {
             "version": "test"
           },

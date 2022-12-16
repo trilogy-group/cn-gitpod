@@ -10,11 +10,8 @@ import { Redirect, Route, Switch } from "react-router";
 
 import { Login } from "./Login";
 import { UserContext } from "./user-context";
-import { ThemeContext } from "./theme-context";
 import { shouldSeeWhatsNew, WhatsNew } from "./whatsnew/WhatsNew";
 import gitpodIcon from "./icons/gitpod.svg";
-import { useHistory } from "react-router-dom";
-import { trackButtonOrAnchor, trackPathChange } from "./Analytics";
 import { ContextURL, User } from "@gitpod/gitpod-protocol";
 import * as GitpodCookie from "@gitpod/gitpod-protocol/lib/util/gitpod-cookie";
 import { Experiment } from "./experiments";
@@ -53,6 +50,7 @@ import { BlockedRepositories } from "./admin/BlockedRepositories";
 import { AppNotifications } from "./AppNotifications";
 import PersonalAccessTokenCreateView from "./settings/PersonalAccessTokensCreateView";
 import { useUserAndTeamsLoader } from "./hooks/use-user-and-teams-loader";
+import { useAnalyticsTracking } from "./hooks/use-analytics-tracking";
 
 const Setup = React.lazy(() => import(/* webpackPrefetch: true */ "./Setup"));
 const Workspaces = React.lazy(() => import(/* webpackPrefetch: true */ "./workspaces/Workspaces"));
@@ -150,41 +148,12 @@ function AdminRoute({ component }: any) {
 }
 
 function App() {
-    const { setIsDark } = useContext(ThemeContext);
     const [isWhatsNewShown, setWhatsNewShown] = useState(false);
     const [showUserIdePreference, setShowUserIdePreference] = useState(false);
-    const history = useHistory();
     const { user, teams, isSetupRequired, loading } = useUserAndTeamsLoader();
 
-    // Sets theme
-    useEffect(() => {
-        const updateTheme = () => {
-            const isDark =
-                localStorage.theme === "dark" ||
-                (localStorage.theme !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-            setIsDark(isDark);
-        };
-        updateTheme();
-        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-        if (mediaQuery instanceof EventTarget) {
-            mediaQuery.addEventListener("change", updateTheme);
-        } else {
-            // backward compatibility for Safari < 14
-            (mediaQuery as MediaQueryList).addListener(updateTheme);
-        }
-        window.addEventListener("storage", updateTheme);
-        return function cleanup() {
-            if (mediaQuery instanceof EventTarget) {
-                mediaQuery.removeEventListener("change", updateTheme);
-            } else {
-                // backward compatibility for Safari < 14
-                (mediaQuery as MediaQueryList).removeListener(updateTheme);
-            }
-            window.removeEventListener("storage", updateTheme);
-        };
-        // TODO: Add setIsDark to dep list after updating context to wrap setter w/ useCallback
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    // Setup analytics/tracking
+    useAnalyticsTracking();
 
     // Setup experiments
     useEffect(() => {
@@ -194,39 +163,18 @@ function App() {
         }
     }, []);
 
-    // listen and notify Segment of client-side path updates
     useEffect(() => {
-        return history.listen((location: any) => {
-            const path = window.location.pathname;
-            trackPathChange({
-                prev: (window as any)._gp.path,
-                path: path,
-            });
-            (window as any)._gp.path = path;
-        });
-    }, [history]);
-
-    // Track button/anchor clicks
-    useEffect(() => {
-        const handleButtonOrAnchorTracking = (props: MouseEvent) => {
-            var curr = props.target as HTMLElement;
-
-            // TODO: Look at using curr.closest('a,button') instead - determine if divs w/ onClick are being used
-            //check if current target or any ancestor up to document is button or anchor
-            while (!(curr instanceof Document)) {
-                if (
-                    curr instanceof HTMLButtonElement ||
-                    curr instanceof HTMLAnchorElement ||
-                    (curr instanceof HTMLDivElement && curr.onclick)
-                ) {
-                    trackButtonOrAnchor(curr);
-                    break; //finding first ancestor is sufficient
-                }
-                curr = curr.parentNode as HTMLElement;
+        const onHashChange = () => {
+            // Refresh on hash change if the path is '/' (new context URL)
+            if (window.location.pathname === "/") {
+                window.location.reload();
             }
         };
-        window.addEventListener("click", handleButtonOrAnchorTracking, true);
-        return () => window.removeEventListener("click", handleButtonOrAnchorTracking, true);
+        window.addEventListener("hashchange", onHashChange, false);
+
+        return () => {
+            window.removeEventListener("hashchange", onHashChange);
+        };
     }, []);
 
     // redirect to website for any website slugs
@@ -288,18 +236,6 @@ function App() {
             </Suspense>
         );
     }
-
-    // TODO: this will re-subscribe for every render, maybe move to a useEffect
-    window.addEventListener(
-        "hashchange",
-        () => {
-            // Refresh on hash change if the path is '/' (new context URL)
-            if (window.location.pathname === "/") {
-                window.location.reload();
-            }
-        },
-        false,
-    );
 
     let toRender: React.ReactElement = (
         <Route>

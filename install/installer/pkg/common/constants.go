@@ -41,6 +41,7 @@ const (
 	SlowServerComponent         = "slow-server"
 	ServerInstallationAdminPort = 9000
 	SystemNodeCritical          = "system-node-critical"
+	PaymentEndpointComponent    = "payment-endpoint"
 	PublicApiComponent          = "public-api-server"
 	WSManagerComponent          = "ws-manager"
 	WSManagerBridgeComponent    = "ws-manager-bridge"
@@ -48,6 +49,10 @@ const (
 	ImageBuilderComponent       = "image-builder-mk3"
 	ImageBuilderRPCPort         = 8080
 	DebugNodePort               = 9229
+	DBCaCertEnvVarName          = "DB_CA_CERT"
+	DBCaFileName                = "ca.crt"
+	DBCaBasePath                = "/db-ssl"
+	DBCaPath                    = DBCaBasePath + "/" + DBCaFileName
 
 	AnnotationConfigChecksum = "gitpod.io/checksum_config"
 
