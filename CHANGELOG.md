@@ -1,6 +1,15 @@
 # Change Log
 
 ## December 2022
+- Update JetBrains IDE images to most recent stable version. ([#15462](https://github.com/gitpod-io/gitpod/pull/15462)) - [@roboquat](https://github.com/roboquat)
+- The Admin Teams search will also search by team slug in addition to team name. ([#15338](https://github.com/gitpod-io/gitpod/pull/15338)) - [@selfcontained](https://github.com/selfcontained)
+- [installer] Update third_party charts to use full index ([#15432](https://github.com/gitpod-io/gitpod/pull/15432)) - [@Pothulapati](https://github.com/Pothulapati)
+- Update beta notice for the JetBrains integration ([#15371](https://github.com/gitpod-io/gitpod/pull/15371)) - [@gtsiolis](https://github.com/gtsiolis)
+- Allow specifying CA certificate to configure SSL secured database connections ([#15320](https://github.com/gitpod-io/gitpod/pull/15320)) - [@geropl](https://github.com/geropl)
+- Replace prebuild duration message emoji ([#15364](https://github.com/gitpod-io/gitpod/pull/15364)) - [@gtsiolis](https://github.com/gtsiolis)
+- Replace prebuild message emoji ([#15367](https://github.com/gitpod-io/gitpod/pull/15367)) - [@gtsiolis](https://github.com/gtsiolis)
+- Support AWS ECR container registry ([#15313](https://github.com/gitpod-io/gitpod/pull/15313)) - [@jenting](https://github.com/jenting), [@mrsimonemms](https://github.com/mrsimonemms)
+- Show team usage tab only for team owners ([#15350](https://github.com/gitpod-io/gitpod/pull/15350)) - [@gtsiolis](https://github.com/gtsiolis)
 - Projects can now be deleted from the corresponding Settings page for that project. ([#15316](https://github.com/gitpod-io/gitpod/pull/15316)) - [@selfcontained](https://github.com/selfcontained)
 - [installer]: add required bucket name to mirror kots command ([#15296](https://github.com/gitpod-io/gitpod/pull/15296)) - [@mrsimonemms](https://github.com/mrsimonemms)
 - Allow setting workspace class for prebuilds ([#15288](https://github.com/gitpod-io/gitpod/pull/15288)) - [@svenefftinge](https://github.com/svenefftinge)

@@ -19,13 +19,13 @@ dev_image="$(tar xfO "$bldfn" ./imgnames.txt | head -n1)"
 echo "Dev Image: $dev_image"
 
 cf_patch=$(kubectl get cm ide-config -o=json | jq '.data."config.json"' |jq -r)
-# TODO: Findout how to update the ide config from .ideOptions.options.imageLayers and .ideOptions.options.latestImageLayers
-# cf_patch=$(echo "$cf_patch" |jq ".ideOptions.options.intellij.$prop = \"$dev_image\"")
-# cf_patch=$(echo "$cf_patch" |jq ".ideOptions.options.goland.$prop = \"$dev_image\"")
-# cf_patch=$(echo "$cf_patch" |jq ".ideOptions.options.pycharm.$prop = \"$dev_image\"")
-# cf_patch=$(echo "$cf_patch" |jq ".ideOptions.options.phpstorm.$prop = \"$dev_image\"")
-# cf_patch=$(echo "$cf_patch" |jq ".ideOptions.options.rubymine.$prop = \"$dev_image\"")
-# cf_patch=$(echo "$cf_patch" |jq ".ideOptions.options.webstorm.$prop = \"$dev_image\"")
+ides=$(echo "$cf_patch" |jq '.ideOptions.clients."jetbrains-gateway".desktopIDEs')
+for ide in $(echo "$ides" | jq -r '.[]'); do
+  # second image is always jb-launcher, if position is changed then this script should be updated as well
+  cf_patch=$(echo "$cf_patch" |jq ".ideOptions.options.${ide}.imageLayers[1] = \"$dev_image\"")
+  cf_patch=$(echo "$cf_patch" |jq ".ideOptions.options.${ide}.latestImageLayers[1] = \"$dev_image\"")
+done
+
 cf_patch=$(echo "$cf_patch" |jq tostring)
 cf_patch="{\"data\": {\"config.json\": $cf_patch}}"
 

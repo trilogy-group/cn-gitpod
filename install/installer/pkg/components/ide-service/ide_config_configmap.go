@@ -54,6 +54,7 @@ func ideConfigConfigmap(ctx *common.RenderContext) ([]runtime.Object, error) {
 	jbPluginLatestImage := resolveLatestImage(ide.JetBrainsBackendPluginImage, "latest", ctx.VersionManifest.Components.Workspace.DesktopIdeImages.JetBrainsBackendPluginLatestImage)
 	jbLauncherImage := ctx.ImageName(ctx.Config.Repository, ide.JetBrainsLauncherImage, ctx.VersionManifest.Components.Workspace.DesktopIdeImages.JetBrainsLauncherImage.Version)
 	idecfg := ide_config.IDEConfig{
+		GpRunImage:      ctx.ImageName("registry.hub.docker.com", "gitpod/gp-run", "latest"),
 		SupervisorImage: ctx.ImageName(ctx.Config.Repository, workspace.SupervisorImage, ctx.VersionManifest.Components.Workspace.Supervisor.Version),
 		IdeOptions: ide_config.IDEOptions{
 			Clients: map[string]ide_config.IDEClient{
@@ -100,6 +101,7 @@ func ideConfigConfigmap(ctx *common.RenderContext) ([]runtime.Object, error) {
 				intellij: {
 					OrderKey:          "04",
 					Title:             "IntelliJ IDEA",
+					Label:             "Ultimate",
 					Type:              ide_config.IDETypeDesktop,
 					Logo:              getIdeLogoPath("intellijIdeaLogo"),
 					Image:             ctx.ImageName(ctx.Config.Repository, ide.IntelliJDesktopIDEImage, ctx.VersionManifest.Components.Workspace.DesktopIdeImages.IntelliJImage.Version),
@@ -124,6 +126,7 @@ func ideConfigConfigmap(ctx *common.RenderContext) ([]runtime.Object, error) {
 				pycharm: {
 					OrderKey:          "06",
 					Title:             "PyCharm",
+					Label:             "Professional",
 					Type:              ide_config.IDETypeDesktop,
 					Logo:              getIdeLogoPath("pycharmLogo"),
 					Image:             ctx.ImageName(ctx.Config.Repository, ide.PyCharmDesktopIdeImage, ctx.VersionManifest.Components.Workspace.DesktopIdeImages.PyCharmImage.Version),
