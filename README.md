@@ -44,8 +44,6 @@ Tightly integrated with GitLab, GitHub, and Bitbucket, Gitpod automatically and 
 
 [Learn more 👉](https://www.gitpod.io/)
 
-Gitpod is provided as a [managed Saas version](https://gitpod.io) with a free subscription for open-source or a [free self-hosted version](https://www.gitpod.io/self-hosted). An enterprise license is available [here](https://www.gitpod.io/self-hosted).
-
 ## Getting Started
 
 You can start using Gitpod in one or more of the following ways:
@@ -61,7 +59,7 @@ You can start using Gitpod in one or more of the following ways:
 All documentation can be found on https://www.gitpod.io/docs.
 For example, see [Introduction](https://www.gitpod.io/docs) and [Getting Started](https://www.gitpod.io/docs/getting-started) sections. 📚
 
-Also check out [**awesome-gitpod**](https://github.com/shaal/awesome-gitpod) ✨
+Also check out [**awesome-gitpod**](https://github.com/Gitpod-Samples/awesome-gitpod) ✨
 
 ## Questions
 

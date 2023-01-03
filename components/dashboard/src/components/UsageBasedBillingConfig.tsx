@@ -232,7 +232,9 @@ export default function UsageBasedBillingConfig({ attributionId }: Props) {
                     <div className="flex flex-col mt-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-800">
                         <div className="uppercase text-sm text-gray-400 dark:text-gray-500">Balance</div>
                         <div className="mt-1 text-xl font-semibold flex-grow">
-                            <span className="text-gray-900 dark:text-gray-100">{balance}</span>
+                            <span className="text-gray-900 dark:text-gray-100">
+                                {balance.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                            </span>
                             <span className="text-gray-400 dark:text-gray-500"> Credits</span>
                         </div>
                         <div className="mt-4 text-sm flex text-gray-400 dark:text-gray-500">
@@ -291,11 +293,8 @@ export default function UsageBasedBillingConfig({ attributionId }: Props) {
                                 <span>
                                     {currency === "EUR" ? "€" : "$"}0.36 for 10 credits or 1 hour of Standard workspace
                                     usage, excluding VAT.{" "}
-                                    <a
-                                        className="gp-link"
-                                        href="https://www.gitpod.io/docs/configure/billing/usage-based-billing"
-                                    >
-                                        Learn more about credits
+                                    <a className="gp-link" href="https://www.gitpod.io/pricing#cost-estimator">
+                                        Estimate costs
                                     </a>
                                 </span>
                             </div>
@@ -317,11 +316,8 @@ export default function UsageBasedBillingConfig({ attributionId }: Props) {
                                 <span className="font-bold text-gray-500 dark:text-gray-400">{usageLimit} credits</span>
                                 <span>
                                     {usageLimit / 10} hours of Standard workspace usage.{" "}
-                                    <a
-                                        className="gp-link"
-                                        href="https://www.gitpod.io/docs/configure/billing/usage-based-billing"
-                                    >
-                                        Learn more about credits
+                                    <a className="gp-link" href="https://www.gitpod.io/pricing#cost-estimator">
+                                        Estimate costs
                                     </a>
                                 </span>
                             </div>

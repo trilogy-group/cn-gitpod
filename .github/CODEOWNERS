@@ -5,7 +5,7 @@
 /.github/CODEOWNERS
 
 /components/blobserve @gitpod-io/engineering-ide
-/components/common-go @gitpod-io/engineering-workspace @gitpod-io/engineering-webapp
+/components/common-go @gitpod-io/engineering-staff-engineers
 /components/content-service-api @gitpod-io/engineering-workspace
 /components/content-service @gitpod-io/engineering-workspace
 /components/dashboard @gitpod-io/engineering-webapp
@@ -18,6 +18,8 @@
 /components/gitpod-messagebus @gitpod-io/engineering-webapp
 /components/gitpod-protocol @gitpod-io/engineering-webapp
 /components/gitpod-protocol/java @gitpod-io/engineering-ide
+/components/iam @gitpod-io/engineering-webapp
+/components/iam-api @gitpod-io/engineering-webapp
 /components/ide @gitpod-io/engineering-ide
 /components/ide-metrics @gitpod-io/engineering-ide
 /components/ide-metrics-api @gitpod-io/engineering-ide
@@ -47,8 +49,11 @@
 /install/installer/pkg/components/image-builder-mk3 @gitpod-io/engineering-workspace
 /install/installer/pkg/components/openvsx-proxy @gitpod-io/engineering-ide
 /install/installer/pkg/components/proxy @gitpod-io/engineering-webapp
+/install/installer/pkg/components/refresh-credential @gitpod-io/engineering-workspace
 /install/installer/pkg/components/registry-facade @gitpod-io/engineering-workspace
 /install/installer/pkg/components/public-api-server @gitpod-io/engineering-webapp
+/install/installer/pkg/components/iam @gitpod-io/engineering-webapp
+/install/installer/pkg/components/iam-api @gitpod-io/engineering-webapp
 /install/installer/pkg/components/server @gitpod-io/engineering-webapp
 /install/installer/pkg/components/server/ide @gitpod-io/engineering-ide
 /install/installer/pkg/components/usage @gitpod-io/engineering-webapp
@@ -71,9 +76,11 @@
 # Any team can make changes to the experimental package
 /components/public-api/gitpod/experimental @gitpod-io/engineering-workspace @gitpod-io/engineering-webapp @gitpod-io/engineering-delivery-operations-experience @gitpod-io/engineering-ide
 /components/public-api-server @gitpod-io/engineering-webapp
+/components/refresh-credential @gitpod-io/engineering-workspace
 /components/registry-facade-api @csweichel @aledbf
 /components/registry-facade @gitpod-io/engineering-workspace
 /components/server @gitpod-io/engineering-webapp
+/components/server/src/ide-service.* @gitpod-io/engineering-ide
 /components/service-waiter @gitpod-io/engineering-webapp
 /components/supervisor-api/*.proto @csweichel @akosyakov
 /components/supervisor @gitpod-io/engineering-ide

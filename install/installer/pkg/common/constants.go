@@ -41,15 +41,24 @@ const (
 	SlowServerComponent         = "slow-server"
 	ServerInstallationAdminPort = 9000
 	SystemNodeCritical          = "system-node-critical"
+	PaymentEndpointComponent    = "payment-endpoint"
 	PublicApiComponent          = "public-api-server"
 	WSManagerComponent          = "ws-manager"
 	WSManagerBridgeComponent    = "ws-manager-bridge"
 	WSProxyComponent            = "ws-proxy"
 	ImageBuilderComponent       = "image-builder-mk3"
 	ImageBuilderRPCPort         = 8080
+	ImageBuilderTLSSecret       = "image-builder-mk3-tls"
+	ImageBuilderVolumeTLSCerts  = "image-builder-mk3-tls-certs"
 	DebugNodePort               = 9229
+	DBCaCertEnvVarName          = "DB_CA_CERT"
+	DBCaFileName                = "ca.crt"
+	DBCaBasePath                = "/db-ssl"
+	DBCaPath                    = DBCaBasePath + "/" + DBCaFileName
 
 	AnnotationConfigChecksum = "gitpod.io/checksum_config"
+
+	DatabaseConfigMountPath = "/secrets/database-config"
 )
 
 var (

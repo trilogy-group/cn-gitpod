@@ -4,8 +4,8 @@
  * See License.AGPL.txt in the project root for license information.
  */
 
-import { useContext, useEffect, useState } from "react";
-import { useLocation } from "react-router";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { useLocation, useHistory } from "react-router";
 import { Project, ProjectSettings, Team } from "@gitpod/gitpod-protocol";
 import CheckBox from "../components/CheckBox";
 import { getGitpodService } from "../service/service";
@@ -17,6 +17,7 @@ import SelectWorkspaceClass from "../settings/selectClass";
 import { BillingMode } from "@gitpod/gitpod-protocol/lib/billing-mode";
 import Alert from "../components/Alert";
 import { Link } from "react-router-dom";
+import { RemoveProjectModal } from "./RemoveProjectModal";
 
 export function getProjectSettingsMenu(project?: Project, team?: Team) {
     const teamOrUserSlug = !!team ? "t/" + team.slug : "projects";
@@ -51,8 +52,11 @@ export function ProjectSettingsPage(props: { project?: Project; children?: React
 export default function () {
     const { project, setProject } = useContext(ProjectContext);
     const [billingMode, setBillingMode] = useState<BillingMode | undefined>(undefined);
+    const [showRemoveModal, setShowRemoveModal] = useState(false);
     const { teams } = useContext(TeamsContext);
     const team = getCurrentTeam(useLocation(), teams);
+    const history = useHistory();
+
     useEffect(() => {
         if (team) {
             getGitpodService().server.getBillingModeForTeam(team.id).then(setBillingMode);
@@ -61,28 +65,87 @@ export default function () {
         }
     }, [team]);
 
-    if (!project) return null;
+    const updateProjectSettings = useCallback(
+        (settings: ProjectSettings) => {
+            if (!project) return;
 
-    const updateProjectSettings = (settings: ProjectSettings) => {
-        if (!project) return;
+            const newSettings = { ...project.settings, ...settings };
+            getGitpodService().server.updateProjectPartial({ id: project.id, settings: newSettings });
+            setProject({ ...project, settings: newSettings });
+        },
+        [project, setProject],
+    );
 
-        const newSettings = { ...project.settings, ...settings };
-        getGitpodService().server.updateProjectPartial({ id: project.id, settings: newSettings });
-        setProject({ ...project, settings: newSettings });
-    };
+    const setWorkspaceClass = useCallback(
+        async (value: string) => {
+            if (!project) {
+                return value;
+            }
+            const before = project.settings?.workspaceClasses?.regular;
+            updateProjectSettings({ workspaceClasses: { ...project.settings?.workspaceClasses, regular: value } });
+            return before;
+        },
+        [project, updateProjectSettings],
+    );
 
-    const setWorkspaceClass = async (value: string) => {
-        if (!project) {
-            return value;
+    const setWorkspaceClassForPrebuild = useCallback(
+        async (value: string) => {
+            if (!project) {
+                return value;
+            }
+            const before = project.settings?.workspaceClasses?.prebuild;
+            updateProjectSettings({ workspaceClasses: { ...project.settings?.workspaceClasses, prebuild: value } });
+            return before;
+        },
+        [project, updateProjectSettings],
+    );
+
+    const onProjectRemoved = useCallback(() => {
+        // if there's a current team, navigate to team projects
+        if (team) {
+            history.push(`/t/${team.slug}/projects`);
+        } else {
+            history.push("/projects");
         }
-        const before = project.settings?.workspaceClasses?.regular;
-        updateProjectSettings({ workspaceClasses: { prebuild: value, regular: value } });
-        return before;
-    };
+    }, [history, team]);
+
+    // TODO: Render a generic error screen for when an entity isn't found
+    if (!project) return null;
 
     return (
         <ProjectSettingsPage project={project}>
             <h3>Prebuilds</h3>
+            <p className="text-base text-gray-500 dark:text-gray-400">
+                Choose the workspace machine type for your prebuilds.
+            </p>
+            {BillingMode.canSetWorkspaceClass(billingMode) ? (
+                <SelectWorkspaceClass
+                    workspaceClass={project.settings?.workspaceClasses?.prebuild}
+                    setWorkspaceClass={setWorkspaceClassForPrebuild}
+                />
+            ) : (
+                <Alert type="message" className="mt-4">
+                    <div className="flex flex-col">
+                        <span>
+                            To access{" "}
+                            <a
+                                className="gp-link"
+                                href="https://www.gitpod.io/docs/configure/workspaces/workspace-classes"
+                            >
+                                large workspaces
+                            </a>{" "}
+                            and{" "}
+                            <a className="gp-link" href="https://www.gitpod.io/docs/configure/billing/pay-as-you-go">
+                                pay-as-you-go
+                            </a>
+                            , first cancel your existing plan.
+                        </span>
+                        <Link className="mt-2" to={project.teamId ? "../billing" : "/plans"}>
+                            <button>Go to {project.teamId ? "Team" : "Personal"} Billing</button>
+                        </Link>
+                    </div>
+                </Alert>
+            )}
             <CheckBox
                 title={<span>Enable Incremental Prebuilds </span>}
                 desc={
@@ -197,6 +260,23 @@ export default function () {
                     </Alert>
                 )}
             </div>
+            <div className="">
+                <h3 className="mt-12">Remove Project</h3>
+                <p className="text-base text-gray-500 dark:text-gray-400 pb-4">
+                    This will delete the project and all project-level environment variables you've set for this
+                    project.
+                </p>
+                <button className="danger secondary" onClick={() => setShowRemoveModal(true)}>
+                    Remove Project
+                </button>
+            </div>
+            {showRemoveModal && (
+                <RemoveProjectModal
+                    project={project}
+                    onRemoved={onProjectRemoved}
+                    onClose={() => setShowRemoveModal(false)}
+                />
+            )}
         </ProjectSettingsPage>
     );
 }

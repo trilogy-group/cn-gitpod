@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/gitpod-io/gitpod/installer/pkg/cluster"
+	"github.com/gitpod-io/gitpod/installer/pkg/config/v1"
 
 	"github.com/gitpod-io/gitpod/installer/pkg/common"
 	dockerregistry "github.com/gitpod-io/gitpod/installer/pkg/components/docker-registry"
@@ -81,6 +82,7 @@ func deployment(ctx *common.RenderContext) ([]runtime.Object, error) {
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
 					SecretName: secretName,
+					Items:      []corev1.KeyToPath{{Key: ".dockerconfigjson", Path: "pull-secret.json"}},
 				},
 			},
 		},
@@ -100,13 +102,33 @@ func deployment(ctx *common.RenderContext) ([]runtime.Object, error) {
 		},
 		{
 			Name:      "pull-secret",
-			MountPath: PullSecretFile,
-			SubPath:   ".dockerconfigjson",
+			MountPath: "/config/pull-secret",
 		},
 	}
 	if vol, mnt, _, ok := common.CustomCACertVolume(ctx); ok {
 		volumes = append(volumes, *vol)
 		volumeMounts = append(volumeMounts, *mnt)
+	}
+	if ctx.Config.Kind == config.InstallationWorkspace {
+		// Only enable TLS in workspace clusters. This check can be removed
+		// once image-builder-mk3 has been removed from application clusters
+		// (https://github.com/gitpod-io/gitpod/issues/7845).
+		volumes = append(volumes, corev1.Volume{
+			Name: VolumeTLSCerts,
+			VolumeSource: corev1.VolumeSource{
+				Secret: &corev1.SecretVolumeSource{SecretName: TLSSecretName},
+			},
+		})
+		volumeMounts = append(volumeMounts, corev1.VolumeMount{
+			Name:      VolumeTLSCerts,
+			MountPath: "/certs",
+			ReadOnly:  true,
+		})
+	}
+
+	var nodeAffinity = cluster.AffinityLabelMeta
+	if ctx.Config.Kind == config.InstallationWorkspace {
+		nodeAffinity = cluster.AffinityLabelWorkspaceServices
 	}
 
 	return []runtime.Object{&appsv1.Deployment{
@@ -133,7 +155,7 @@ func deployment(ctx *common.RenderContext) ([]runtime.Object, error) {
 					}),
 				},
 				Spec: corev1.PodSpec{
-					Affinity:                      common.NodeAffinity(cluster.AffinityLabelMeta),
+					Affinity:                      common.NodeAffinity(nodeAffinity),
 					ServiceAccountName:            Component,
 					EnableServiceLinks:            pointer.Bool(false),
 					DNSPolicy:                     "ClusterFirst",

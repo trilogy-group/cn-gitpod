@@ -84,18 +84,22 @@ export class IDEService {
         return newIDESettings;
     }
 
-    async resolveWorkspaceConfig(workspace: Workspace, user: User): Promise<ResolveWorkspaceConfigResponse> {
+    async resolveWorkspaceConfig(
+        workspace: Workspace,
+        user: User,
+        userSelectedIdeSettings?: IDESettings,
+    ): Promise<ResolveWorkspaceConfigResponse> {
         const use = await this.configCatClientFactory().getValueAsync("use_IDEService_ResolveWorkspaceConfig", false, {
             user,
         });
         if (use) {
-            return this.doResolveWorkspaceConfig(workspace, user);
+            return this.doResolveWorkspaceConfig(workspace, user, userSelectedIdeSettings);
         }
 
         const deprecated = await this.resolveDeprecated(workspace, user);
         // assert against ide-service
         (async () => {
-            const config = await this.doResolveWorkspaceConfig(workspace, user);
+            const config = await this.doResolveWorkspaceConfig(workspace, user, userSelectedIdeSettings);
             const { tasks: configTasks, ...newConfig } = config;
             const { tasks: deprecatedTasks, ...newDeprecated } = deprecated;
             // we omit tasks because we're going to rewrite them soon and the deepEqual was failing
@@ -104,27 +108,30 @@ export class IDEService {
         return deprecated;
     }
 
-    private async doResolveWorkspaceConfig(workspace: Workspace, user: User): Promise<ResolveWorkspaceConfigResponse> {
+    private async doResolveWorkspaceConfig(
+        workspace: Workspace,
+        user: User,
+        userSelectedIdeSettings?: IDESettings,
+    ): Promise<ResolveWorkspaceConfigResponse> {
         const workspaceType =
             workspace.type === "prebuild" ? IdeServiceApi.WorkspaceType.PREBUILD : IdeServiceApi.WorkspaceType.REGULAR;
 
         const req: IdeServiceApi.ResolveWorkspaceConfigRequest = {
             type: workspaceType,
             context: JSON.stringify(workspace.context),
-            ideSettings: JSON.stringify(user.additionalData?.ideSettings),
+            ideSettings: JSON.stringify(userSelectedIdeSettings || user.additionalData?.ideSettings),
             workspaceConfig: JSON.stringify(workspace.config),
+            user: {
+                id: user.id,
+                email: User.getPrimaryEmail(user),
+            },
         };
         for (let attempt = 0; attempt < 15; attempt++) {
             if (attempt != 0) {
                 await new Promise((resolve) => setTimeout(resolve, 1000));
             }
-            const controller = new AbortController();
-            setTimeout(() => controller.abort(), 1000);
             try {
-                const resp = await this.ideService.resolveWorkspaceConfig(req, {
-                    signal: controller.signal,
-                });
-                return resp;
+                return await this.ideService.resolveWorkspaceConfig(req);
             } catch (e) {
                 console.error("ide-service: failed to resolve workspace config: ", e);
             }

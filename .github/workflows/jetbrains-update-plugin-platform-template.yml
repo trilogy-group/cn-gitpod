@@ -89,14 +89,14 @@ jobs:
                       ```
 
                       ## Werft options:
-                      - [x] /werft with-preview
-                      - [x] /werft with-large-vm
+                      - [ ] /werft with-preview
+                      - [ ] /werft with-large-vm
                       - [x] /werft with-integration-tests=jetbrains
 
                       _This PR was created automatically with GitHub Actions using [this](https://github.com/gitpod-io/gitpod/blob/main/.github/workflows/jetbrains-update-plugin-platform-template.yml) template._
                   commit-message: "Update Platform Version of ${{ inputs.pluginName }} to ${{ steps.latest-version.outputs.result }}"
                   branch: "jetbrains/${{ inputs.pluginId }}-platform"
-                  labels: "team: IDE,editor: jetbrains"
+                  labels: "team: IDE,editor: jetbrains,do-not-merge/hold"
                   team-reviewers: "engineering-ide"
                   token: ${{ secrets.roboquatRepoPat }}
                   committer: Robo Quat <roboquat@gitpod.io>
@@ -119,7 +119,7 @@ jobs:
                       ## How to test
                       1. Open the preview environment generated for this branch
                       2. Choose the _Latest Release (Unstable)_ version of IntelliJ IDEA as your preferred editor
-                      3. Start a workspace using this repository: https://github.com/gitpod-io/spring-petclinic
+                      3. Start a workspace using this repository: https://github.com/gitpod-samples/spring-petclinic
                       4. Verify that the workspace starts successfully
                       5. Verify that the IDE opens successfully
 
@@ -136,7 +136,7 @@ jobs:
                       _This PR was created automatically with GitHub Actions using [this](https://github.com/gitpod-io/gitpod/blob/main/.github/workflows/jetbrains-update-plugin-platform-template.yml) template._
                   commit-message: "Update Platform Version of ${{ inputs.pluginName }} to ${{ steps.latest-version.outputs.result }}"
                   branch: "jetbrains/${{ inputs.pluginId }}-platform"
-                  labels: "team: IDE,editor: jetbrains"
+                  labels: "team: IDE,editor: jetbrains,do-not-merge/hold"
                   team-reviewers: "engineering-ide"
                   token: ${{ secrets.roboquatRepoPat }}
                   committer: Robo Quat <roboquat@gitpod.io>

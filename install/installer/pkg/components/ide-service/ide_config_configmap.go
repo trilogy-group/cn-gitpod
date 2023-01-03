@@ -52,7 +52,9 @@ func ideConfigConfigmap(ctx *common.RenderContext) ([]runtime.Object, error) {
 
 	jbPluginImage := ctx.ImageName(ctx.Config.Repository, ide.JetBrainsBackendPluginImage, ctx.VersionManifest.Components.Workspace.DesktopIdeImages.JetBrainsBackendPluginImage.Version)
 	jbPluginLatestImage := resolveLatestImage(ide.JetBrainsBackendPluginImage, "latest", ctx.VersionManifest.Components.Workspace.DesktopIdeImages.JetBrainsBackendPluginLatestImage)
+	jbLauncherImage := ctx.ImageName(ctx.Config.Repository, ide.JetBrainsLauncherImage, ctx.VersionManifest.Components.Workspace.DesktopIdeImages.JetBrainsLauncherImage.Version)
 	idecfg := ide_config.IDEConfig{
+		GpRunImage:      ctx.ImageName("registry.hub.docker.com", "gitpod/gp-run", "latest"),
 		SupervisorImage: ctx.ImageName(ctx.Config.Repository, workspace.SupervisorImage, ctx.VersionManifest.Components.Workspace.Supervisor.Version),
 		IdeOptions: ide_config.IDEOptions{
 			Clients: map[string]ide_config.IDEClient{
@@ -99,12 +101,15 @@ func ideConfigConfigmap(ctx *common.RenderContext) ([]runtime.Object, error) {
 				intellij: {
 					OrderKey:          "04",
 					Title:             "IntelliJ IDEA",
+					Label:             "Ultimate",
 					Type:              ide_config.IDETypeDesktop,
 					Logo:              getIdeLogoPath("intellijIdeaLogo"),
 					Image:             ctx.ImageName(ctx.Config.Repository, ide.IntelliJDesktopIDEImage, ctx.VersionManifest.Components.Workspace.DesktopIdeImages.IntelliJImage.Version),
 					LatestImage:       ctx.ImageName(ctx.Config.Repository, ide.IntelliJDesktopIDEImage, "latest"),
 					PluginImage:       jbPluginImage,
 					PluginLatestImage: jbPluginLatestImage,
+					ImageLayers:       []string{jbPluginImage, jbLauncherImage},
+					LatestImageLayers: []string{jbPluginLatestImage, jbLauncherImage},
 				},
 				goland: {
 					OrderKey:          "05",
@@ -115,16 +120,21 @@ func ideConfigConfigmap(ctx *common.RenderContext) ([]runtime.Object, error) {
 					LatestImage:       ctx.ImageName(ctx.Config.Repository, ide.GoLandDesktopIdeImage, "latest"),
 					PluginImage:       jbPluginImage,
 					PluginLatestImage: jbPluginLatestImage,
+					ImageLayers:       []string{jbPluginImage, jbLauncherImage},
+					LatestImageLayers: []string{jbPluginLatestImage, jbLauncherImage},
 				},
 				pycharm: {
 					OrderKey:          "06",
 					Title:             "PyCharm",
+					Label:             "Professional",
 					Type:              ide_config.IDETypeDesktop,
 					Logo:              getIdeLogoPath("pycharmLogo"),
 					Image:             ctx.ImageName(ctx.Config.Repository, ide.PyCharmDesktopIdeImage, ctx.VersionManifest.Components.Workspace.DesktopIdeImages.PyCharmImage.Version),
 					LatestImage:       ctx.ImageName(ctx.Config.Repository, ide.PyCharmDesktopIdeImage, "latest"),
 					PluginImage:       jbPluginImage,
 					PluginLatestImage: jbPluginLatestImage,
+					ImageLayers:       []string{jbPluginImage, jbLauncherImage},
+					LatestImageLayers: []string{jbPluginLatestImage, jbLauncherImage},
 				},
 				phpstorm: {
 					OrderKey:          "07",
@@ -135,6 +145,8 @@ func ideConfigConfigmap(ctx *common.RenderContext) ([]runtime.Object, error) {
 					LatestImage:       ctx.ImageName(ctx.Config.Repository, ide.PhpStormDesktopIdeImage, "latest"),
 					PluginImage:       jbPluginImage,
 					PluginLatestImage: jbPluginLatestImage,
+					ImageLayers:       []string{jbPluginImage, jbLauncherImage},
+					LatestImageLayers: []string{jbPluginLatestImage, jbLauncherImage},
 				},
 				rubymine: {
 					OrderKey:          "08",
@@ -145,6 +157,8 @@ func ideConfigConfigmap(ctx *common.RenderContext) ([]runtime.Object, error) {
 					LatestImage:       ctx.ImageName(ctx.Config.Repository, ide.RubyMineDesktopIdeImage, "latest"),
 					PluginImage:       jbPluginImage,
 					PluginLatestImage: jbPluginLatestImage,
+					ImageLayers:       []string{jbPluginImage, jbLauncherImage},
+					LatestImageLayers: []string{jbPluginLatestImage, jbLauncherImage},
 				},
 				webstorm: {
 					OrderKey:          "09",
@@ -155,6 +169,8 @@ func ideConfigConfigmap(ctx *common.RenderContext) ([]runtime.Object, error) {
 					LatestImage:       ctx.ImageName(ctx.Config.Repository, ide.WebStormDesktopIdeImage, "latest"),
 					PluginImage:       jbPluginImage,
 					PluginLatestImage: jbPluginLatestImage,
+					ImageLayers:       []string{jbPluginImage, jbLauncherImage},
+					LatestImageLayers: []string{jbPluginLatestImage, jbLauncherImage},
 				},
 				rider: {
 					OrderKey:          "10",
@@ -165,6 +181,8 @@ func ideConfigConfigmap(ctx *common.RenderContext) ([]runtime.Object, error) {
 					LatestImage:       ctx.ImageName(ctx.Config.Repository, ide.RiderDesktopIdeImage, "latest"),
 					PluginImage:       jbPluginImage,
 					PluginLatestImage: jbPluginLatestImage,
+					ImageLayers:       []string{jbPluginImage, jbLauncherImage},
+					LatestImageLayers: []string{jbPluginLatestImage, jbLauncherImage},
 				},
 				clion: {
 					OrderKey:          "11",
@@ -175,6 +193,8 @@ func ideConfigConfigmap(ctx *common.RenderContext) ([]runtime.Object, error) {
 					LatestImage:       ctx.ImageName(ctx.Config.Repository, ide.CLionDesktopIdeImage, "latest"),
 					PluginImage:       jbPluginImage,
 					PluginLatestImage: jbPluginLatestImage,
+					ImageLayers:       []string{jbPluginImage, jbLauncherImage},
+					LatestImageLayers: []string{jbPluginLatestImage, jbLauncherImage},
 				},
 			},
 			DefaultIde:        "code",

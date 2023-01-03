@@ -30,16 +30,7 @@ metadata:
   namespace: default
 spec:
   ingress:
-    - from:
-        - podSelector:
-            matchLabels:
-              component: server
-        - podSelector:
-            matchLabels:
-              component: slow-server
-        - podSelector:
-            matchLabels:
-              component: ws-manager
+    - {}
   podSelector:
     matchLabels:
       app: gitpod
@@ -356,6 +347,34 @@ spec:
       component: cluster
 status: {}
 ---
+# cert-manager.io/v1/Certificate image-builder-mk3-tls
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  creationTimestamp: null
+  labels:
+    app: gitpod
+    component: image-builder-mk3
+  name: image-builder-mk3-tls
+  namespace: default
+spec:
+  dnsNames:
+  - image-builder-mk3.default.svc
+  - image-builder-mk3.default.svc.cluster.local
+  - image-builder-mk3
+  - image-builder-mk3-dev
+  duration: 2160h0m0s
+  issuerRef:
+    group: cert-manager.io
+    kind: Issuer
+    name: ca-issuer
+  secretName: image-builder-mk3-tls
+  secretTemplate:
+    labels:
+      app: gitpod
+      component: image-builder-mk3
+status: {}
+---
 # cert-manager.io/v1/Certificate ws-daemon-tls
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -400,6 +419,7 @@ spec:
   - server
   - ws-manager-bridge
   - ws-proxy
+  - image-builder-mk3
   - ws-manager
   duration: 2160h0m0s
   issuerRef:
@@ -737,6 +757,9 @@ data:
           "public-api-server": {
             "version": "test"
           },
+          "refreshCredential": {
+            "version": "test"
+          },
           "registryFacade": {
             "version": "test"
           },
@@ -824,6 +847,9 @@ data:
                 "version": "test"
               },
               "jbBackendPluginLatest": {
+                "version": "test"
+              },
+              "jbLauncher": {
                 "version": "test"
               }
             }
@@ -1572,6 +1598,16 @@ data:
       name: image-builder-mk3
       namespace: default
     ---
+    apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: gitpod
+        component: image-builder-mk3
+      name: image-builder-mk3-tls
+      namespace: default
+    ---
     apiVersion: v1
     kind: Secret
     metadata:
@@ -1666,7 +1702,7 @@ data:
           }
         },
         "pullSecret": "builtin-registry-auth",
-        "pullSecretFile": "/config/pull-secret.json",
+        "pullSecretFile": "/config/pull-secret/pull-secret.json",
         "baseImageRepository": "registry.gitpod.example.com/base-images",
         "workspaceImageRepository": "registry.gitpod.example.com/workspace-images",
         "builderImage": "eu.gcr.io/gitpod-core-dev/build/image-builder-mk3/bob:test"
@@ -1680,7 +1716,12 @@ data:
       "server": {
         "services": {
           "grpc": {
-            "address": "0.0.0.0:8080"
+            "address": "0.0.0.0:8080",
+            "tls": {
+              "caPath": "/certs/ca.crt",
+              "certPath": "/certs/tls.crt",
+              "keyPath": "/certs/tls.key"
+            }
           }
         }
       }
@@ -1769,7 +1810,7 @@ data:
           "key": "/mnt/certificates/tls.key"
         }
       },
-      "dockerAuth": "/mnt/pull-secret.json",
+      "dockerAuth": "/mnt/pull-secret/pull-secret.json",
       "pprofAddr": "127.0.0.1:6060",
       "prometheusAddr": "127.0.0.1:9500",
       "readinessProbeAddr": ":8086"
@@ -2034,7 +2075,12 @@ data:
         "ratelimits": {}
       },
       "imageBuilderProxy": {
-        "targetAddr": "image-builder-mk3.default.svc.cluster.local:8080"
+        "targetAddr": "image-builder-mk3.default.svc.cluster.local:8080",
+        "tls": {
+          "ca": "/image-builder-mk3-tls-certs/ca.crt",
+          "crt": "/image-builder-mk3-tls-certs/tls.crt",
+          "key": "/image-builder-mk3-tls-certs/tls.key"
+        }
       },
       "pprof": {
         "addr": "127.0.0.1:6060"
@@ -2966,7 +3012,7 @@ spec:
   template:
     metadata:
       annotations:
-        gitpod.io/checksum_config: 1568539df3f78cad79c3dd7b7e3ae3f5cf4fa74ad7263936762f004a8a6af77c
+        gitpod.io/checksum_config: 3e487f9543c719b9ee3f5590a0f98cb535b4bf1b301c66de8f00f3aa9d61381d
       creationTimestamp: null
       labels:
         app: gitpod
@@ -3054,9 +3100,8 @@ spec:
         - mountPath: /ws-manager-client-tls-certs
           name: ws-manager-client-tls-certs
           readOnly: true
-        - mountPath: /mnt/pull-secret.json
+        - mountPath: /mnt/pull-secret
           name: pull-secret
-          subPath: .dockerconfigjson
         - mountPath: /mnt/certificates
           name: config-certificates
       - args:
@@ -3145,6 +3190,9 @@ spec:
           secretName: ws-manager-client-tls
       - name: pull-secret
         secret:
+          items:
+          - key: .dockerconfigjson
+            path: pull-secret.json
           secretName: builtin-registry-auth
       - hostPath:
           path: /
@@ -3322,6 +3370,15 @@ spec:
               - /app/ready-probe-labeler
               - --label=gitpod.io/ws-daemon_ready_ns_default
               - --shutdown
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /ready
+            port: 9501
+          initialDelaySeconds: 5
+          periodSeconds: 2
+          successThreshold: 1
+          timeoutSeconds: 1
         name: node-labeler
         resources: {}
         securityContext:
@@ -3467,7 +3524,7 @@ spec:
   template:
     metadata:
       annotations:
-        gitpod.io/checksum_config: 6b82d310231a10f059f0a9efebcf1422f6b2e72eacb55b1ac68f283695b1a167
+        gitpod.io/checksum_config: 17379f665f26a7fe1e7ad830348985a5af3e35ba52bf2d8073bbdadb67c0aaeb
       creationTimestamp: null
       labels:
         app: gitpod
@@ -3480,7 +3537,7 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: gitpod.io/workload_meta
+              - key: gitpod.io/workload_workspace_services
                 operator: Exists
       containers:
       - args:
@@ -3527,9 +3584,11 @@ spec:
         - mountPath: /wsman-certs
           name: wsman-tls-certs
           readOnly: true
-        - mountPath: /config/pull-secret.json
+        - mountPath: /config/pull-secret
           name: pull-secret
-          subPath: .dockerconfigjson
+        - mountPath: /certs
+          name: image-builder-mk3-tls-certs
+          readOnly: true
       - args:
         - --logtostderr
         - --insecure-listen-address=[$(IP)]:9500
@@ -3584,11 +3643,17 @@ spec:
           secretName: ws-manager-client-tls
       - name: pull-secret
         secret:
+          items:
+          - key: .dockerconfigjson
+            path: pull-secret.json
           secretName: builtin-registry-auth
       - emptyDir: {}
         name: gitpod-ca-certificate
       - emptyDir: {}
         name: cacerts
+      - name: image-builder-mk3-tls-certs
+        secret:
+          secretName: image-builder-mk3-tls
 status: {}
 ---
 # apps/v1/Deployment registry
@@ -3700,7 +3765,7 @@ spec:
   template:
     metadata:
       annotations:
-        gitpod.io/checksum_config: cd4b2686fe34e3488f453e58aabb2197bd886fb64b6e6fc3ab840694d09b6391
+        gitpod.io/checksum_config: 8e17df1f6904718d97532e9779c3342f517ed6366049cd670c4ca158e272c1ec
       creationTimestamp: null
       labels:
         app: gitpod
@@ -3767,6 +3832,9 @@ spec:
         - mountPath: /certs
           name: tls-certs
           readOnly: true
+        - mountPath: /image-builder-mk3-tls-certs
+          name: image-builder-mk3-tls-certs
+          readOnly: true
       - args:
         - --logtostderr
         - --insecure-listen-address=[$(IP)]:9500
@@ -3809,6 +3877,9 @@ spec:
       - name: tls-certs
         secret:
           secretName: ws-manager-tls
+      - name: image-builder-mk3-tls-certs
+        secret:
+          secretName: image-builder-mk3-tls
 status: {}
 ---
 # apps/v1/Deployment ws-proxy
@@ -3910,11 +3981,11 @@ spec:
         - mountPath: /config
           name: config
           readOnly: true
+        - mountPath: /mnt/certificates
+          name: config-certificates
         - mountPath: /ws-manager-client-tls-certs
           name: ws-manager-client-tls-certs
           readOnly: true
-        - mountPath: /mnt/certificates
-          name: config-certificates
       - args:
         - --logtostderr
         - --insecure-listen-address=[$(IP)]:9500
@@ -3956,10 +4027,10 @@ spec:
       - configMap:
           name: ws-proxy
         name: config
-      - name: ws-manager-client-tls-certs
-        secret:
-          secretName: ws-manager-client-tls
       - name: config-certificates
         secret:
           secretName: https-certificates
+      - name: ws-manager-client-tls-certs
+        secret:
+          secretName: ws-manager-client-tls
 status: {}

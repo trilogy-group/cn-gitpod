@@ -41,6 +41,7 @@ packages:
       - components/ide/code-desktop:docker
       - components/ide/code-desktop:docker-insiders
       - components/ide/code:docker
+      - components/ide/jetbrains/launcher:docker
       - components/ide/jetbrains/backend-plugin:stable
       - components/ide/jetbrains/backend-plugin:latest
       - components/ide/jetbrains/image:goland
@@ -61,11 +62,14 @@ packages:
       - components/ide/jetbrains/image:clion-latest
       - components/image-builder-bob:docker
       - components/image-builder-mk3:docker
+      - components/ipfs/ipfs-cluster:docker
+      - components/ipfs/kubo:docker
       - components/local-app:docker
       - components/public-api-server:docker
       - components/usage:docker
       - components/openvsx-proxy:docker
       - components/proxy:docker
+      - components/refresh-credential:docker
       - components/registry-facade:docker
       - components/registry-facade/ca-updater:docker
       - components/server:docker
@@ -121,6 +125,7 @@ packages:
       - components/image-builder-mk3:app
       - components/openvsx-proxy:app
       - components/public-api-server:app
+      - components/refresh-credential:app
       - components/registry-facade:app
       - components/server:app
       - components/service-waiter:app
@@ -134,6 +139,7 @@ packages:
       - components/ws-manager:app
       - components/ide-metrics:app
       - components/ide-service:app
+      - components/ide/jetbrains/launcher:app
 scripts:
   - name: update-license-header
     description: Updates the license header in all source files

@@ -6,7 +6,7 @@ package ide
 
 const (
 	CodeIDEImage                = "ide/code"
-	CodeIDEImageStableVersion   = "commit-8335b0de46d748b9d12119bc7cbdf8554a9e121c" // stable version that will be updated manually on demand
+	CodeIDEImageStableVersion   = "commit-fdf6a08a681c53ddd97c7bae9acc7d49158a41a0" // stable version that will be updated manually on demand
 	CodeDesktopIDEImage         = "ide/code-desktop"
 	CodeDesktopInsidersIDEImage = "ide/code-desktop-insiders"
 	IntelliJDesktopIDEImage     = "ide/intellij"
@@ -18,4 +18,5 @@ const (
 	RiderDesktopIdeImage        = "ide/rider"
 	CLionDesktopIdeImage        = "ide/clion"
 	JetBrainsBackendPluginImage = "ide/jb-backend-plugin"
+	JetBrainsLauncherImage      = "ide/jb-launcher"
 )

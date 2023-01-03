@@ -11,4 +11,8 @@ import (
 // Config configures this service
 type ServiceConfig struct {
 	Server *baseserver.Configuration `json:"server"`
+
+	DatabaseConfigPath string `json:"databaseConfigPath"`
+
+	OIDCClientsConfigFile string `json:"oidcClientsConfigFile,omitempty"`
 }

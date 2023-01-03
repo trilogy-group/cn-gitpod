@@ -11,6 +11,7 @@ import (
 
 	"github.com/gitpod-io/gitpod/installer/pkg/cluster"
 	"github.com/gitpod-io/gitpod/installer/pkg/common"
+	"github.com/gitpod-io/gitpod/installer/pkg/config/v1/experimental"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -31,6 +32,7 @@ func deployment(ctx *common.RenderContext) ([]runtime.Object, error) {
 		return nil, err
 	}
 
+	databaseSecretVolume, databaseSecretMount, _ := common.DatabaseEnvSecret(ctx.Config)
 	volumes := []corev1.Volume{
 		{
 			Name: configmapVolume,
@@ -42,6 +44,7 @@ func deployment(ctx *common.RenderContext) ([]runtime.Object, error) {
 				},
 			},
 		},
+		databaseSecretVolume,
 	}
 	volumeMounts := []corev1.VolumeMount{
 		{
@@ -50,7 +53,19 @@ func deployment(ctx *common.RenderContext) ([]runtime.Object, error) {
 			MountPath: configMountPath,
 			SubPath:   configJSONFilename,
 		},
+		databaseSecretMount,
 	}
+
+	_ = ctx.WithExperimental(func(cfg *experimental.Config) error {
+		volume, mount, _, ok := getOIDCClientsConfig(cfg)
+		if !ok {
+			return nil
+		}
+
+		volumes = append(volumes, volume)
+		volumeMounts = append(volumeMounts, mount)
+		return nil
+	})
 
 	labels := common.CustomizeLabel(ctx, Component, common.TypeMetaDeployment)
 	return []runtime.Object{
