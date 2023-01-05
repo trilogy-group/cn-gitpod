@@ -47,6 +47,35 @@ spec:
     - Ingress
 
 ---
+# networking.k8s.io/v1/NetworkPolicy iam
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  creationTimestamp: null
+  labels:
+    app: gitpod
+    component: iam
+  name: iam
+  namespace: default
+spec:
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              component: proxy
+      ports:
+        - port: 9001
+          protocol: TCP
+        - port: 9002
+          protocol: TCP
+  podSelector:
+    matchLabels:
+      app: gitpod
+      component: iam
+  policyTypes:
+    - Ingress
+
+---
 # networking.k8s.io/v1/NetworkPolicy messagebus
 # Source: rabbitmq/charts/rabbitmq/templates/networkpolicy.yaml
 kind: NetworkPolicy
@@ -868,6 +897,9 @@ data:
           "public-api-server": {
             "version": "test"
           },
+          "refreshCredential": {
+            "version": "test"
+          },
           "registryFacade": {
             "version": "test"
           },
@@ -955,6 +987,9 @@ data:
                 "version": "test"
               },
               "jbBackendPluginLatest": {
+                "version": "test"
+              },
+              "jbLauncher": {
                 "version": "test"
               }
             }
@@ -1149,7 +1184,7 @@ data:
     kind: Deployment
     metadata:
       annotations:
-        gitpod.io/checksum_config: cb4cc24849de9562a8146bc14338c6a2298f3056b17f1cee5f08c1475327ff57
+        gitpod.io/checksum_config: 7346723d23891c253f282241ed24e225e16dd2ddafa9b7c90d1da928a4923f4b
       creationTimestamp: null
       labels:
         app: gitpod
@@ -1194,6 +1229,16 @@ data:
         app: gitpod
         component: iam
         kind: service
+      name: iam
+      namespace: default
+    ---
+    apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: gitpod
+        component: iam
       name: iam
       namespace: default
     ---
@@ -2071,7 +2116,8 @@ data:
             "address": "0.0.0.0:9002"
           }
         }
-      }
+      },
+      "databaseConfigPath": "/secrets/database-config"
     }
 kind: ConfigMap
 metadata:
@@ -2309,6 +2355,7 @@ data:
       "stripeConfigFile": "",
       "enablePayment": false,
       "patSigningKeyFile": "",
+      "withoutWorkspaceComponents": false,
       "workspaceHeartbeat": {
         "intervalSeconds": 60,
         "timeoutSeconds": 300
@@ -3926,7 +3973,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    gitpod.io/checksum_config: cb4cc24849de9562a8146bc14338c6a2298f3056b17f1cee5f08c1475327ff57
+    gitpod.io/checksum_config: 7346723d23891c253f282241ed24e225e16dd2ddafa9b7c90d1da928a4923f4b
   creationTimestamp: null
   labels:
     app: gitpod
@@ -4040,6 +4087,9 @@ spec:
           name: config
           readOnly: true
           subPath: config.json
+        - mountPath: /secrets/database-config
+          name: database-config
+          readOnly: true
       - args:
         - --logtostderr
         - --insecure-listen-address=[$(IP)]:9500
@@ -4110,6 +4160,9 @@ spec:
       - configMap:
           name: iam
         name: config
+      - name: database-config
+        secret:
+          secretName: mysql
 status: {}
 ---
 # apps/v1/Deployment minio
@@ -4681,7 +4734,7 @@ spec:
   template:
     metadata:
       annotations:
-        gitpod.io/checksum_config: a369165008e0cfac09c1b83051c9c686c06acf116907f80e46cf73b105f55719
+        gitpod.io/checksum_config: 726dafd8c59907accd3250e873f40d6e59d6913f82b7198335bc6c24ae2e7db1
       creationTimestamp: null
       labels:
         app: gitpod
@@ -4814,11 +4867,11 @@ spec:
         - mountPath: /ide-config
           name: ide-config
           readOnly: true
-        - mountPath: /ws-manager-client-tls-certs
-          name: ws-manager-client-tls-certs
-          readOnly: true
         - mountPath: /twilio-config
           name: twilio-secret-volume
+          readOnly: true
+        - mountPath: /ws-manager-client-tls-certs
+          name: ws-manager-client-tls-certs
           readOnly: true
       - args:
         - --logtostderr
@@ -4927,13 +4980,13 @@ spec:
       - configMap:
           name: server-ide-config
         name: ide-config
-      - name: ws-manager-client-tls-certs
-        secret:
-          secretName: ws-manager-client-tls
       - name: twilio-secret-volume
         secret:
           optional: true
           secretName: twilio-secret
+      - name: ws-manager-client-tls-certs
+        secret:
+          secretName: ws-manager-client-tls
 status: {}
 ---
 # apps/v1/Deployment ws-manager-bridge

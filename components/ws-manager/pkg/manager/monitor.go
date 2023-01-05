@@ -317,7 +317,6 @@ func actOnPodEvent(ctx context.Context, m actingManager, manager *Manager, statu
 		// The workspace has been scheduled on the cluster which means that we can start initializing it
 		go func() {
 			err := m.initializeWorkspaceContent(ctx, pod)
-
 			if err != nil {
 				// workspace initialization failed, which means the workspace as a whole failed
 				err = m.markWorkspace(ctx, workspaceID, addMark(workspaceExplicitFailAnnotation, err.Error()))
@@ -325,6 +324,12 @@ func actOnPodEvent(ctx context.Context, m actingManager, manager *Manager, statu
 					log.WithError(err).Warn("was unable to mark workspace as failed")
 				}
 			}
+
+			err = m.markWorkspace(ctx, workspaceID, addMark(alreadyInitializingAnnotation, util.BooleanTrueString))
+			if err != nil {
+				log.WithError(err).Warn("was unable to mark workspace as already initializing")
+			}
+
 		}()
 
 	case api.WorkspacePhase_INITIALIZING:
@@ -1239,8 +1244,17 @@ func (m *Monitor) finalizeWorkspaceContent(ctx context.Context, wso *workspaceOb
 		span.LogKV("attempt", i)
 		gs, err := doFinalize()
 		if err != nil {
-			tracing.LogError(span, err)
-			log.WithError(err).Error("doFinalize failed")
+			// do not log NotFound errors in tracing
+			if status.Code(err) != codes.NotFound {
+				tracing.LogError(span, err)
+				log.WithError(err).Error("doFinalize failed")
+			} else {
+				// workspace state not found, that is normal.
+				// it can happen if previous finalizeWorkspaceContent already disposed the workspace
+				span.LogKV("not found", true)
+				// we want to bail out from finalizeWorkspaceContent function now and do not update disposal status or metrics
+				return
+			}
 		}
 
 		// by default we assume the worst case scenario. If things aren't just as bad, we'll tune it down below.
@@ -1255,14 +1269,6 @@ func (m *Monitor) finalizeWorkspaceContent(ctx context.Context, wso *workspaceOb
 		st, isGRPCError := grpc_status.FromError(err)
 		if !isGRPCError {
 			break
-		}
-
-		if st.Code() == codes.NotFound {
-			// workspace state not found, that is normal.
-			// it can happen if previous finalizeWorkspaceContent already disposed the workspace
-			span.LogKV("not found", true)
-			// we want to bail out from finalizeWorkspaceContent function now and do not update disposal status or metrics
-			return
 		}
 
 		if (err != nil && strings.Contains(err.Error(), context.DeadlineExceeded.Error())) ||

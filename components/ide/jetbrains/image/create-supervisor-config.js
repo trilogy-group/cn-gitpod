@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 // @ts-check
 const fs = require("fs");
@@ -44,7 +44,7 @@ const ideConfigs = [
     ideConfigs.forEach((ideConfig) => {
         const name = ideConfig.name + (qualifier === "stable" ? "" : "-" + qualifier);
         const template = {
-            entrypoint: `/ide-desktop/${name}/status`,
+            entrypoint: `/ide-desktop/jb-launcher`,
             entrypointArgs: ["{DESKTOPIDEPORT}", ideConfig.name, `Open in ${ideConfig.displayName}`],
             readinessProbe: {
                 type: "http",

@@ -24,6 +24,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"runtime"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -151,6 +152,16 @@ func (s IDEKind) String() string {
 func Run(options ...RunOption) {
 	exitCode := 0
 	defer handleExit(&exitCode)
+	defer func() {
+		r := recover()
+		if r == nil {
+			return
+		}
+		log.WithField("cause", r).WithField("stack", string(debug.Stack())).Error("panicked")
+		if exitCode == 0 {
+			exitCode = 1
+		}
+	}()
 
 	opts := runOptions{
 		Args: os.Args,
@@ -180,14 +191,17 @@ func Run(options ...RunOption) {
 	configureGit(cfg, childProcEnvvars)
 
 	tokenService := NewInMemoryTokenService()
-	tkns, err := cfg.GetTokens(true)
-	if err != nil {
-		log.WithError(err).Warn("cannot prepare tokens")
-	}
-	for i := range tkns {
-		_, err = tokenService.SetToken(context.Background(), &tkns[i].SetTokenRequest)
+
+	if !opts.RunGP {
+		tkns, err := cfg.GetTokens(true)
 		if err != nil {
 			log.WithError(err).Warn("cannot prepare tokens")
+		}
+		for i := range tkns {
+			_, err = tokenService.SetToken(context.Background(), &tkns[i].SetTokenRequest)
+			if err != nil {
+				log.WithError(err).Warn("cannot prepare tokens")
+			}
 		}
 	}
 
@@ -227,6 +241,12 @@ func Run(options ...RunOption) {
 		desktopIdeReady *ideReadyState = nil
 
 		cstate        = NewInMemoryContentState(cfg.RepoRoot)
+		gitpodService serverapi.APIInterface
+
+		notificationService = NewNotificationService()
+	)
+
+	if !opts.RunGP {
 		gitpodService = serverapi.NewServerApiService(ctx, &serverapi.ServiceConfig{
 			Host:              host,
 			Endpoint:          endpoint,
@@ -234,13 +254,12 @@ func Run(options ...RunOption) {
 			WorkspaceID:       cfg.WorkspaceID,
 			SupervisorVersion: Version,
 		}, tokenService)
+	}
 
-		notificationService = NewNotificationService()
-	)
 	if cfg.DesktopIDE != nil {
 		desktopIdeReady = &ideReadyState{cond: sync.NewCond(&sync.Mutex{})}
 	}
-	if !cfg.isHeadless() {
+	if !cfg.isHeadless() && !opts.RunGP {
 		go trackReadiness(ctx, gitpodService, cfg, cstate, ideReady, desktopIdeReady)
 	}
 	tokenService.provider[KindGit] = []tokenProvider{NewGitTokenProvider(gitpodService, cfg.WorkspaceConfig, notificationService)}
@@ -248,8 +267,14 @@ func Run(options ...RunOption) {
 	gitpodConfigService := config.NewConfigService(cfg.RepoRoot+"/.gitpod.yml", cstate.ContentReady(), log.Log)
 	go gitpodConfigService.Watch(ctx)
 
+	var exposedPorts ports.ExposedPortsInterface
+
+	if !opts.RunGP {
+		exposedPorts = createExposedPortsImpl(cfg, gitpodService)
+	}
+
 	portMgmt := ports.NewManager(
-		createExposedPortsImpl(cfg, gitpodService),
+		exposedPorts,
 		&ports.PollingServedPortsObserver{
 			RefreshInterval: 2 * time.Second,
 		},
@@ -259,26 +284,29 @@ func Run(options ...RunOption) {
 	)
 
 	topService := NewTopService()
-	topService.Observe(ctx)
 
 	supervisorMetrics := metrics.NewMetrics()
 	var metricsReporter *metrics.GrpcMetricsReporter
 	if opts.RunGP {
 		cstate.MarkContentReady(csapi.WorkspaceInitFromOther)
 	} else {
-		if !cfg.isHeadless() {
+		topService.Observe(ctx)
+
+		if !cfg.isHeadless() && !opts.RunGP {
 			go startAnalyze(ctx, cfg, gitpodConfigService, topService, gitpodService)
 		}
-		_, gitpodHost, err := cfg.GitpodAPIEndpoint()
-		if err != nil {
-			log.WithError(err).Error("grpc metrics: failed to parse gitpod host")
-		} else {
-			metricsReporter = metrics.NewGrpcMetricsReporter(gitpodHost)
-			if err := supervisorMetrics.Register(metricsReporter.Registry); err != nil {
-				log.WithError(err).Error("could not register supervisor metrics")
-			}
-			if err := gitpodService.RegisterMetrics(metricsReporter.Registry); err != nil {
-				log.WithError(err).Error("could not register public api metrics")
+		if !strings.Contains("ephemeral", cfg.WorkspaceClusterHost) {
+			_, gitpodHost, err := cfg.GitpodAPIEndpoint()
+			if err != nil {
+				log.WithError(err).Error("grpc metrics: failed to parse gitpod host")
+			} else {
+				metricsReporter = metrics.NewGrpcMetricsReporter(gitpodHost)
+				if err := supervisorMetrics.Register(metricsReporter.Registry); err != nil {
+					log.WithError(err).Error("could not register supervisor metrics")
+				}
+				if err := gitpodService.RegisterMetrics(metricsReporter.Registry); err != nil {
+					log.WithError(err).Error("could not register public api metrics")
+				}
 			}
 		}
 	}
@@ -342,17 +370,28 @@ func Run(options ...RunOption) {
 		wg       sync.WaitGroup
 		shutdown = make(chan ShutdownReason, 1)
 	)
-	wg.Add(1)
-	go startContentInit(ctx, cfg, &wg, cstate, supervisorMetrics)
+
+	if !opts.RunGP {
+		wg.Add(1)
+		go startContentInit(ctx, cfg, &wg, cstate, supervisorMetrics)
+	}
+
 	wg.Add(1)
 	go startAPIEndpoint(ctx, cfg, &wg, apiServices, tunneledPortsService, metricsReporter, apiEndpointOpts...)
-	wg.Add(1)
-	go startSSHServer(ctx, cfg, &wg, childProcEnvvars)
+
+	if !opts.RunGP {
+		wg.Add(1)
+		go startSSHServer(ctx, cfg, &wg, childProcEnvvars)
+	}
+
 	wg.Add(1)
 	tasksSuccessChan := make(chan taskSuccess, 1)
 	go taskManager.Run(ctx, &wg, tasksSuccessChan)
-	wg.Add(1)
-	go socketActivationForDocker(ctx, &wg, termMux)
+
+	if !opts.RunGP {
+		wg.Add(1)
+		go socketActivationForDocker(ctx, &wg, termMux)
+	}
 
 	if cfg.isHeadless() {
 		wg.Add(1)
