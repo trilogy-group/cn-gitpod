@@ -413,6 +413,8 @@ export class WorkspaceStarter {
         throw new Error(`${contextURL} is blocklisted on Gitpod.`);
     }
 
+    // Hookpoint 1 - inform arm-service that a workspace is about to be started.
+    // If ARM, service will mark instanceID as ARM. To be consumed by Hookpoint 4
     // Note: this function does not expect to be awaited for by its caller. This means that it takes care of error handling itself.
     protected async actuallyStartWorkspace(
         ctx: TraceContext,
@@ -1117,6 +1119,9 @@ export class WorkspaceStarter {
                     }),
                 );
 
+            // Hook point 2 - inform arm-service that a build is going to happen (workspace, BuildSource)
+            // If workspace is ARM, then arm-service will mark the BuildSource as ARM
+            // To be consumed by Hook point 3.
             const result = await client.build({ span }, req, imageBuildLogInfo);
 
             if (result.actuallyNeedsBuild) {
