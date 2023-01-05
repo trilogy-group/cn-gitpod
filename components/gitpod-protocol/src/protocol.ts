@@ -811,6 +811,7 @@ export interface WorkspaceConfig {
     mainConfiguration?: string;
     additionalRepositories?: RepositoryCloneInformation[];
     image?: ImageConfig;
+    arch?: string;
     ports?: PortConfig[];
     tasks?: TaskConfig[];
     checkoutLocation?: string;
