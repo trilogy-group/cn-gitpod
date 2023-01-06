@@ -347,9 +347,9 @@ func (o *Orchestrator) Build(req *protocol.BuildRequest, resp protocol.ImageBuil
 		}
 	}
 
-	// Hook point 3 - is the current Build ARM based on (BuildSource, buildID)?
-	// if yes mark (pseudo) instanceID = buildID  as ARM
-	// To be consumed by Hook point 4
+	// Hookpoint - 3. Notifies extenstion-service that an ImageBuildWorkspace is gonna be spawned for a req (BuildRequest), with "buildID"
+	// preStartImageBuildWorkspaceNotifyHook(req, buildID)
+	// To be consumed by Hookpoint - 4
 	var swr *wsmanapi.StartWorkspaceResponse
 	err = retry(ctx, func(ctx context.Context) (err error) {
 		swr, err = o.wsman.StartWorkspace(ctx, &wsmanapi.StartWorkspaceRequest{
