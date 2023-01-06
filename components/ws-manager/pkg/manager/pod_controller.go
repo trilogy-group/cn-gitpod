@@ -15,7 +15,8 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
 // PodReconciler reconciles a Pod object
@@ -47,7 +48,7 @@ func (r *PodReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 				Object: &pod,
 			})
 		}
-		return reconcile.Result{}, nil
+		return ctrl.Result{}, nil
 	}
 	r.Pods[req.NamespacedName] = pod
 
@@ -67,6 +68,21 @@ func (r *PodReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 // SetupWithManager sets up the controller with the Manager.
 func (r *PodReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
+		WithEventFilter(
+			predicate.Funcs{
+				UpdateFunc: func(e event.UpdateEvent) bool {
+					_, ok := e.ObjectNew.GetAnnotations()[workspaceIDAnnotation]
+					return ok
+				},
+				CreateFunc: func(e event.CreateEvent) bool {
+					_, ok := e.Object.GetAnnotations()[workspaceIDAnnotation]
+					return ok
+				},
+				DeleteFunc: func(e event.DeleteEvent) bool {
+					_, ok := e.Object.GetAnnotations()[workspaceIDAnnotation]
+					return ok
+				},
+			}).
 		For(&corev1.Pod{}).
 		Complete(r)
 }

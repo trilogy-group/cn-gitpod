@@ -21,6 +21,8 @@ import SelectIDEModal from "../settings/SelectIDEModal";
 import Arrow from "../components/Arrow";
 import ConfirmationModal from "../components/ConfirmationModal";
 import { ProfileState } from "../settings/ProfileInformation";
+import { FeatureFlagContext } from "../contexts/FeatureFlagContext";
+import { workspacesService } from "../service/public-api";
 
 export interface WorkspacesProps {}
 
@@ -37,6 +39,7 @@ export default function () {
 
     const { user } = useContext(UserContext);
     const { teams } = useContext(TeamsContext);
+    const { usePublicApiWorkspacesService } = useContext(FeatureFlagContext);
     const [activeWorkspaces, setActiveWorkspaces] = useState<WorkspaceInfo[]>([]);
     const [inactiveWorkspaces, setInactiveWorkspaces] = useState<WorkspaceInfo[]>([]);
     const [workspaceModel, setWorkspaceModel] = useState<WorkspaceModel>();
@@ -64,7 +67,9 @@ export default function () {
                 visible={!!deleteModalVisible}
                 onClose={() => setDeleteModalVisible(false)}
                 onConfirm={() => {
-                    inactiveWorkspaces.forEach((ws) => workspaceModel?.deleteWorkspace(ws.workspace.id));
+                    inactiveWorkspaces.forEach((ws) =>
+                        workspaceModel?.deleteWorkspace(ws.workspace.id, usePublicApiWorkspacesService),
+                    );
                     setDeleteModalVisible(false);
                 }}
             ></ConfirmationModal>
@@ -146,7 +151,11 @@ export default function () {
                                         key={e.workspace.id}
                                         desc={e}
                                         model={workspaceModel}
-                                        stopWorkspace={(wsId) => getGitpodService().server.stopWorkspace(wsId)}
+                                        stopWorkspace={(wsId) =>
+                                            usePublicApiWorkspacesService
+                                                ? workspacesService.stopWorkspace({ workspaceId: wsId })
+                                                : getGitpodService().server.stopWorkspace(wsId)
+                                        }
                                     />
                                 );
                             })}
@@ -202,7 +211,9 @@ export default function () {
                                                         desc={e}
                                                         model={workspaceModel}
                                                         stopWorkspace={(wsId) =>
-                                                            getGitpodService().server.stopWorkspace(wsId)
+                                                            usePublicApiWorkspacesService
+                                                                ? workspacesService.stopWorkspace({ workspaceId: wsId })
+                                                                : getGitpodService().server.stopWorkspace(wsId)
                                                         }
                                                     />
                                                 );
