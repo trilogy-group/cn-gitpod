@@ -584,9 +584,9 @@ metadata:
 # v1/Secret builtin-registry-auth
 apiVersion: v1
 data:
-  .dockerconfigjson: eyJhdXRocyI6eyJyZWdpc3RyeS5naXRwb2QuZXhhbXBsZS5jb20iOnsiYXV0aCI6ImVGTmxaRXBwUkdkS1VWRm5ORUpyVnpWNFMzVTZRMWMwUTFKQ2FtazJVakJpUjBjNE1XZDVSWGs9In19fQ==
-  password: Q1c0Q1JCamk2UjBiR0c4MWd5RXk=
-  user: eFNlZEppRGdKUVFnNEJrVzV4S3U=
+  .dockerconfigjson: eyJhdXRocyI6eyJyZWdpc3RyeS5naXRwb2QuZXhhbXBsZS5jb20iOnsiYXV0aCI6ImVIZDVRMGRsTlZVd1RrRnFObFZsYVhFM1RqQTZWbE5UYkcxaFMxZFFhaTVRVVhCdFZXWnNWR1E9In19fQ==
+  password: VlNTbG1hS1dQai5QUXBtVWZsVGQ=
+  user: eHd5Q0dlNVUwTkFqNlVlaXE3TjA=
 kind: Secret
 metadata:
   creationTimestamp: null
@@ -606,7 +606,7 @@ metadata:
   namespace: default
   labels:
     app: docker-registry
-    chart: docker-registry-1.16.0
+    chart: docker-registry-2.2.2
     heritage: Helm
     release: docker-registry
 type: Opaque
@@ -1614,7 +1614,7 @@ data:
       creationTimestamp: null
       labels:
         app: docker-registry
-        chart: docker-registry-1.16.0
+        chart: docker-registry-2.2.2
         heritage: Helm
         release: docker-registry
       name: registry-secret
@@ -1626,7 +1626,7 @@ data:
       creationTimestamp: null
       labels:
         app: docker-registry
-        chart: docker-registry-1.16.0
+        chart: docker-registry-2.2.2
         heritage: Helm
         release: docker-registry
       name: registry-config
@@ -1638,7 +1638,7 @@ data:
       creationTimestamp: null
       labels:
         app: registry
-        chart: docker-registry-1.16.0
+        chart: docker-registry-2.2.2
         heritage: Helm
         release: docker-registry
       name: registry
@@ -1650,7 +1650,7 @@ data:
       creationTimestamp: null
       labels:
         app: docker-registry
-        chart: docker-registry-1.16.0
+        chart: docker-registry-2.2.2
         heritage: Helm
         release: docker-registry
       name: registry
@@ -1662,7 +1662,7 @@ data:
       creationTimestamp: null
       labels:
         app: docker-registry
-        chart: docker-registry-1.16.0
+        chart: docker-registry-2.2.2
         heritage: Helm
         release: docker-registry
       name: registry
@@ -1744,7 +1744,7 @@ metadata:
   namespace: default
   labels:
     app: docker-registry
-    chart: docker-registry-1.16.0
+    chart: docker-registry-2.2.2
     heritage: Helm
     release: docker-registry
 data:
@@ -1871,9 +1871,9 @@ data:
             },
             "minio": {
               "endpoint": "minio.default.svc.cluster.local:9000",
-              "accessKey": "8-WGqw2oTnsPfUDNSk0Y",
+              "accessKey": "RBji6R0bGG81gyEye25P",
               "accessKeyFile": "",
-              "secretKey": "DpC.aSAxkWBPu2_bJ_AE",
+              "secretKey": "tX6ML8gCW31miw0T8QMI",
               "secretKeyFile": "",
               "region": "local",
               "parallelUpload": 6
@@ -2055,9 +2055,9 @@ data:
           },
           "minio": {
             "endpoint": "minio.default.svc.cluster.local:9000",
-            "accessKey": "8-WGqw2oTnsPfUDNSk0Y",
+            "accessKey": "RBji6R0bGG81gyEye25P",
             "accessKeyFile": "",
-            "secretKey": "DpC.aSAxkWBPu2_bJ_AE",
+            "secretKey": "tX6ML8gCW31miw0T8QMI",
             "secretKeyFile": "",
             "region": "local",
             "parallelUpload": 6
@@ -2170,7 +2170,7 @@ metadata:
   namespace: default
   labels:
     app: registry
-    chart: "docker-registry-1.16.0"
+    chart: "docker-registry-2.2.2"
     release: "docker-registry"
     heritage: "Helm"
 spec:
@@ -2757,7 +2757,7 @@ metadata:
   namespace: default
   labels:
     app: docker-registry
-    chart: docker-registry-1.16.0
+    chart: docker-registry-2.2.2
     release: docker-registry
     heritage: Helm
 spec:
@@ -3012,7 +3012,7 @@ spec:
   template:
     metadata:
       annotations:
-        gitpod.io/checksum_config: 3e487f9543c719b9ee3f5590a0f98cb535b4bf1b301c66de8f00f3aa9d61381d
+        gitpod.io/checksum_config: 3e7db160db71491d8d16b0423783bf99a0dc293dc723960c9308756bdde69d3b
       creationTimestamp: null
       labels:
         app: gitpod
@@ -3229,7 +3229,7 @@ spec:
   template:
     metadata:
       annotations:
-        gitpod.io/checksum_config: b938c6e286051c22b503c29f5de266741c2045a3ed69be85d7fd9f22a9346254
+        gitpod.io/checksum_config: 2a29ef265c219405bda658cb21613f40ad5e692590d2779476a3ff90917ed6fb
         seccomp.security.alpha.kubernetes.io/shiftfs-module-loader: unconfined
       creationTimestamp: null
       labels:
@@ -3524,7 +3524,7 @@ spec:
   template:
     metadata:
       annotations:
-        gitpod.io/checksum_config: 17379f665f26a7fe1e7ad830348985a5af3e35ba52bf2d8073bbdadb67c0aaeb
+        gitpod.io/checksum_config: 9be6cd6b32a0508817c7d1dadc9d574f14a8946d1c60c135954dab56ca241e29
       creationTimestamp: null
       labels:
         app: gitpod
@@ -3665,7 +3665,7 @@ metadata:
   namespace: default
   labels:
     app: docker-registry
-    chart: docker-registry-1.16.0
+    chart: docker-registry-2.2.2
     release: docker-registry
     heritage: Helm
 spec:
@@ -3681,8 +3681,10 @@ spec:
         app: docker-registry
         release: docker-registry
       annotations:
-        checksum/config: 1d22b82e19bbc654e029029c4fb86ad02dc13422dc3ac52f8175ad190e52a0bb
-        gitpod.io/checksum_config: 0ce55d51677cd683df3c7a244542c6aeaaf5dd6dca0f0458e8053a713228f535
+        checksum/config: 699dd382179068f3354c330fcce38625e2861d97b962074b4f57005d40497b00
+        checksum/secret: 6fe5d819b2ea20bf72ad31384d4886d6f64dd1f0d237703ac3aff11c1e0737fd
+        
+        gitpod.io/checksum_config: 1c66f4ccdb7f6331da2edaecefcb40f6c1b6315c9277eb0418fef3cc584a28bd
     spec:
       serviceAccountName: docker-registry
       securityContext:
@@ -3690,7 +3692,7 @@ spec:
         runAsUser: 1000
       containers:
         - name: docker-registry
-          image: "docker.io/library/registry:2.7.1"
+          image: "docker.io/library/registry:2.8.1"
           imagePullPolicy: IfNotPresent
           command:
           - /bin/registry
@@ -3708,9 +3710,9 @@ spec:
               scheme: HTTPS
               path: /
               port: 5000
-          resources:
+          resources: 
             {}
-          env:
+          env: 
             - name: REGISTRY_HTTP_SECRET
               valueFrom:
                 secretKeyRef:
@@ -3722,21 +3724,21 @@ spec:
               value: /etc/ssl/docker/tls.key
             - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
               value: "/var/lib/registry"
-          volumeMounts:
-            - name: data
-              mountPath: /var/lib/registry/
+          volumeMounts: 
             - name: "registry-config"
               mountPath: "/etc/docker/registry"
+            - name: data
+              mountPath: /var/lib/registry/
             - mountPath: /etc/ssl/docker
               name: tls-cert
               readOnly: true
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: registry
+      volumes: 
         - name: registry-config
           configMap:
             name: registry-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: registry
         - name: tls-cert
           secret:
             secretName: builtin-registry-certs
@@ -3765,7 +3767,7 @@ spec:
   template:
     metadata:
       annotations:
-        gitpod.io/checksum_config: 8e17df1f6904718d97532e9779c3342f517ed6366049cd670c4ca158e272c1ec
+        gitpod.io/checksum_config: b7a18ab8174f569b7581efcda13a5f2ee2e35bda88559aead6bf593339a2db54
       creationTimestamp: null
       labels:
         app: gitpod

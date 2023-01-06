@@ -179,6 +179,10 @@ type (
 
 // StartWorkspace creates a new running workspace within the manager's cluster
 func (m *Manager) StartWorkspace(ctx context.Context, req *api.StartWorkspaceRequest) (res *api.StartWorkspaceResponse, err error) {
+	if m.Config.MaintenanceMode {
+		return &api.StartWorkspaceResponse{}, status.Error(codes.FailedPrecondition, "under maintenance mode")
+	}
+
 	startWorkspaceTime := time.Now()
 
 	// We cannot use the passed context because we need to decouple the timeouts
@@ -204,18 +208,18 @@ func (m *Manager) StartWorkspace(ctx context.Context, req *api.StartWorkspaceReq
 	defer tracing.FinishSpan(span, &err)
 
 	defer func(req *api.StartWorkspaceRequest, err *error) {
-		success := true
-		alreadyExists := false
-		if err != nil && *err != nil {
-			success = false
-			if status.Code(*err) == codes.AlreadyExists {
-				alreadyExists = true
-			}
+		if err != nil && status.Code(*err) == codes.AlreadyExists {
+			// do not record metrics for already started workspaces
+			return
 		}
-		// do not record metrics for already started workspaces
-		if !alreadyExists {
-			m.metrics.OnWorkspaceStarted(req.Type, req.Spec.Class, success)
+
+		tpe := api.WorkspaceType_name[int32(req.Type)]
+		counter, cErr := m.metrics.totalStartsCounterVec.GetMetricWithLabelValues(tpe, req.Spec.Class)
+		if cErr != nil {
+			log.WithError(cErr).WithField("type", tpe).Warn("cannot get counter for workspace start metric")
+			return
 		}
+		counter.Inc()
 	}(req, &err)
 
 	clog.Info("StartWorkspace")
@@ -780,6 +784,10 @@ func areValidFeatureFlags(value interface{}) error {
 
 // StopWorkspace stops a running workspace
 func (m *Manager) StopWorkspace(ctx context.Context, req *api.StopWorkspaceRequest) (res *api.StopWorkspaceResponse, err error) {
+	if m.Config.MaintenanceMode {
+		return &api.StopWorkspaceResponse{}, status.Error(codes.FailedPrecondition, "under maintenance mode")
+	}
+
 	span, ctx := tracing.FromContext(ctx, "StopWorkspace")
 	owi := log.OWI("", "", req.Id)
 	tracing.ApplyOWI(span, owi)
@@ -811,8 +819,8 @@ func (m *Manager) StopWorkspace(ctx context.Context, req *api.StopWorkspaceReque
 
 // stopWorkspace stops a workspace. If the workspace is already stopping, this is a noop
 func (m *Manager) stopWorkspace(ctx context.Context, workspaceID string, gracePeriod time.Duration) (err error) {
-	if m.Config.DryRun {
-		log.WithFields(log.OWI("", "", workspaceID)).Info("should have stopped pod but this is a dry run")
+	if m.Config.MaintenanceMode {
+		log.WithFields(log.OWI("", "", workspaceID)).Info("under maintenance mode")
 		return nil
 	}
 
