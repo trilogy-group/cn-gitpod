@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package extension_service;
+
+
+service ExtensionService {
+
+    rpc preStartWorkspaceNotifyHook(PreStartWorkspaceNotifyRequest) returns (PreStartWorkspaceNotifyResponse) {}
+
+}
+
+message PreStartWorkspaceNotifyRequest {
+    PreStartWorkspace workspace = 1;
+    PreStartWorkspaceInstance instance = 2;
+}
+
+message PreStartWorkspace {
+    // TODO
+}
+
+message PreStartWorkspaceInstance {
+    // TODO
+}
