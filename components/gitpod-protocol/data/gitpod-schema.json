@@ -136,6 +136,12 @@
             },
             "additionalProperties": false
         },
+        "arch": {
+            "type": "string",
+            "enum": ["x86", "arm"],
+            "description": "Architecture to run the workspace on.",
+            "default": "x86"
+        },
         "additionalRepositories": {
             "type": "array",
             "description": "List of additional repositories that are part of this project.",
