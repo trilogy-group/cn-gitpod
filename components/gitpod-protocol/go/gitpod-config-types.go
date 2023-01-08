@@ -44,6 +44,9 @@ type GitpodConfig struct {
 	// List of additional repositories that are part of this project.
 	AdditionalRepositories []*AdditionalRepositoriesItems `yaml:"additionalRepositories,omitempty" json:"additionalRepositories,omitempty"`
 
+	// Architecture to run the workspace on.
+	Arch string `yaml:"arch,omitempty" json:"arch,omitempty"`
+
 	// Path to where the repository should be checked out relative to `/workspace`. Defaults to the simple repository name.
 	CheckoutLocation string `yaml:"checkoutLocation,omitempty" json:"checkoutLocation,omitempty"`
 
