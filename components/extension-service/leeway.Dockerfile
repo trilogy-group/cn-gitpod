@@ -24,6 +24,15 @@ RUN apt-get update && apt-get install -yq \
 
 EXPOSE 8080
 
+# '--no-log-init': see https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
+RUN useradd --no-log-init --create-home --uid 31001 --home-dir /app/ unode
+COPY --from=builder /app /app/
+USER unode
+WORKDIR /app/node_modules/@cn-gitpod/extension-service
+
+ARG __GIT_COMMIT
+ARG VERSION
+
 ENV GITPOD_BUILD_GIT_COMMIT=${__GIT_COMMIT}
 ENV GITPOD_BUILD_VERSION=${VERSION}
 

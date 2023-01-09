@@ -9,7 +9,7 @@ import {
     ExtensionServiceService,
     PreStartWorkspaceNotifyRequest,
     PreStartWorkspaceNotifyResponse,
-} from "@cn-gitpod/extension-service/lib";
+} from "@cn-gitpod/extension-service-api/lib";
 
 const server = new grpc.Server();
 

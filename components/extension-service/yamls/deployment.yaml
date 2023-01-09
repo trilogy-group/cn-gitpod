@@ -32,7 +32,7 @@ spec:
       namespace: gitpod-infra-test
     spec:
       containers:
-        - image: public.ecr.aws/k1t8c0v2/bilal-cn-gp/extension-service:latest
+        - image: 346945241475.dkr.ecr.us-east-1.amazonaws.com/gitpod-infra-test/extension-service:arm-support
           imagePullPolicy: Always
           name: extension-service
           ports:
