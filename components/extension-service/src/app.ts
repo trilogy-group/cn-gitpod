@@ -16,7 +16,7 @@ const preStartWorkspaceNotifyHookHandler: grpc.handleUnaryCall<
     console.log("preStartWorkspaceNotifyHookHandler", call.request.toObject());
 
     const response = new PreStartWorkspaceNotifyResponse();
-    response.setMessage('This is a custom message from the response')
+    response.setMessage("This is a custom message from the response");
     callback(null, response);
 };
 
@@ -25,7 +25,7 @@ server.addService(ExtensionServiceService, {
     preStartWorkspaceNotifyHook: preStartWorkspaceNotifyHookHandler,
 });
 
-server.bindAsync("0.0.0.0:8082", grpc.ServerCredentials.createInsecure(), (err, port) => {
+server.bindAsync("0.0.0.0:8080", grpc.ServerCredentials.createInsecure(), (err, port) => {
     if (err) {
         console.error(err);
         return;
