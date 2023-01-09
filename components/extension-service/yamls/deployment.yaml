@@ -1,0 +1,41 @@
+# * we have to run the extension service as a pod. For that we need this deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    meta.helm.sh/release-name: gitpod
+    meta.helm.sh/release-namespace: gitpod-infra-test
+# * labels
+  labels:
+    app: gitpod
+    app.kubernetes.io/name: extension-service
+    component: extension-service
+  name: extension-service
+  namespace: gitpod-infra-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitpod
+      component: extension-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: gitpod
+        component: extension-service
+      name: extension-service
+      namespace: gitpod-infra-test
+    spec:
+      containers:
+        - image: public.ecr.aws/k1t8c0v2/bilal-cn-gp/extension-service:latest
+          imagePullPolicy: Always
+          name: extension-service
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
