@@ -12,4 +12,6 @@ ENV NODE_OPTIONS="--unhandled-rejections=warn --max_old_space_size=2048"
 ENV GITPOD_BUILD_GIT_COMMIT=${__GIT_COMMIT}
 ENV GITPOD_BUILD_VERSION=${VERSION}
 
+EXPOSE 8080
+
 CMD exec yarn start-ee
