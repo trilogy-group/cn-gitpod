@@ -6,19 +6,25 @@ FROM node:16.13.0-slim as builder
 
 RUN apt-get update && apt-get install -y build-essential python3
 
-WORKDIR /workspace/gitpod/extension-service
+COPY components-extension-service--app /installer/
 
-COPY package.json ./
+WORKDIR /app
+RUN /installer/install.sh
 
-RUN yarn install
+FROM node:16.13.0-slim
+ENV NODE_OPTIONS="--unhandled-rejections=warn --max_old_space_size=2048"
+# Using ssh-keygen for RSA keypair generation
+RUN apt-get update && apt-get install -yq \
+        openssh-client \
+        procps \
+        net-tools \
+        nano \
+        curl \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/*
 
-COPY components/extension-service .
-
-RUN yarn build
+EXPOSE 8080
 
 ENV GITPOD_BUILD_GIT_COMMIT=${__GIT_COMMIT}
 ENV GITPOD_BUILD_VERSION=${VERSION}
-
-EXPOSE 8080
 
 CMD exec yarn start
