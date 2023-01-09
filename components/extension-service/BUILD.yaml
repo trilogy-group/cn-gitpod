@@ -1,27 +1,15 @@
 packages:
   - name: app
     type: yarn
-    srcs:
-      - "src/**"
-      - package.json
     deps:
       - components/extension-service-api/typescript:lib
+    srcs:
+      - "src/*.ts"
+      - package.json
+      - tslint.yaml
     config:
-      packaging: offline-mirror
-      yarnLock: ${coreYarnLockBase}/yarn.lock
+      packaging: library
+      dontTest: true
+      commands:
+        build: ["yarn", "build"]
       tsconfig: tsconfig.json
-  - name: docker
-    type: docker
-    deps:
-      - :app
-    argdeps:
-      - imageRepoBase
-    config:
-      buildArgs:
-        VERSION: ${version}
-      dockerfile: leeway.Dockerfile
-      metadata:
-        helm-component: server
-      image:
-        - ${imageRepoBase}/extension-service:${version}
-        - ${imageRepoBase}/extension-service:commit-${__git_commit}
