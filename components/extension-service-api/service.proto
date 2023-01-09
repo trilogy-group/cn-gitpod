@@ -13,7 +13,9 @@ message PreStartWorkspaceNotifyRequest {
     PreStartWorkspaceInstance instance = 2;
 }
 
-message PreStartWorkspaceNotifyResponse {}
+message PreStartWorkspaceNotifyResponse {
+    string message = 1;
+}
 
 message PreStartWorkspace {
     PreStartWorkspaceConfig config = 1;
