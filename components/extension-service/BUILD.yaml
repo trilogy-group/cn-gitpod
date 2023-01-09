@@ -8,10 +8,8 @@ packages:
       - package.json
       - tslint.yaml
     config:
-      packaging: library
-      dontTest: true
-      commands:
-        build: ["yarn", "build"]
+      packaging: offline-mirror
+      yarnLock: ${coreYarnLockBase}/yarn.lock
       tsconfig: tsconfig.json
   - name: docker
     type: docker
