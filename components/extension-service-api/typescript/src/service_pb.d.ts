@@ -60,6 +60,11 @@ export namespace PreStartWorkspaceNotifyResponse {
 
 export class PreStartWorkspace extends jspb.Message {
 
+    hasConfig(): boolean;
+    clearConfig(): void;
+    getConfig(): PreStartWorkspaceConfig | undefined;
+    setConfig(value?: PreStartWorkspaceConfig): PreStartWorkspace;
+
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): PreStartWorkspace.AsObject;
     static toObject(includeInstance: boolean, msg: PreStartWorkspace): PreStartWorkspace.AsObject;
@@ -72,10 +77,33 @@ export class PreStartWorkspace extends jspb.Message {
 
 export namespace PreStartWorkspace {
     export type AsObject = {
+        config?: PreStartWorkspaceConfig.AsObject,
+    }
+}
+
+export class PreStartWorkspaceConfig extends jspb.Message {
+    getArch(): string;
+    setArch(value: string): PreStartWorkspaceConfig;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): PreStartWorkspaceConfig.AsObject;
+    static toObject(includeInstance: boolean, msg: PreStartWorkspaceConfig): PreStartWorkspaceConfig.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: PreStartWorkspaceConfig, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): PreStartWorkspaceConfig;
+    static deserializeBinaryFromReader(message: PreStartWorkspaceConfig, reader: jspb.BinaryReader): PreStartWorkspaceConfig;
+}
+
+export namespace PreStartWorkspaceConfig {
+    export type AsObject = {
+        arch: string,
     }
 }
 
 export class PreStartWorkspaceInstance extends jspb.Message {
+    getId(): string;
+    setId(value: string): PreStartWorkspaceInstance;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): PreStartWorkspaceInstance.AsObject;
@@ -89,5 +117,6 @@ export class PreStartWorkspaceInstance extends jspb.Message {
 
 export namespace PreStartWorkspaceInstance {
     export type AsObject = {
+        id: string,
     }
 }

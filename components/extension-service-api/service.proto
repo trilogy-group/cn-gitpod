@@ -16,9 +16,13 @@ message PreStartWorkspaceNotifyRequest {
 message PreStartWorkspaceNotifyResponse {}
 
 message PreStartWorkspace {
-    // TODO
+    PreStartWorkspaceConfig config = 1;
+}
+
+message PreStartWorkspaceConfig {
+    string arch = 1;
 }
 
 message PreStartWorkspaceInstance {
-    // TODO
+    string id = 1;
 }
