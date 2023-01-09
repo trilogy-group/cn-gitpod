@@ -1,0 +1,15 @@
+packages:
+  - name: app
+    type: yarn
+    deps:
+      - components/extension-service-api/typescript:lib
+    srcs:
+      - "src/*.ts"
+      - package.json
+      - tslint.yaml
+    config:
+      packaging: library
+      dontTest: true
+      commands:
+        build: ["yarn", "build"]
+      tsconfig: tsconfig.json
