@@ -16,6 +16,7 @@ const preStartWorkspaceNotifyHookHandler: grpc.handleUnaryCall<
     console.log("preStartWorkspaceNotifyHookHandler", call.request.toObject());
 
     const response = new PreStartWorkspaceNotifyResponse();
+    response.setMessage('This is a custom message from the response')
     callback(null, response);
 };
 

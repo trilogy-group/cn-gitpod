@@ -42,6 +42,8 @@ export namespace PreStartWorkspaceNotifyRequest {
 }
 
 export class PreStartWorkspaceNotifyResponse extends jspb.Message {
+    getMessage(): string;
+    setMessage(value: string): PreStartWorkspaceNotifyResponse;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): PreStartWorkspaceNotifyResponse.AsObject;
@@ -55,6 +57,7 @@ export class PreStartWorkspaceNotifyResponse extends jspb.Message {
 
 export namespace PreStartWorkspaceNotifyResponse {
     export type AsObject = {
+        message: string,
     }
 }
 
