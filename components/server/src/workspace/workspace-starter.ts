@@ -87,7 +87,7 @@ import {
     PreStartWorkspaceConfig,
     PreStartWorkspaceInstance,
     PreStartWorkspaceNotifyRequest,
-} from "@cn-gitpod/extension-service/lib";
+} from "@cn-gitpod/extension-service-api/lib";
 // Devspaces-specific end
 import { StartWorkspaceSpec, WorkspaceFeatureFlag, StartWorkspaceResponse, IDEImage } from "@gitpod/ws-manager/lib";
 import { WorkspaceManagerClientProvider } from "@gitpod/ws-manager/lib/client-provider";
