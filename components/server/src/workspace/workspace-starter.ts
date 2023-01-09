@@ -430,6 +430,12 @@ export class WorkspaceStarter {
         throw new Error(`${contextURL} is blocklisted on Gitpod.`);
     }
 
+    // protected async preStartWorkspaceNotifyRequest(
+    //     ctx: TraceContext,
+    //     workspace: Workspace,
+    //     instance: WorkspaceInstance
+    // ): Promise<Build> {}
+
     // Note: this function does not expect to be awaited for by its caller. This means that it takes care of error handling itself.
     protected async actuallyStartWorkspace(
         ctx: TraceContext,
@@ -446,7 +452,10 @@ export class WorkspaceStarter {
         // Hookpoint - 1. Hook notifies extension service saying that an "instance" of a "workspace" is about to be started.
         // preStartWorkspaceNotifyHook(workspace, instance)
         // To be consumed by Hookpoint - 4.
+        // Devpsaces-specifc start
 
+        log.info({ preStartWorkspaceNotifyHook: `Is an ${workspace.config.arch} workspace` });
+        // Devspaces-specifc end
         const span = TraceContext.startSpan("actuallyStartWorkspace", ctx);
 
         try {
