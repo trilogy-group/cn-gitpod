@@ -365,7 +365,7 @@ proto.extension_service.PreStartWorkspaceNotifyResponse.prototype.toObject = fun
  */
 proto.extension_service.PreStartWorkspaceNotifyResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-
+    message: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -402,6 +402,10 @@ proto.extension_service.PreStartWorkspaceNotifyResponse.deserializeBinaryFromRea
     }
     var field = reader.getFieldNumber();
     switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setMessage(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -431,6 +435,31 @@ proto.extension_service.PreStartWorkspaceNotifyResponse.prototype.serializeBinar
  */
 proto.extension_service.PreStartWorkspaceNotifyResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
+  f = message.getMessage();
+  if (f.length > 0) {
+    writer.writeString(
+      1,
+      f
+    );
+  }
+};
+
+
+/**
+ * optional string message = 1;
+ * @return {string}
+ */
+proto.extension_service.PreStartWorkspaceNotifyResponse.prototype.getMessage = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.extension_service.PreStartWorkspaceNotifyResponse} returns this
+ */
+proto.extension_service.PreStartWorkspaceNotifyResponse.prototype.setMessage = function(value) {
+  return jspb.Message.setProto3StringField(this, 1, value);
 };
 
 

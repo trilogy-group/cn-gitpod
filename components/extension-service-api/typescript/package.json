@@ -1,5 +1,5 @@
 {
-  "name": "@cn-gitpod/extension-service",
+  "name": "@cn-gitpod/extension-service-api",
   "version": "0.0.1",
   "scripts": {
     "build": "mkdir -p lib; tsc && cp -f src/*.js src/*d.ts lib"
