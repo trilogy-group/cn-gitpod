@@ -1367,6 +1367,10 @@ data:
             ],
             "inlineStatic": [
               {
+                "search": "window.location.origin;",
+                "replacement": "'${ide}';"
+              },
+              {
                 "search": "${window.location.origin}",
                 "replacement": "."
               },
@@ -2266,7 +2270,7 @@ data:
     kind: Deployment
     metadata:
       annotations:
-        gitpod.io/checksum_config: 7346723d23891c253f282241ed24e225e16dd2ddafa9b7c90d1da928a4923f4b
+        gitpod.io/checksum_config: 350c5081ae3f30253f80d07e0adfd8d82f0d8b416858b42d61fec05c2d1d246a
       creationTimestamp: null
       labels:
         app: gitpod
@@ -3775,7 +3779,8 @@ data:
           }
         }
       },
-      "databaseConfigPath": "/secrets/database-config"
+      "databaseConfigPath": "/secrets/database-config",
+      "sessionServiceAddress": "server.default.svc.cluster.local:9876"
     }
 kind: ConfigMap
 metadata:
@@ -3791,7 +3796,7 @@ apiVersion: v1
 data:
   config.json: |-
     {
-      "gpRunImage": "registry.hub.docker.com/gitpod/gp-run:latest",
+      "gpRunImage": "registry.hub.docker.com/gitpod/gp-run:ak-test",
       "supervisorImage": "registry.mydomain.com/namespace/supervisor:test",
       "ideOptions": {
         "options": {
@@ -5507,7 +5512,7 @@ apiVersion: v1
 data:
   config.json: |-
     {
-      "gpRunImage": "registry.hub.docker.com/gitpod/gp-run:latest",
+      "gpRunImage": "registry.hub.docker.com/gitpod/gp-run:ak-test",
       "supervisorImage": "registry.mydomain.com/namespace/supervisor:test",
       "ideOptions": {
         "options": {
@@ -6081,7 +6086,9 @@ data:
         },
         "workspacePodConfig": {
           "theiaPort": 23000,
+          "ideDebugPort": 25000,
           "supervisorPort": 22999,
+          "supervisorDebugPort": 24999,
           "supervisorImage": "registry.mydomain.com/namespace/supervisor:test"
         },
         "builtinPages": {
@@ -9082,7 +9089,7 @@ spec:
   template:
     metadata:
       annotations:
-        gitpod.io/checksum_config: ca8305ae7d44552aace863e8af17bbdef1c57b0259ee7bdc20a7ab9061d2fb9f
+        gitpod.io/checksum_config: 46bf85a0c156df9b29d1750baba3e50c29eb608aa27cea65c04286a059bb283c
       creationTimestamp: null
       labels:
         app: gitpod
@@ -9406,7 +9413,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    gitpod.io/checksum_config: 7346723d23891c253f282241ed24e225e16dd2ddafa9b7c90d1da928a4923f4b
+    gitpod.io/checksum_config: 350c5081ae3f30253f80d07e0adfd8d82f0d8b416858b42d61fec05c2d1d246a
   creationTimestamp: null
   labels:
     app: gitpod
@@ -11307,7 +11314,7 @@ spec:
   template:
     metadata:
       annotations:
-        gitpod.io/checksum_config: 54a20d5d027f3637c14e46ec387021c29056fc293a700bd87f470fdd7d796937
+        gitpod.io/checksum_config: f0a077b5cee652ccf128621f7f7cc23ae4cdb4225b4aa32942eccaa2be4e528e
       creationTimestamp: null
       labels:
         app: gitpod

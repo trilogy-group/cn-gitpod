@@ -16,16 +16,10 @@ const baseWorkspaceIDRegex =
     "(([a-f][0-9a-f]{7}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|([0-9a-z]{2,16}-[0-9a-z]{2,16}-[0-9a-z]{8,11}))";
 
 // this pattern matches v4 UUIDs as well as the new generated workspace ids (e.g. pink-panda-ns35kd21)
-const workspaceIDRegex = RegExp(`^${baseWorkspaceIDRegex}$`);
+const workspaceIDRegex = RegExp(`^(?:debug-)?${baseWorkspaceIDRegex}$`);
 
 // this pattern matches URL prefixes of workspaces
-const workspaceUrlPrefixRegex = RegExp(`^([0-9]{4,6}-)?${baseWorkspaceIDRegex}\\.`);
-
-export namespace StartOptions {
-    export const WORKSPACE_CLASS = "workspaceClass";
-    export const EDITOR = "editor";
-    export const USE_LATEST_EDITOR = "useLatestEditor";
-}
+const workspaceUrlPrefixRegex = RegExp(`^(([0-9]{4,6}|debug)-)?${baseWorkspaceIDRegex}\\.`);
 
 export class GitpodHostUrl {
     readonly url: URL;
@@ -130,31 +124,6 @@ export class GitpodHostUrl {
         });
     }
 
-    asCreateWorkspace(
-        contextUrl: string,
-        o?: {
-            workspaceClass?: string;
-            editor?: string;
-            useLatestEditor?: boolean;
-        },
-    ): GitpodHostUrl {
-        const searchParams: URLSearchParams = new URLSearchParams();
-        if (o?.workspaceClass && o?.workspaceClass.length > 0) {
-            searchParams.append(StartOptions.WORKSPACE_CLASS, o.workspaceClass);
-        }
-        if (o?.editor && o?.editor?.length > 0) {
-            searchParams.append(StartOptions.EDITOR, o.editor);
-        }
-        if (o?.useLatestEditor !== undefined) {
-            searchParams.append(StartOptions.USE_LATEST_EDITOR, o.useLatestEditor.toString());
-        }
-        return this.withoutWorkspacePrefix().with({
-            pathname: "/",
-            search: searchParams.toString(),
-            hash: "#" + contextUrl,
-        });
-    }
-
     asWorkspaceAuth(instanceID: string, redirect?: boolean): GitpodHostUrl {
         return this.with((url) => ({
             pathname: `/api/auth/workspace-cookie/${instanceID}`,
@@ -174,6 +143,10 @@ export class GitpodHostUrl {
         return result;
     }
 
+    get debugWorkspace(): boolean {
+        return this.url.host.match(workspaceUrlPrefixRegex)?.[2] === "debug";
+    }
+
     get workspaceId(): string | undefined {
         const hostSegs = this.url.host.split(".");
         if (hostSegs.length > 1) {
@@ -181,7 +154,7 @@ export class GitpodHostUrl {
             if (matchResults) {
                 // URL has a workspace prefix
                 // port prefixes are excluded
-                return matchResults[0];
+                return matchResults[1];
             }
         }
 
