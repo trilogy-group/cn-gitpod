@@ -178,8 +178,6 @@ export const productionContainerModule = new ContainerModule((bind, unbind, isBo
     // Devspaces-specific start
     bind(ExtensionServiceClientConfig).toDynamicValue((ctx) => {
         const config = ctx.container.get<Config>(Config);
-        // TODO: Remove this hardcoding
-        config.extensionServiceAddr = "someaddress";
         return { address: config.extensionServiceAddr };
     });
     bind(ExtensionServiceClientProvider).toSelf().inSingletonScope();
