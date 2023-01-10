@@ -170,6 +170,14 @@ export interface ConfigSerialized {
      */
     imageBuilderAddr: string;
 
+    // Devspaces-specific start
+    /**
+     * The address content service clients connect to
+     * Example: image-builder:8080
+     */
+    extensionServiceAddr: string;
+    // Devspaces-specific eb
+
     /**
      * The address usage service clients connect to
      * Example: usage:8080
