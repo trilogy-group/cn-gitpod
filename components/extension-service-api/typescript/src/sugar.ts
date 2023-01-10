@@ -4,8 +4,8 @@
  * See License.AGPL.txt in the project root for license information.
  */
 
+import "reflect-metadata";
 import { inject, injectable } from "inversify";
-import { TraceContext } from "@gitpod/gitpod-protocol/lib/util/tracing";
 import { ExtensionServiceClient } from "./service_grpc_pb";
 import { PreStartWorkspaceNotifyRequest, PreStartWorkspaceNotifyResponse } from "./service_pb";
 import * as grpc from "@grpc/grpc-js";
@@ -67,20 +67,16 @@ export class PromisifiedExtensionServiceClient {
     }
 
     public preStartWorkspaceNotifyHook(
-        ctx: TraceContext,
         request: PreStartWorkspaceNotifyRequest,
     ): Promise<PreStartWorkspaceNotifyResponse> {
         return new Promise<PreStartWorkspaceNotifyResponse>((resolve, reject) => {
-            const span = TraceContext.startSpan(`/extension-service/preStartWorkspaceNotify`, ctx);
             // TODO: pass span to extension-service for better tracing
             this.client.preStartWorkspaceNotifyHook(request, (err, resp) => {
                 if (err) {
-                    TraceContext.setError({ span }, err);
                     reject(err);
                 } else {
                     resolve(resp);
                 }
-                span.finish();
             });
         });
     }

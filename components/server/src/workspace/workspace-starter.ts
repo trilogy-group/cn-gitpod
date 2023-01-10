@@ -486,7 +486,6 @@ export class WorkspaceStarter {
     // Devspaces-specifc start
     // TODO: When the PreStartWorkspaceNotifyRequest's proto is updated with all necessary fields, update this function accordingly
     protected preparePreStartWorkspaceNotifyRequest(
-        ctx: TraceContext,
         workspace: Workspace,
         instance: WorkspaceInstance,
     ): PreStartWorkspaceNotifyRequest {
@@ -523,12 +522,9 @@ export class WorkspaceStarter {
         // Hookpoint - 1. Hook notifies extension service saying that an "instance" of a "workspace" is about to be started.
         // preStartWorkspaceNotifyHook(workspace, instance)
         // To be consumed by Hookpoint - 4.
-        let preStartWorkspaceNotifyRequest = this.preparePreStartWorkspaceNotifyRequest({ span }, workspace, instance);
+        let preStartWorkspaceNotifyRequest = this.preparePreStartWorkspaceNotifyRequest(workspace, instance);
         let extensionServiceClient = await this.extensionServiceClientProvider.getClient();
-        let response = await extensionServiceClient.preStartWorkspaceNotifyHook(
-            { span },
-            preStartWorkspaceNotifyRequest,
-        );
+        let response = await extensionServiceClient.preStartWorkspaceNotifyHook(preStartWorkspaceNotifyRequest);
         log.info(
             { workspace: workspace.id, instance: instance.id },
             `Got response from extensionService: ${response.toString()}`,
