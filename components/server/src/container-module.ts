@@ -113,6 +113,7 @@ import { prometheusClientMiddleware } from "@gitpod/gitpod-protocol/lib/util/nic
 import { UsageService, UsageServiceImpl } from "./user/usage-service";
 import { OpenPrebuildPrefixContextParser } from "./workspace/open-prebuild-prefix-context-parser";
 import { contentServiceBinder } from "./util/content-service-sugar";
+import { ExtensionServiceClientConfig, ExtensionServiceClientProvider } from "@cn-gitpod/extension-service-api/lib";
 
 export const productionContainerModule = new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(Config).toConstantValue(ConfigFile.fromFile());
@@ -169,6 +170,14 @@ export const productionContainerModule = new ContainerModule((bind, unbind, isBo
 
     bind(PrometheusClientCallMetrics).toSelf().inSingletonScope();
     bind(IClientCallMetrics).to(PrometheusClientCallMetrics).inSingletonScope();
+
+    // Devspaces-specific start
+    bind(ExtensionServiceClientConfig).toDynamicValue((ctx) => {
+        const config = ctx.container.get<Config>(Config);
+        return { address: config.extensionServiceAddr };
+    });
+    bind(ExtensionServiceClientProvider).toSelf().inSingletonScope();
+    // Devspaces-specific end
 
     bind(ImageBuilderClientConfig).toDynamicValue((ctx) => {
         const config = ctx.container.get<Config>(Config);

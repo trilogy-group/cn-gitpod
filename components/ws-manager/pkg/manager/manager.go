@@ -255,6 +255,8 @@ func (m *Manager) StartWorkspace(ctx context.Context, req *api.StartWorkspaceReq
 
 	// create a Pod object for the workspace
 	pod, err := m.createWorkspacePod(startContext)
+	// Hookpoint - 4. Hook notifies extension serivce saying that a "pod" object is created with a "startContext".
+	// pod = postCreateWorkspacePodModifyHook(pod, startContext)
 	if err != nil {
 		return nil, xerrors.Errorf("cannot create workspace pod: %w", err)
 	}

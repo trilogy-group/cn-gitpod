@@ -8,6 +8,7 @@ packages:
       - package.json
       - mocha.opts
     deps:
+      - components/extension-service-api/typescript:lib
       - components/content-service-api/typescript:lib
       - components/gitpod-db:lib
       - components/gitpod-messagebus:lib
@@ -48,6 +49,7 @@ packages:
       - mocha.opts
       - tslint.yaml
     deps:
+      - components/extension-service-api/typescript:lib
       - components/content-service-api/typescript:lib
       - components/gitpod-db:lib
       - components/gitpod-messagebus:lib

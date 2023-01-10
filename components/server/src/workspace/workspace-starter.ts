@@ -81,6 +81,15 @@ import {
 } from "@gitpod/image-builder/lib";
 import { StartWorkspaceSpec, WorkspaceFeatureFlag, StartWorkspaceResponse, IDEImage } from "@gitpod/ws-manager/lib";
 import { WorkspaceManagerClientProvider } from "@gitpod/ws-manager/lib/client-provider";
+// Devspaces-specific start
+import {
+    ExtensionServiceClientProvider,
+    PreStartWorkspace,
+    PreStartWorkspaceConfig,
+    PreStartWorkspaceInstance,
+    PreStartWorkspaceNotifyRequest,
+} from "@cn-gitpod/extension-service-api/lib";
+// Devspaces-specific end
 import {
     AdmissionLevel,
     EnvironmentVariable,
@@ -284,6 +293,10 @@ export class WorkspaceStarter {
     @inject(TeamDB) protected readonly teamDB: TeamDB;
     @inject(EntitlementService) protected readonly entitlementService: EntitlementService;
     @inject(BillingModes) protected readonly billingModes: BillingModes;
+    // Devspaces-specific start
+    @inject(ExtensionServiceClientProvider)
+    protected readonly extensionServiceClientProvider: ExtensionServiceClientProvider;
+    // Devspaces-specifc end
 
     public async startWorkspace(
         ctx: TraceContext,
@@ -470,6 +483,27 @@ export class WorkspaceStarter {
         throw new Error(`${contextURL} is blocklisted on Gitpod.`);
     }
 
+    // Devspaces-specifc start
+    // TODO: When the PreStartWorkspaceNotifyRequest's proto is updated with all necessary fields, update this function accordingly
+    protected preparePreStartWorkspaceNotifyRequest(
+        ctx: TraceContext,
+        workspace: Workspace,
+        instance: WorkspaceInstance,
+    ): PreStartWorkspaceNotifyRequest {
+        let reqWorkspace = new PreStartWorkspace();
+        let config = new PreStartWorkspaceConfig();
+        // TODO: Ideally, this null value must be handled and default should be set before it reaches this function and not here.
+        config.setArch(workspace.config.arch ? workspace.config.arch : "x86");
+        reqWorkspace.setConfig(config);
+        let reqInsance = new PreStartWorkspaceInstance();
+        reqInsance.setId(instance.id);
+        let req = new PreStartWorkspaceNotifyRequest();
+        req.setWorkspace(reqWorkspace);
+        req.setInstance(reqInsance);
+        return req;
+    }
+    // Devspaces-specifc end
+
     // Note: this function does not expect to be awaited for by its caller. This means that it takes care of error handling itself.
     protected async actuallyStartWorkspace(
         ctx: TraceContext,
@@ -484,6 +518,22 @@ export class WorkspaceStarter {
         forceRebuild?: boolean,
     ): Promise<StartWorkspaceResult> {
         const span = TraceContext.startSpan("actuallyStartWorkspace", ctx);
+
+        // Devpsaces-specifc start
+        // Hookpoint - 1. Hook notifies extension service saying that an "instance" of a "workspace" is about to be started.
+        // preStartWorkspaceNotifyHook(workspace, instance)
+        // To be consumed by Hookpoint - 4.
+        let preStartWorkspaceNotifyRequest = this.preparePreStartWorkspaceNotifyRequest({ span }, workspace, instance);
+        let extensionServiceClient = await this.extensionServiceClientProvider.getClient();
+        let response = await extensionServiceClient.preStartWorkspaceNotifyHook(
+            { span },
+            preStartWorkspaceNotifyRequest,
+        );
+        log.info(
+            { workspace: workspace.id, instance: instance.id },
+            `Got response from extensionService: ${response.toString()}`,
+        );
+        // Devspaces-specifc end
 
         try {
             // build workspace image
@@ -1293,6 +1343,9 @@ export class WorkspaceStarter {
                     }),
                 );
 
+            // Hookpoint - 2. Hook notifies the extension service that a build with "req" (BuildRequest) for "workspace" is going to be built.
+            // preImageBuildRequestNotifyHook(req, workspace)
+            // To be consumed by Hookpoint - 3.
             const result = await client.build({ span }, req, imageBuildLogInfo);
 
             if (result.actuallyNeedsBuild) {

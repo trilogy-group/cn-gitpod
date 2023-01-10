@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package extension_service;
+
+option go_package = "github.com/gitpod-io/gitpod/extension-service/api";
+
+service ExtensionService {
+    rpc preStartWorkspaceNotifyHook(PreStartWorkspaceNotifyRequest) returns (PreStartWorkspaceNotifyResponse) {}
+}
+
+message PreStartWorkspaceNotifyRequest {
+    PreStartWorkspace workspace = 1;
+    PreStartWorkspaceInstance instance = 2;
+}
+
+message PreStartWorkspaceNotifyResponse {
+    string message = 1;
+}
+
+message PreStartWorkspace {
+    PreStartWorkspaceConfig config = 1;
+}
+
+message PreStartWorkspaceConfig {
+    string arch = 1;
+}
+
+message PreStartWorkspaceInstance {
+    string id = 1;
+}

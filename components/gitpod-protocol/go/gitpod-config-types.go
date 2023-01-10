@@ -1,4 +1,4 @@
-// Copyright (c) 2022 Gitpod GmbH. All rights reserved.
+// Copyright (c) 2023 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
 // See License-AGPL.txt in the project root for license information.
 
@@ -50,6 +50,9 @@ type GitpodConfig struct {
 
 	// List of additional repositories that are part of this project.
 	AdditionalRepositories []*AdditionalRepositoriesItems `yaml:"additionalRepositories,omitempty"`
+
+	// Architecture to run the workspace on.
+	Arch string `yaml:"arch,omitempty" json:"arch,omitempty"`
 
 	// Path to where the repository should be checked out relative to `/workspace`. Defaults to the simple repository name.
 	CheckoutLocation string `yaml:"checkoutLocation,omitempty"`
