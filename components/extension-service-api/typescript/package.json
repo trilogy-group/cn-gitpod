@@ -10,7 +10,6 @@
   ],
   "license": "UNLICENSED",
   "dependencies": {
-    "@gitpod/gitpod-protocol": "0.1.5",
     "@grpc/grpc-js": "^1.3.7",
     "google-protobuf": "^3.19.1",
     "inversify": "^5.0.1",
