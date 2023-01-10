@@ -23,7 +23,7 @@ variable "zone" {
 variable "cluster_version" {
   type        = string
   description = "Kubernetes version to be setup"
-  default     = "1.22.8-gke.201"
+  default     = "1.23.8-gke.201"
 }
 
 variable "cluster_name" {

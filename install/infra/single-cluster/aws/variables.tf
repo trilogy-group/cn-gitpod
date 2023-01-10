@@ -16,13 +16,13 @@ variable "image_id" {
 variable "region" {
   type        = string
   description = "Region to create the resources in"
-  default     = "eu-west-1"
+  default     = "us-east-1"
 }
 
 variable "vpc_availability_zones" {
   type        = list(string)
   description = "Availibiliy zones under the provided region, should be atleast two"
-  default     = ["eu-west-1c", "eu-west-1b"]
+  default     = ["us-east-1a", "us-east-1b"]
 }
 
 variable "vpc_cidr" {
@@ -36,7 +36,7 @@ variable "domain_name" {
 }
 
 variable "create_external_database" {
-  default     = true
+  default     = false
   description = "Create a mysql RDS database"
 }
 

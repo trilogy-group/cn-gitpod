@@ -16,7 +16,7 @@ resource "kubernetes_secret" "aws_dns_solver" {
 # the following is only for GCP managed DNS setup
 
 resource "kubernetes_secret" "gcp_dns_solver" {
-  count    = var.gcp_credentials == null ? 0 : 1
+  count = var.gcp_credentials == null ? 0 : 1
 
   metadata {
     name      = "clouddns-dns01-solver"

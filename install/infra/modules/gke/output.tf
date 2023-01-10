@@ -24,7 +24,7 @@ output "kubeconfig" {
 
 output "cluster-sa" {
   sensitive = true
-  value = google_service_account_key.gke_sa_key.private_key
+  value     = google_service_account_key.gke_sa_key.private_key
 }
 
 output "database" {
@@ -49,7 +49,7 @@ output "registry" {
 
 output "dns_credentials" {
   sensitive = true
-  value = var.domain_name == null ? "" : base64decode(google_service_account_key.dns_sa_key[0].private_key)
+  value     = var.domain_name == null ? "" : base64decode(google_service_account_key.dns_sa_key[0].private_key)
 }
 
 output "storage" {
