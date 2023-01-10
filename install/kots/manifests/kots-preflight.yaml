@@ -19,7 +19,7 @@ spec:
           - '{{repl Namespace }}'
     - run:
         collectorName: database
-        image: eu.gcr.io/gitpod-core-dev/build/kots-config-check/database:sje-kots-config-check.9
+        image: public.ecr.aws/k1t8c0v2/bilal-cn-gp/kots-config-check/database:latest
         name: database
         namespace: '{{repl Namespace }}'
         args:

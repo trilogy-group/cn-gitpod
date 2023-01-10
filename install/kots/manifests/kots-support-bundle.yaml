@@ -15,7 +15,7 @@ spec:
           serviceAccountName: kotsadm
           containers:
             - name: certificate
-              image: eu.gcr.io/gitpod-core-dev/build/kots-config-check/certificate:mrsimonemms-add-kots-support-bundle-11865.7
+              image: public.ecr.aws/k1t8c0v2/bilal-cn-gp/kots-config-check/certificate:latest
               args:
                 - '{{repl ConfigOption "domain" }}' # DOMAIN
                 - '{{repl Namespace }}' # NAMESPACE

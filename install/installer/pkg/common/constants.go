@@ -18,7 +18,7 @@ const (
 	CertManagerCAIssuer         = "ca-issuer"
 	DockerRegistryURL           = "docker.io"
 	DockerRegistryName          = "registry"
-	GitpodContainerRegistry     = "eu.gcr.io/gitpod-core-dev/build"
+	GitpodContainerRegistry     = "public.ecr.aws/k1t8c0v2/bilal-cn-gp"
 	InClusterDbSecret           = "mysql"
 	InClusterMessageQueueName   = "rabbitmq"
 	InClusterMessageQueueTLS    = "messagebus-certificates-secret-core"

@@ -36,7 +36,7 @@ func (v version) Factory() interface{} {
 }
 
 const (
-	defaultRepositoryUrl  = "eu.gcr.io/gitpod-core-dev/build"
+	defaultRepositoryUrl  = "public.ecr.aws/k1t8c0v2/bilal-cn-gp"
 	defaultOpenVSXURL     = "https://open-vsx.org"
 	defaultMetadataRegion = "local"
 )

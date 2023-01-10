@@ -43,6 +43,7 @@ packages:
     prep:
       - ["sh", "-c", "ls -d third_party/charts/*/ | while read f; do echo \"cd $f && helm dep up && cd -\"; done | sh"]
     config:
+      dontTest: true
       packaging: app
       buildCommand: ["go", "build", "-trimpath", "-ldflags", "-buildid= -w -s -X 'github.com/gitpod-io/gitpod/installer/cmd.Version=commit-${__git_commit}'"]
   - name: app

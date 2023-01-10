@@ -32,7 +32,7 @@ deps:
 
 versionManifest:
 	@echo "Downloading version manifest for ${VERSION}"
-	docker run -it --rm eu.gcr.io/gitpod-core-dev/build/versions:${VERSION} cat versions.yaml > ${VERSION_MANIFEST}
+	docker run -it --rm public.ecr.aws/k1t8c0v2/bilal-cn-gp/versions:${VERSION} cat versions.yaml > ${VERSION_MANIFEST}
 .PHONY: versionManifest
 
 config-doc:
