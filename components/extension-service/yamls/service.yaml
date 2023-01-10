@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    meta.helm.sh/release-name: gitpod
+    meta.helm.sh/release-namespace: gitpod-infra-test
+  labels:
+    app: gitpod
+    app.kubernetes.io/managed-by: Helm
+    component: extension-service
+    kind: service
+  name: extension-service
+  namespace: gitpod-infra-test
+  # resourceVersion: "99693"
+  # uid: 9e2ecda3-68c6-4689-89eb-318e9949b4c
+spec:
+  type: ClusterIP
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+   - name: service
+     port: 8080
+     protocol: TCP
+     targetPort: 8080
+  selector:
+    app: gitpod
+    component: extension-service
