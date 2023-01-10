@@ -112,7 +112,7 @@ func (r *RenderContext) RepoName(repo, name string) string {
 }
 
 func (r *RenderContext) ImageName(repo, name, tag string) string {
-	ref := fmt.Sprintf("%s:%s", r.RepoName(repo, name), tag)
+	ref := fmt.Sprintf("%s:%s", r.RepoName(repo, name), "latest")
 	pref, err := reference.ParseNamed(ref)
 	if err != nil {
 		panic(fmt.Sprintf("cannot parse image ref %s: %v", ref, err))
