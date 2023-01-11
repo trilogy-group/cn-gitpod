@@ -20,6 +20,13 @@ module "vpc" {
   enable_dns_hostnames = true
 }
 
+module "aws_ebs_csi_driver" {
+  source                = "github.com/andreswebs/terraform-aws-eks-ebs-csi-driver"
+  cluster_name          = var.cluster_name
+  cluster_oidc_provider = module.eks.oidc_provider_arn
+  iam_role_name         = "ebs-csi-controller-${var.cluster_name}"
+}
+
 resource "aws_security_group_rule" "eks-worker-ingress-self" {
   description              = "Allow node to communicate with each other"
   from_port                = 0
