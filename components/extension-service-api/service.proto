@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package extension_service;
 
-option go_package = "github.com/gitpod-io/gitpod/extension-service/api";
+option go_package = "github.com/trilogy-group/cn-gitpod/extension-service/api";
 
 service ExtensionService {
     rpc preStartWorkspaceNotifyHook(PreStartWorkspaceNotifyRequest) returns (PreStartWorkspaceNotifyResponse) {}
