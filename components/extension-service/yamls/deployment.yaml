@@ -47,7 +47,7 @@ spec:
                 key: mysql-root-password
                 optional: false
           - name: PRISMA_DB_URL
-            value: mysql://root:$(DB_PASSWORD)@mysql.gitpod-infra-test.svc.cluster.local:3306/extension-service
+            value: mysql://gitpod:$(DB_PASSWORD)@mysql.gitpod-infra-test.svc.cluster.local:3306/extension-service
           # * change resources accordingly
           resources:
             limits:

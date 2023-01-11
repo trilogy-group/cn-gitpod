@@ -22,11 +22,7 @@
         "declarationMap": true,
         "skipLibCheck": true,
         "useUnknownInCatchVariables": false,
-        "baseUrl": "src",
-        "paths": {
-            "/*": ["*"],
-            "@utils/*": ["utils/*"]
-          }
+        "baseUrl": "src"
     },
     "include": [
         "./src/**/*.ts", // include all TypeScript files in the "src" directory and its subdirectories
