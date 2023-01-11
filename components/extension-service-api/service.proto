@@ -18,6 +18,7 @@ message PreStartWorkspaceNotifyResponse {
     string message = 1;
 }
 
+// TODO: expand this interface for a more generic hookpoint payload
 message PreStartWorkspace {
     PreStartWorkspaceConfig config = 1;
 }
@@ -26,6 +27,7 @@ message PreStartWorkspaceConfig {
     string arch = 1;
 }
 
+// TODO: expand this interface for a more generic hookpoint payload
 message PreStartWorkspaceInstance {
     string id = 1;
 }
@@ -39,6 +41,7 @@ message PostCreateWorkspacePodModifyResponse {
     Pod pod = 1;
 }
 
+// TODO: expand this interface for a more generic hookpoint payload
 message Pod {
     // Standard object's metadata.
     // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
