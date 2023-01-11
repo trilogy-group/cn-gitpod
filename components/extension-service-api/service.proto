@@ -6,6 +6,7 @@ option go_package = "github.com/gitpod-io/gitpod/extension-service/api";
 
 service ExtensionService {
     rpc preStartWorkspaceNotifyHook(PreStartWorkspaceNotifyRequest) returns (PreStartWorkspaceNotifyResponse) {}
+    rpc PostCreateWorkspacePodModifyHook(PostCreateWorkspacePodModifyRequest) returns (PostCreateWorkspacePodModifyResponse) {}
 }
 
 message PreStartWorkspaceNotifyRequest {
@@ -27,4 +28,110 @@ message PreStartWorkspaceConfig {
 
 message PreStartWorkspaceInstance {
     string id = 1;
+}
+
+message PostCreateWorkspacePodModifyRequest {
+    string workspaceInstanceId = 1;
+    Pod pod = 2;
+}
+
+message PostCreateWorkspacePodModifyResponse {
+    Pod pod = 1;
+}
+
+message Pod {
+    // Standard object's metadata.
+    // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+    // +optional
+    optional ObjectMeta metadata = 1;
+
+    // Specification of the desired behavior of the pod.
+    // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+    // +optional
+    optional PodSpec spec = 2;
+
+}
+
+message ObjectMeta {
+
+    // Annotations is an unstructured key value map stored with a resource that may be
+    // set by external tools to store and retrieve arbitrary metadata. They are not
+    // queryable and should be preserved when modifying objects.
+    // More info: http://kubernetes.io/docs/user-guide/annotations
+    // +optional
+    map<string, string> annotations = 12;
+}
+
+message PodSpec {
+    // If specified, the pod's scheduling constraints
+    // +optional
+    optional Affinity affinity = 18;
+}
+
+message Affinity {
+    // Describes node affinity scheduling rules for the pod.
+    // +optional
+    optional NodeAffinity nodeAffinity = 1;
+}
+
+message NodeAffinity {
+    // If the affinity requirements specified by this field are not met at
+    // scheduling time, the pod will not be scheduled onto the node.
+    // If the affinity requirements specified by this field cease to be met
+    // at some point during pod execution (e.g. due to an update), the system
+    // may or may not try to eventually evict the pod from its node.
+    // +optional
+    optional NodeSelector requiredDuringSchedulingIgnoredDuringExecution = 1;
+
+    // The scheduler will prefer to schedule pods to nodes that satisfy
+    // the affinity expressions specified by this field, but it may choose
+    // a node that violates one or more of the expressions. The node that is
+    // most preferred is the one with the greatest sum of weights, i.e.
+    // for each node that meets all of the scheduling requirements (resource
+    // request, requiredDuringScheduling affinity expressions, etc.),
+    // compute a sum by iterating through the elements of this field and adding
+    // "weight" to the sum if the node matches the corresponding matchExpressions; the
+    // node(s) with the highest sum are the most preferred.
+    // +optional
+    repeated PreferredSchedulingTerm preferredDuringSchedulingIgnoredDuringExecution = 2;
+}
+
+message NodeSelector {
+    // Required. A list of node selector terms. The terms are ORed.
+    repeated NodeSelectorTerm nodeSelectorTerms = 1;
+}
+
+message NodeSelectorTerm {
+    // A list of node selector requirements by node's labels.
+    // +optional
+    repeated NodeSelectorRequirement matchExpressions = 1;
+
+    // A list of node selector requirements by node's fields.
+    // +optional
+    repeated NodeSelectorRequirement matchFields = 2;
+}
+
+message NodeSelectorRequirement {
+    // The label key that the selector applies to.
+    optional string key = 1;
+
+    // Represents a key's relationship to a set of values.
+    // Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+    optional string operator = 2;
+
+    // An array of string values. If the operator is In or NotIn,
+    // the values array must be non-empty. If the operator is Exists or DoesNotExist,
+    // the values array must be empty. If the operator is Gt or Lt, the values
+    // array must have a single element, which will be interpreted as an integer.
+    // This array is replaced during a strategic merge patch.
+    // +optional
+    repeated string values = 3;
+}
+
+message PreferredSchedulingTerm {
+    // Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.
+    optional int32 weight = 1;
+
+    // A node selector term, associated with the corresponding weight.
+    optional NodeSelectorTerm preference = 2;
 }
