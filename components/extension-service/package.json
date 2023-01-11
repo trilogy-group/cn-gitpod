@@ -4,6 +4,7 @@
   "description": "Typescript Express.js server for Extension Service",
   "scripts": {
     "generate": "npx prisma generate",
+    "migrate": "npx prisma migrate dev",
     "clean": "rimraf lib",
     "start": "node ./lib/app.js",
     "build": "yarn lint && npx tsc",

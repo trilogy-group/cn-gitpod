@@ -7,8 +7,7 @@ datasource db {
   url      = env("PRISMA_DB_URL")
 }
 
-model Workspace {
-    id         String   @id @default(uuid())
-    instanceId String
+model WorkspaceInstance {
+    instanceId String @id @default(uuid())
     arch       String @default("x86")
 }

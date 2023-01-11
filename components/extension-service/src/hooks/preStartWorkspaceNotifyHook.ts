@@ -1,5 +1,6 @@
 import * as grpc from "@grpc/grpc-js";
 import { PreStartWorkspaceNotifyRequest, PreStartWorkspaceNotifyResponse } from "@cn-gitpod/extension-service-api/lib";
+// import { prisma as prismaClient } from "utils/prisma";
 
 const preStartWorkspaceNotifyHookHandler: grpc.handleUnaryCall<
     PreStartWorkspaceNotifyRequest,

@@ -7,15 +7,15 @@
 import * as grpc from "@grpc/grpc-js";
 import { ExtensionServiceService } from "@cn-gitpod/extension-service-api/lib";
 
-const prisma = require("./utils/prisma");
-const hooks = require("./hooks");
+import { connectDB } from "./utils/prisma";
+import { preStartWorkspaceNotifyHookHandler, postCreateWorkspacePodModifyHookHandler } from "./hooks";
 
 const server = new grpc.Server();
 
 // * adding services
 server.addService(ExtensionServiceService, {
-    preStartWorkspaceNotifyHook: hooks.preStartWorkspaceNotifyHookHandler,
-    postCreateWorkspacePodModifyHook: hooks.postCreateWorkspacePodModifyHookHandler,
+    preStartWorkspaceNotifyHook: preStartWorkspaceNotifyHookHandler,
+    postCreateWorkspacePodModifyHook: postCreateWorkspacePodModifyHookHandler,
 });
 
 server.bindAsync("0.0.0.0:8080", grpc.ServerCredentials.createInsecure(), async (err, port) => {
@@ -23,7 +23,7 @@ server.bindAsync("0.0.0.0:8080", grpc.ServerCredentials.createInsecure(), async 
         console.error(err);
         return;
     }
-    await prisma.connectDB();
+    await connectDB();
     server.start();
     console.log(`🚀 Server listening on ${port}`);
 });
