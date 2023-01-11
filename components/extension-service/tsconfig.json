@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-        "rootDir": "src",
         "experimentalDecorators": true,
         "outDir": "lib",
         "lib": [
@@ -25,8 +24,6 @@
     },
     "include": [
         "./src/**/*.ts", // include all TypeScript files in the "src" directory and its subdirectories
-    ],
-    "exclude": [
-        "node_modules"
-    ],
+        "primsa"
+    ]
 }
