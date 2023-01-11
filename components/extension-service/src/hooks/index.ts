@@ -1,2 +1,2 @@
 export * from "./preStartWorkspaceNotifyHook";
-export * from './postCreateWorkspacePodModifyHook'
+export * from "./postCreateWorkspacePodModifyHook";

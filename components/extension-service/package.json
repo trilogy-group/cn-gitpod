@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Typescript Express.js server for Extension Service",
   "scripts": {
+    "generate": "npx prisma generate",
     "clean": "rimraf lib",
     "start": "node ./lib/app.js",
     "build": "yarn lint && npx tsc",
@@ -14,7 +15,6 @@
   "devDependencies": {
     "@types/express": "^4.17.15",
     "prisma": "^4.8.1",
-    "ts-node-dev": "^2.0.0",
     "typescript": "^4.9.4",
     "rimraf": "^3.0.2",
     "tslint": "^6.1.3"
