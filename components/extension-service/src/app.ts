@@ -7,8 +7,8 @@
 import * as grpc from "@grpc/grpc-js";
 import { ExtensionServiceService } from "@cn-gitpod/extension-service-api/lib";
 
-import prisma = require("./utils/prisma");
-import hooks = require("./hooks");
+const prisma = require("./utils/prisma");
+const hooks = require("./hooks");
 
 const server = new grpc.Server();
 
