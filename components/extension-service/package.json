@@ -6,7 +6,7 @@
     "generate": "npx prisma generate",
     "migrate": "npx prisma migrate dev",
     "clean": "rimraf lib",
-    "start": "node ./lib/app.js",
+    "start": "yarn generate && node ./lib/app.js",
     "build": "yarn lint && npx tsc",
     "build:clean": "yarn clean && yarn build",
     "rebuild": "yarn build:clean",
