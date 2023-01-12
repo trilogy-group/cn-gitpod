@@ -413,11 +413,8 @@ export namespace PreferredSchedulingTerm {
 export class PreStartImageBuildWorkspaceNotifyRequest extends jspb.Message {
     getWorkspaceimageref(): string;
     setWorkspaceimageref(value: string): PreStartImageBuildWorkspaceNotifyRequest;
-
-    hasInstance(): boolean;
-    clearInstance(): void;
-    getInstance(): PreStartWorkspaceInstance | undefined;
-    setInstance(value?: PreStartWorkspaceInstance): PreStartImageBuildWorkspaceNotifyRequest;
+    getBuildid(): string;
+    setBuildid(value: string): PreStartImageBuildWorkspaceNotifyRequest;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): PreStartImageBuildWorkspaceNotifyRequest.AsObject;
@@ -432,7 +429,7 @@ export class PreStartImageBuildWorkspaceNotifyRequest extends jspb.Message {
 export namespace PreStartImageBuildWorkspaceNotifyRequest {
     export type AsObject = {
         workspaceimageref: string,
-        instance?: PreStartWorkspaceInstance.AsObject,
+        buildid: string,
     }
 }
 
@@ -459,8 +456,11 @@ export namespace PreStartImageBuildWorkspaceNotifyResponse {
 export class PreCallImageBuilderNotifyRequest extends jspb.Message {
     getWorkspaceimageref(): string;
     setWorkspaceimageref(value: string): PreCallImageBuilderNotifyRequest;
-    getBuildid(): string;
-    setBuildid(value: string): PreCallImageBuilderNotifyRequest;
+
+    hasInstance(): boolean;
+    clearInstance(): void;
+    getInstance(): PreStartWorkspaceInstance | undefined;
+    setInstance(value?: PreStartWorkspaceInstance): PreCallImageBuilderNotifyRequest;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): PreCallImageBuilderNotifyRequest.AsObject;
@@ -475,7 +475,7 @@ export class PreCallImageBuilderNotifyRequest extends jspb.Message {
 export namespace PreCallImageBuilderNotifyRequest {
     export type AsObject = {
         workspaceimageref: string,
-        buildid: string,
+        instance?: PreStartWorkspaceInstance.AsObject,
     }
 }
 
