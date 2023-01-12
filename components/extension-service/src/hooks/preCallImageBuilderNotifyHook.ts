@@ -14,6 +14,6 @@ import {
 const preCallImageBuilderNotifyHook: grpc.handleUnaryCall<
     PreCallImageBuilderNotifyRequest,
     PreCallImageBuilderNotifyResponse
-> = async () => {};
+> = async (call, callback) => {};
 
 export { preCallImageBuilderNotifyHook };

@@ -20,9 +20,9 @@ const server = new grpc.Server();
 // * adding services
 server.addService(ExtensionServiceService, {
     preStartWorkspaceNotifyHook,
-    postCreateWorkspacePodModifyHook,
-    preStartImageBuildWorkspaceNotifyHook,
     preCallImageBuilderNotifyHook,
+    preStartImageBuildWorkspaceNotifyHook,
+    postCreateWorkspacePodModifyHook,
 });
 
 server.bindAsync("0.0.0.0:8080", grpc.ServerCredentials.createInsecure(), async (err, port) => {

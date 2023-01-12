@@ -14,6 +14,8 @@ import {
 const preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<
     PreStartImageBuildWorkspaceNotifyRequest,
     PreStartImageBuildWorkspaceNotifyResponse
-> = async () => {};
+> = async (call, callback) => {
+
+};
 
 export { preStartImageBuildWorkspaceNotifyHook };
