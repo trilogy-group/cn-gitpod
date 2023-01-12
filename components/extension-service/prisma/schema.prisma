@@ -12,4 +12,6 @@ model WorkspaceInstance {
   arch              String?  @default("x86")
   workspaceImageRef String?
   buildId           String?
+
+  @@index([workspaceImageRef, buildId])
 }

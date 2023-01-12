@@ -15,7 +15,29 @@ const preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<
     PreStartImageBuildWorkspaceNotifyRequest,
     PreStartImageBuildWorkspaceNotifyResponse
 > = async (call, callback) => {
+    const request = call.request;
+    const response = new PreStartImageBuildWorkspaceNotifyResponse();
 
+    const workspaceImageRef = request.getWorkspaceimageref();
+    const buildId = request.getBuildid();
+
+    let message: string = "";
+
+    try {
+        const wsInstance = await prismaClient?.workspaceInstance.findFirst({
+            where: {
+                workspaceImageRef,
+                buildId,
+            },
+        });
+
+        message = `Found wsInstance with id: ${wsInstance?.instanceId}`;
+    } catch (err) {
+        message = `Error finding by wsImageRef & buildId: ${err?.message}`;
+    }
+
+    response.setMessage(message);
+    callback(null, response);
 };
 
 export { preStartImageBuildWorkspaceNotifyHook };
