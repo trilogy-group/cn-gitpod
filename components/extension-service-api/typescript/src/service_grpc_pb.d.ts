@@ -16,6 +16,8 @@ import * as service_pb from "./service_pb";
 interface IExtensionServiceService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
     preStartWorkspaceNotifyHook: IExtensionServiceService_IpreStartWorkspaceNotifyHook;
     postCreateWorkspacePodModifyHook: IExtensionServiceService_IPostCreateWorkspacePodModifyHook;
+    preStartImageBuildWorkspaceNotifyHook: IExtensionServiceService_IPreStartImageBuildWorkspaceNotifyHook;
+    preCallImageBuilderNotifyHook: IExtensionServiceService_IPreCallImageBuilderNotifyHook;
 }
 
 interface IExtensionServiceService_IpreStartWorkspaceNotifyHook extends grpc.MethodDefinition<service_pb.PreStartWorkspaceNotifyRequest, service_pb.PreStartWorkspaceNotifyResponse> {
@@ -36,12 +38,32 @@ interface IExtensionServiceService_IPostCreateWorkspacePodModifyHook extends grp
     responseSerialize: grpc.serialize<service_pb.PostCreateWorkspacePodModifyResponse>;
     responseDeserialize: grpc.deserialize<service_pb.PostCreateWorkspacePodModifyResponse>;
 }
+interface IExtensionServiceService_IPreStartImageBuildWorkspaceNotifyHook extends grpc.MethodDefinition<service_pb.PreStartImageBuildWorkspaceNotifyRequest, service_pb.PreStartImageBuildWorkspaceNotifyResponse> {
+    path: "/extension_service.ExtensionService/PreStartImageBuildWorkspaceNotifyHook";
+    requestStream: false;
+    responseStream: false;
+    requestSerialize: grpc.serialize<service_pb.PreStartImageBuildWorkspaceNotifyRequest>;
+    requestDeserialize: grpc.deserialize<service_pb.PreStartImageBuildWorkspaceNotifyRequest>;
+    responseSerialize: grpc.serialize<service_pb.PreStartImageBuildWorkspaceNotifyResponse>;
+    responseDeserialize: grpc.deserialize<service_pb.PreStartImageBuildWorkspaceNotifyResponse>;
+}
+interface IExtensionServiceService_IPreCallImageBuilderNotifyHook extends grpc.MethodDefinition<service_pb.PreCallImageBuilderNotifyRequest, service_pb.PreCallImageBuilderNotifyResponse> {
+    path: "/extension_service.ExtensionService/PreCallImageBuilderNotifyHook";
+    requestStream: false;
+    responseStream: false;
+    requestSerialize: grpc.serialize<service_pb.PreCallImageBuilderNotifyRequest>;
+    requestDeserialize: grpc.deserialize<service_pb.PreCallImageBuilderNotifyRequest>;
+    responseSerialize: grpc.serialize<service_pb.PreCallImageBuilderNotifyResponse>;
+    responseDeserialize: grpc.deserialize<service_pb.PreCallImageBuilderNotifyResponse>;
+}
 
 export const ExtensionServiceService: IExtensionServiceService;
 
 export interface IExtensionServiceServer extends grpc.UntypedServiceImplementation {
     preStartWorkspaceNotifyHook: grpc.handleUnaryCall<service_pb.PreStartWorkspaceNotifyRequest, service_pb.PreStartWorkspaceNotifyResponse>;
     postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<service_pb.PostCreateWorkspacePodModifyRequest, service_pb.PostCreateWorkspacePodModifyResponse>;
+    preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<service_pb.PreStartImageBuildWorkspaceNotifyRequest, service_pb.PreStartImageBuildWorkspaceNotifyResponse>;
+    preCallImageBuilderNotifyHook: grpc.handleUnaryCall<service_pb.PreCallImageBuilderNotifyRequest, service_pb.PreCallImageBuilderNotifyResponse>;
 }
 
 export interface IExtensionServiceClient {
@@ -51,6 +73,12 @@ export interface IExtensionServiceClient {
     postCreateWorkspacePodModifyHook(request: service_pb.PostCreateWorkspacePodModifyRequest, callback: (error: grpc.ServiceError | null, response: service_pb.PostCreateWorkspacePodModifyResponse) => void): grpc.ClientUnaryCall;
     postCreateWorkspacePodModifyHook(request: service_pb.PostCreateWorkspacePodModifyRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: service_pb.PostCreateWorkspacePodModifyResponse) => void): grpc.ClientUnaryCall;
     postCreateWorkspacePodModifyHook(request: service_pb.PostCreateWorkspacePodModifyRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: service_pb.PostCreateWorkspacePodModifyResponse) => void): grpc.ClientUnaryCall;
+    preStartImageBuildWorkspaceNotifyHook(request: service_pb.PreStartImageBuildWorkspaceNotifyRequest, callback: (error: grpc.ServiceError | null, response: service_pb.PreStartImageBuildWorkspaceNotifyResponse) => void): grpc.ClientUnaryCall;
+    preStartImageBuildWorkspaceNotifyHook(request: service_pb.PreStartImageBuildWorkspaceNotifyRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: service_pb.PreStartImageBuildWorkspaceNotifyResponse) => void): grpc.ClientUnaryCall;
+    preStartImageBuildWorkspaceNotifyHook(request: service_pb.PreStartImageBuildWorkspaceNotifyRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: service_pb.PreStartImageBuildWorkspaceNotifyResponse) => void): grpc.ClientUnaryCall;
+    preCallImageBuilderNotifyHook(request: service_pb.PreCallImageBuilderNotifyRequest, callback: (error: grpc.ServiceError | null, response: service_pb.PreCallImageBuilderNotifyResponse) => void): grpc.ClientUnaryCall;
+    preCallImageBuilderNotifyHook(request: service_pb.PreCallImageBuilderNotifyRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: service_pb.PreCallImageBuilderNotifyResponse) => void): grpc.ClientUnaryCall;
+    preCallImageBuilderNotifyHook(request: service_pb.PreCallImageBuilderNotifyRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: service_pb.PreCallImageBuilderNotifyResponse) => void): grpc.ClientUnaryCall;
 }
 
 export class ExtensionServiceClient extends grpc.Client implements IExtensionServiceClient {
@@ -61,4 +89,10 @@ export class ExtensionServiceClient extends grpc.Client implements IExtensionSer
     public postCreateWorkspacePodModifyHook(request: service_pb.PostCreateWorkspacePodModifyRequest, callback: (error: grpc.ServiceError | null, response: service_pb.PostCreateWorkspacePodModifyResponse) => void): grpc.ClientUnaryCall;
     public postCreateWorkspacePodModifyHook(request: service_pb.PostCreateWorkspacePodModifyRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: service_pb.PostCreateWorkspacePodModifyResponse) => void): grpc.ClientUnaryCall;
     public postCreateWorkspacePodModifyHook(request: service_pb.PostCreateWorkspacePodModifyRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: service_pb.PostCreateWorkspacePodModifyResponse) => void): grpc.ClientUnaryCall;
+    public preStartImageBuildWorkspaceNotifyHook(request: service_pb.PreStartImageBuildWorkspaceNotifyRequest, callback: (error: grpc.ServiceError | null, response: service_pb.PreStartImageBuildWorkspaceNotifyResponse) => void): grpc.ClientUnaryCall;
+    public preStartImageBuildWorkspaceNotifyHook(request: service_pb.PreStartImageBuildWorkspaceNotifyRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: service_pb.PreStartImageBuildWorkspaceNotifyResponse) => void): grpc.ClientUnaryCall;
+    public preStartImageBuildWorkspaceNotifyHook(request: service_pb.PreStartImageBuildWorkspaceNotifyRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: service_pb.PreStartImageBuildWorkspaceNotifyResponse) => void): grpc.ClientUnaryCall;
+    public preCallImageBuilderNotifyHook(request: service_pb.PreCallImageBuilderNotifyRequest, callback: (error: grpc.ServiceError | null, response: service_pb.PreCallImageBuilderNotifyResponse) => void): grpc.ClientUnaryCall;
+    public preCallImageBuilderNotifyHook(request: service_pb.PreCallImageBuilderNotifyRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: service_pb.PreCallImageBuilderNotifyResponse) => void): grpc.ClientUnaryCall;
+    public preCallImageBuilderNotifyHook(request: service_pb.PreCallImageBuilderNotifyRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: service_pb.PreCallImageBuilderNotifyResponse) => void): grpc.ClientUnaryCall;
 }
