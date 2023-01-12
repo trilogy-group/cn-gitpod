@@ -24,6 +24,10 @@ type RefCacheConfig struct {
 type Configuration struct {
 	WorkspaceManager WorkspaceManagerConfig `json:"wsman"`
 
+	// Devspaces-specific start
+	ExtensionService ExtensionServiceConfig `json:"extService"`
+	// Devspaces-specific end
+
 	// PullSecret names a Kubernetes secret which contains a `.dockerconfigjson` entry
 	// carrying the Docker authentication credentials to interact with the baseImageRepository
 	// and workspaceImageRepository.
@@ -42,6 +46,16 @@ type Configuration struct {
 	// BuilderImage is an image ref to the workspace builder image
 	BuilderImage string `json:"builderImage"`
 }
+
+// Devspaces-specific start
+type ExtensionServiceConfig struct {
+	Address string `json:"addr"`
+	// expected to be a extservice.ExtensionServiceClient - use to avoid dependency on extserviceapi
+	// this field is used for testing only
+	Client interface{} `json:"-"`
+}
+
+// Devspaces-specific end
 
 type TLS struct {
 	Authority   string `json:"ca"`

@@ -361,6 +361,8 @@ func (m *Manager) StartWorkspace(ctx context.Context, req *api.StartWorkspaceReq
 		return nil, xerrors.Errorf("error occurred during PreparePostCreateWorkspacePodModifyRequest: %w", err)
 	}
 	// Hookpoint - 4. Hook notifies extension serivce saying that a "pod" object is created for "workspaceInstanceID".)
+	clog.Info("Calling PostCreateWorkspacePodModifyHook")
+	// TODO: Mock this hook for tests to succeed
 	hookResponse, err := m.extservice.PostCreateWorkspacePodModifyHook(ctx, hookRequest)
 	if err != nil {
 		return nil, xerrors.Errorf("error occurred while calling hook PostCreateWorkspacePodModifyHook: %w", err)
@@ -370,6 +372,7 @@ func (m *Manager) StartWorkspace(ctx context.Context, req *api.StartWorkspaceReq
 	if err != nil {
 		return nil, xerrors.Errorf("error occurred during ParsePostCreateWorkspacepodModifyResponse: %w", err)
 	}
+	clog.Info("Successfully Received response from PostCreateWorkspacePodModifyHook")
 	// Devspaces-specific end
 
 	span.LogKV("event", "pod created", "name", pod.Name, "namespace", pod.Namespace)
