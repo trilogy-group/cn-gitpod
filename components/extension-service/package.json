@@ -3,9 +3,10 @@
   "version": "0.0.1",
   "description": "Typescript Express.js server for Extension Service",
   "scripts": {
-    "prisma:deploy": "npx prisma migrate deploy",
-    "prisma:generate": "npx prisma generate",
-    "prisma:migrate": "npx prisma migrate dev",
+    "p:deploy": "npx prisma migrate deploy",
+    "p:generate": "npx prisma generate",
+    "p:migrate": "npx prisma migrate dev",
+    "p:studio": "npx prisma studio",
     "clean": "rimraf lib",
     "start": "node ./lib/app.js",
     "build": "yarn lint && npx tsc",
