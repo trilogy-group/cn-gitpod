@@ -344,7 +344,7 @@ func (o *Orchestrator) Build(req *protocol.BuildRequest, resp protocol.ImageBuil
 	}
 
 	// Hookpoint - 3. Notifies extenstion-service that an ImageBuildWorkspace is gonna be spawned for a req (BuildRequest), with "buildID"
-	// preStartImageBuildWorkspaceNotifyHook(req, buildID)
+	// preStartImageBuildWorkspaceNotifyHook(wsrefstr, buildID)
 	// To be consumed by Hookpoint - 4
 	var swr *wsmanapi.StartWorkspaceResponse
 	err = retry(ctx, func(ctx context.Context) (err error) {

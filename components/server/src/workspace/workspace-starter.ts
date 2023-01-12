@@ -1338,10 +1338,12 @@ export class WorkspaceStarter {
                         workspaceId: instance.workspaceId,
                     }),
                 );
-
+            // Devspaces-specific start
             // Hookpoint - 2. Hook notifies the extension service that a build with "req" (BuildRequest) for "workspace" is going to be built.
-            // preImageBuildRequestNotifyHook(req, workspace)
+            // refstr = await client.ResolveWorkspaceImage({span}, req)
+            // preImageBuildRequestNotifyHook(refstr, workspaceInstance)
             // To be consumed by Hookpoint - 3.
+            // Devspaces-specific end
             const result = await client.build({ span }, req, imageBuildLogInfo);
 
             if (result.actuallyNeedsBuild) {
