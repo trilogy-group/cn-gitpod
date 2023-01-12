@@ -144,7 +144,7 @@ message PreferredSchedulingTerm {
 
 message PreStartImageBuildWorkspaceNotifyRequest {
     string workspaceImageRef = 1;
-    PreStartWorkspaceInstance instance = 2;
+    string buildId = 2;
 }
 
 message PreStartImageBuildWorkspaceNotifyResponse {
@@ -153,7 +153,7 @@ message PreStartImageBuildWorkspaceNotifyResponse {
 
 message PreCallImageBuilderNotifyRequest {
     string workspaceImageRef = 1;
-    string buildId = 2;
+    PreStartWorkspaceInstance instance = 2;
 }
 
 message PreCallImageBuilderNotifyResponse {

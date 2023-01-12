@@ -3241,7 +3241,7 @@ proto.extension_service.PreStartImageBuildWorkspaceNotifyRequest.prototype.toObj
 proto.extension_service.PreStartImageBuildWorkspaceNotifyRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     workspaceimageref: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    instance: (f = msg.getInstance()) && proto.extension_service.PreStartWorkspaceInstance.toObject(includeInstance, f)
+    buildid: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -3283,9 +3283,8 @@ proto.extension_service.PreStartImageBuildWorkspaceNotifyRequest.deserializeBina
       msg.setWorkspaceimageref(value);
       break;
     case 2:
-      var value = new proto.extension_service.PreStartWorkspaceInstance;
-      reader.readMessage(value,proto.extension_service.PreStartWorkspaceInstance.deserializeBinaryFromReader);
-      msg.setInstance(value);
+      var value = /** @type {string} */ (reader.readString());
+      msg.setBuildid(value);
       break;
     default:
       reader.skipField();
@@ -3323,12 +3322,11 @@ proto.extension_service.PreStartImageBuildWorkspaceNotifyRequest.serializeBinary
       f
     );
   }
-  f = message.getInstance();
-  if (f != null) {
-    writer.writeMessage(
+  f = message.getBuildid();
+  if (f.length > 0) {
+    writer.writeString(
       2,
-      f,
-      proto.extension_service.PreStartWorkspaceInstance.serializeBinaryToWriter
+      f
     );
   }
 };
@@ -3353,39 +3351,20 @@ proto.extension_service.PreStartImageBuildWorkspaceNotifyRequest.prototype.setWo
 
 
 /**
- * optional PreStartWorkspaceInstance instance = 2;
- * @return {?proto.extension_service.PreStartWorkspaceInstance}
+ * optional string buildId = 2;
+ * @return {string}
  */
-proto.extension_service.PreStartImageBuildWorkspaceNotifyRequest.prototype.getInstance = function() {
-  return /** @type{?proto.extension_service.PreStartWorkspaceInstance} */ (
-    jspb.Message.getWrapperField(this, proto.extension_service.PreStartWorkspaceInstance, 2));
+proto.extension_service.PreStartImageBuildWorkspaceNotifyRequest.prototype.getBuildid = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /**
- * @param {?proto.extension_service.PreStartWorkspaceInstance|undefined} value
- * @return {!proto.extension_service.PreStartImageBuildWorkspaceNotifyRequest} returns this
-*/
-proto.extension_service.PreStartImageBuildWorkspaceNotifyRequest.prototype.setInstance = function(value) {
-  return jspb.Message.setWrapperField(this, 2, value);
-};
-
-
-/**
- * Clears the message field making it undefined.
+ * @param {string} value
  * @return {!proto.extension_service.PreStartImageBuildWorkspaceNotifyRequest} returns this
  */
-proto.extension_service.PreStartImageBuildWorkspaceNotifyRequest.prototype.clearInstance = function() {
-  return this.setInstance(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {boolean}
- */
-proto.extension_service.PreStartImageBuildWorkspaceNotifyRequest.prototype.hasInstance = function() {
-  return jspb.Message.getField(this, 2) != null;
+proto.extension_service.PreStartImageBuildWorkspaceNotifyRequest.prototype.setBuildid = function(value) {
+  return jspb.Message.setProto3StringField(this, 2, value);
 };
 
 
@@ -3552,7 +3531,7 @@ proto.extension_service.PreCallImageBuilderNotifyRequest.prototype.toObject = fu
 proto.extension_service.PreCallImageBuilderNotifyRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     workspaceimageref: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    buildid: jspb.Message.getFieldWithDefault(msg, 2, "")
+    instance: (f = msg.getInstance()) && proto.extension_service.PreStartWorkspaceInstance.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -3594,8 +3573,9 @@ proto.extension_service.PreCallImageBuilderNotifyRequest.deserializeBinaryFromRe
       msg.setWorkspaceimageref(value);
       break;
     case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setBuildid(value);
+      var value = new proto.extension_service.PreStartWorkspaceInstance;
+      reader.readMessage(value,proto.extension_service.PreStartWorkspaceInstance.deserializeBinaryFromReader);
+      msg.setInstance(value);
       break;
     default:
       reader.skipField();
@@ -3633,11 +3613,12 @@ proto.extension_service.PreCallImageBuilderNotifyRequest.serializeBinaryToWriter
       f
     );
   }
-  f = message.getBuildid();
-  if (f.length > 0) {
-    writer.writeString(
+  f = message.getInstance();
+  if (f != null) {
+    writer.writeMessage(
       2,
-      f
+      f,
+      proto.extension_service.PreStartWorkspaceInstance.serializeBinaryToWriter
     );
   }
 };
@@ -3662,20 +3643,39 @@ proto.extension_service.PreCallImageBuilderNotifyRequest.prototype.setWorkspacei
 
 
 /**
- * optional string buildId = 2;
- * @return {string}
+ * optional PreStartWorkspaceInstance instance = 2;
+ * @return {?proto.extension_service.PreStartWorkspaceInstance}
  */
-proto.extension_service.PreCallImageBuilderNotifyRequest.prototype.getBuildid = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+proto.extension_service.PreCallImageBuilderNotifyRequest.prototype.getInstance = function() {
+  return /** @type{?proto.extension_service.PreStartWorkspaceInstance} */ (
+    jspb.Message.getWrapperField(this, proto.extension_service.PreStartWorkspaceInstance, 2));
 };
 
 
 /**
- * @param {string} value
+ * @param {?proto.extension_service.PreStartWorkspaceInstance|undefined} value
+ * @return {!proto.extension_service.PreCallImageBuilderNotifyRequest} returns this
+*/
+proto.extension_service.PreCallImageBuilderNotifyRequest.prototype.setInstance = function(value) {
+  return jspb.Message.setWrapperField(this, 2, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
  * @return {!proto.extension_service.PreCallImageBuilderNotifyRequest} returns this
  */
-proto.extension_service.PreCallImageBuilderNotifyRequest.prototype.setBuildid = function(value) {
-  return jspb.Message.setProto3StringField(this, 2, value);
+proto.extension_service.PreCallImageBuilderNotifyRequest.prototype.clearInstance = function() {
+  return this.setInstance(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.extension_service.PreCallImageBuilderNotifyRequest.prototype.hasInstance = function() {
+  return jspb.Message.getField(this, 2) != null;
 };
 
 
