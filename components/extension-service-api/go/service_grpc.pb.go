@@ -29,7 +29,7 @@ type ExtensionServiceClient interface {
 	// Hook point 3
 	PreStartImageBuildWorkspaceNotifyHook(ctx context.Context, in *PreStartImageBuildWorkspaceNotifyRequest, opts ...grpc.CallOption) (*PreStartImageBuildWorkspaceNotifyResponse, error)
 	// Hook point 2
-	PreImageBuildRequestNotifyHook(ctx context.Context, in *PreImageBuildRequestNotifyRequest, opts ...grpc.CallOption) (*PreImageBuildRequestNotifyResponse, error)
+	PreCallImageBuilderNotifyHook(ctx context.Context, in *PreImageBuildRequestNotifyRequest, opts ...grpc.CallOption) (*PreImageBuildRequestNotifyResponse, error)
 }
 
 type extensionServiceClient struct {
@@ -67,9 +67,9 @@ func (c *extensionServiceClient) PreStartImageBuildWorkspaceNotifyHook(ctx conte
 	return out, nil
 }
 
-func (c *extensionServiceClient) PreImageBuildRequestNotifyHook(ctx context.Context, in *PreImageBuildRequestNotifyRequest, opts ...grpc.CallOption) (*PreImageBuildRequestNotifyResponse, error) {
+func (c *extensionServiceClient) PreCallImageBuilderNotifyHook(ctx context.Context, in *PreImageBuildRequestNotifyRequest, opts ...grpc.CallOption) (*PreImageBuildRequestNotifyResponse, error) {
 	out := new(PreImageBuildRequestNotifyResponse)
-	err := c.cc.Invoke(ctx, "/extension_service.ExtensionService/PreImageBuildRequestNotifyHook", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/extension_service.ExtensionService/PreCallImageBuilderNotifyHook", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ type ExtensionServiceServer interface {
 	// Hook point 3
 	PreStartImageBuildWorkspaceNotifyHook(context.Context, *PreStartImageBuildWorkspaceNotifyRequest) (*PreStartImageBuildWorkspaceNotifyResponse, error)
 	// Hook point 2
-	PreImageBuildRequestNotifyHook(context.Context, *PreImageBuildRequestNotifyRequest) (*PreImageBuildRequestNotifyResponse, error)
+	PreCallImageBuilderNotifyHook(context.Context, *PreImageBuildRequestNotifyRequest) (*PreImageBuildRequestNotifyResponse, error)
 	mustEmbedUnimplementedExtensionServiceServer()
 }
 
@@ -104,8 +104,8 @@ func (UnimplementedExtensionServiceServer) PostCreateWorkspacePodModifyHook(cont
 func (UnimplementedExtensionServiceServer) PreStartImageBuildWorkspaceNotifyHook(context.Context, *PreStartImageBuildWorkspaceNotifyRequest) (*PreStartImageBuildWorkspaceNotifyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PreStartImageBuildWorkspaceNotifyHook not implemented")
 }
-func (UnimplementedExtensionServiceServer) PreImageBuildRequestNotifyHook(context.Context, *PreImageBuildRequestNotifyRequest) (*PreImageBuildRequestNotifyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PreImageBuildRequestNotifyHook not implemented")
+func (UnimplementedExtensionServiceServer) PreCallImageBuilderNotifyHook(context.Context, *PreImageBuildRequestNotifyRequest) (*PreImageBuildRequestNotifyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PreCallImageBuilderNotifyHook not implemented")
 }
 func (UnimplementedExtensionServiceServer) mustEmbedUnimplementedExtensionServiceServer() {}
 
@@ -174,20 +174,20 @@ func _ExtensionService_PreStartImageBuildWorkspaceNotifyHook_Handler(srv interfa
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ExtensionService_PreImageBuildRequestNotifyHook_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ExtensionService_PreCallImageBuilderNotifyHook_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PreImageBuildRequestNotifyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ExtensionServiceServer).PreImageBuildRequestNotifyHook(ctx, in)
+		return srv.(ExtensionServiceServer).PreCallImageBuilderNotifyHook(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/extension_service.ExtensionService/PreImageBuildRequestNotifyHook",
+		FullMethod: "/extension_service.ExtensionService/PreCallImageBuilderNotifyHook",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExtensionServiceServer).PreImageBuildRequestNotifyHook(ctx, req.(*PreImageBuildRequestNotifyRequest))
+		return srv.(ExtensionServiceServer).PreCallImageBuilderNotifyHook(ctx, req.(*PreImageBuildRequestNotifyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -212,8 +212,8 @@ var ExtensionService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ExtensionService_PreStartImageBuildWorkspaceNotifyHook_Handler,
 		},
 		{
-			MethodName: "PreImageBuildRequestNotifyHook",
-			Handler:    _ExtensionService_PreImageBuildRequestNotifyHook_Handler,
+			MethodName: "PreCallImageBuilderNotifyHook",
+			Handler:    _ExtensionService_PreCallImageBuilderNotifyHook_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

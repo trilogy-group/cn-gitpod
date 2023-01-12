@@ -137,8 +137,8 @@ preStartImageBuildWorkspaceNotifyHook: {
     responseDeserialize: deserialize_extension_service_PreStartImageBuildWorkspaceNotifyResponse,
   },
   // Hook point 2
-preImageBuildRequestNotifyHook: {
-    path: '/extension_service.ExtensionService/PreImageBuildRequestNotifyHook',
+preCallImageBuilderNotifyHook: {
+    path: '/extension_service.ExtensionService/PreCallImageBuilderNotifyHook',
     requestStream: false,
     responseStream: false,
     requestType: service_pb.PreImageBuildRequestNotifyRequest,

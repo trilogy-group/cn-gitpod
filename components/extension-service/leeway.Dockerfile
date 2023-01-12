@@ -31,7 +31,7 @@ RUN useradd --no-log-init --create-home --uid 31001 --home-dir /app/ unode
 COPY --from=builder /app /app/
 
 WORKDIR /app/node_modules/@cn-gitpod/extension-service
-RUN yarn prisma:generate
+RUN yarn p:generate
 
 USER unode
 
