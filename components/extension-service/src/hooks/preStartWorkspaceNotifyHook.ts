@@ -9,7 +9,7 @@ import { PreStartWorkspaceNotifyRequest, PreStartWorkspaceNotifyResponse } from 
 import { prismaClient } from "../utils/prisma";
 
 // ! original:
-const preStartWorkspaceNotifyHookHandler: grpc.handleUnaryCall<
+const preStartWorkspaceNotifyHook: grpc.handleUnaryCall<
     PreStartWorkspaceNotifyRequest,
     PreStartWorkspaceNotifyResponse
 > = async (call, callback) => {
@@ -42,4 +42,4 @@ const preStartWorkspaceNotifyHookHandler: grpc.handleUnaryCall<
         });
 };
 
-export { preStartWorkspaceNotifyHookHandler };
+export { preStartWorkspaceNotifyHook };

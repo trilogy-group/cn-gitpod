@@ -6,3 +6,5 @@
 
 export * from "./preStartWorkspaceNotifyHook";
 export * from "./postCreateWorkspacePodModifyHook";
+export * from './preStartImageBuildWorkspaceNotifyHook'
+export * from './preCallImageBuilderNotifyHook'

@@ -8,14 +8,21 @@ import * as grpc from "@grpc/grpc-js";
 import { ExtensionServiceService } from "@cn-gitpod/extension-service-api/lib";
 
 import { connectDB } from "./utils/prisma";
-import { preStartWorkspaceNotifyHookHandler, postCreateWorkspacePodModifyHookHandler } from "./hooks";
+import {
+    preStartWorkspaceNotifyHook,
+    postCreateWorkspacePodModifyHook,
+    preStartImageBuildWorkspaceNotifyHook,
+    preCallImageBuilderNotifyHook,
+} from "./hooks";
 
 const server = new grpc.Server();
 
 // * adding services
 server.addService(ExtensionServiceService, {
-    preStartWorkspaceNotifyHook: preStartWorkspaceNotifyHookHandler,
-    postCreateWorkspacePodModifyHook: postCreateWorkspacePodModifyHookHandler,
+    preStartWorkspaceNotifyHook,
+    postCreateWorkspacePodModifyHook,
+    preStartImageBuildWorkspaceNotifyHook,
+    preCallImageBuilderNotifyHook,
 });
 
 server.bindAsync("0.0.0.0:8080", grpc.ServerCredentials.createInsecure(), async (err, port) => {

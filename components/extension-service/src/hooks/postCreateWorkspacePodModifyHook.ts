@@ -10,7 +10,7 @@ import {
     PostCreateWorkspacePodModifyResponse,
 } from "@cn-gitpod/extension-service-api/lib";
 
-const postCreateWorkspacePodModifyHookHandler: grpc.handleUnaryCall<
+const postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<
     PostCreateWorkspacePodModifyRequest,
     PostCreateWorkspacePodModifyResponse
 > = async (call, callback) => {
@@ -43,4 +43,4 @@ const postCreateWorkspacePodModifyHookHandler: grpc.handleUnaryCall<
     callback(null, response);
 };
 
-export { postCreateWorkspacePodModifyHookHandler };
+export { postCreateWorkspacePodModifyHook };
