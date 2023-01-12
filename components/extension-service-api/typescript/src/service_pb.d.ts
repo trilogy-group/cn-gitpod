@@ -409,3 +409,92 @@ export namespace PreferredSchedulingTerm {
         preference?: NodeSelectorTerm.AsObject,
     }
 }
+
+export class PreStartImageBuildWorkspaceNotifyRequest extends jspb.Message {
+    getWorkspaceimageref(): string;
+    setWorkspaceimageref(value: string): PreStartImageBuildWorkspaceNotifyRequest;
+
+    hasInstance(): boolean;
+    clearInstance(): void;
+    getInstance(): PreStartWorkspaceInstance | undefined;
+    setInstance(value?: PreStartWorkspaceInstance): PreStartImageBuildWorkspaceNotifyRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): PreStartImageBuildWorkspaceNotifyRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: PreStartImageBuildWorkspaceNotifyRequest): PreStartImageBuildWorkspaceNotifyRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: PreStartImageBuildWorkspaceNotifyRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): PreStartImageBuildWorkspaceNotifyRequest;
+    static deserializeBinaryFromReader(message: PreStartImageBuildWorkspaceNotifyRequest, reader: jspb.BinaryReader): PreStartImageBuildWorkspaceNotifyRequest;
+}
+
+export namespace PreStartImageBuildWorkspaceNotifyRequest {
+    export type AsObject = {
+        workspaceimageref: string,
+        instance?: PreStartWorkspaceInstance.AsObject,
+    }
+}
+
+export class PreStartImageBuildWorkspaceNotifyResponse extends jspb.Message {
+    getMessage(): string;
+    setMessage(value: string): PreStartImageBuildWorkspaceNotifyResponse;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): PreStartImageBuildWorkspaceNotifyResponse.AsObject;
+    static toObject(includeInstance: boolean, msg: PreStartImageBuildWorkspaceNotifyResponse): PreStartImageBuildWorkspaceNotifyResponse.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: PreStartImageBuildWorkspaceNotifyResponse, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): PreStartImageBuildWorkspaceNotifyResponse;
+    static deserializeBinaryFromReader(message: PreStartImageBuildWorkspaceNotifyResponse, reader: jspb.BinaryReader): PreStartImageBuildWorkspaceNotifyResponse;
+}
+
+export namespace PreStartImageBuildWorkspaceNotifyResponse {
+    export type AsObject = {
+        message: string,
+    }
+}
+
+export class PreImageBuildRequestNotifyRequest extends jspb.Message {
+    getWorkspaceimageref(): string;
+    setWorkspaceimageref(value: string): PreImageBuildRequestNotifyRequest;
+    getBuildid(): string;
+    setBuildid(value: string): PreImageBuildRequestNotifyRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): PreImageBuildRequestNotifyRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: PreImageBuildRequestNotifyRequest): PreImageBuildRequestNotifyRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: PreImageBuildRequestNotifyRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): PreImageBuildRequestNotifyRequest;
+    static deserializeBinaryFromReader(message: PreImageBuildRequestNotifyRequest, reader: jspb.BinaryReader): PreImageBuildRequestNotifyRequest;
+}
+
+export namespace PreImageBuildRequestNotifyRequest {
+    export type AsObject = {
+        workspaceimageref: string,
+        buildid: string,
+    }
+}
+
+export class PreImageBuildRequestNotifyResponse extends jspb.Message {
+    getMessage(): string;
+    setMessage(value: string): PreImageBuildRequestNotifyResponse;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): PreImageBuildRequestNotifyResponse.AsObject;
+    static toObject(includeInstance: boolean, msg: PreImageBuildRequestNotifyResponse): PreImageBuildRequestNotifyResponse.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: PreImageBuildRequestNotifyResponse, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): PreImageBuildRequestNotifyResponse;
+    static deserializeBinaryFromReader(message: PreImageBuildRequestNotifyResponse, reader: jspb.BinaryReader): PreImageBuildRequestNotifyResponse;
+}
+
+export namespace PreImageBuildRequestNotifyResponse {
+    export type AsObject = {
+        message: string,
+    }
+}

@@ -32,6 +32,50 @@ function deserialize_extension_service_PostCreateWorkspacePodModifyResponse(buff
   return service_pb.PostCreateWorkspacePodModifyResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_extension_service_PreImageBuildRequestNotifyRequest(arg) {
+  if (!(arg instanceof service_pb.PreImageBuildRequestNotifyRequest)) {
+    throw new Error('Expected argument of type extension_service.PreImageBuildRequestNotifyRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_extension_service_PreImageBuildRequestNotifyRequest(buffer_arg) {
+  return service_pb.PreImageBuildRequestNotifyRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_extension_service_PreImageBuildRequestNotifyResponse(arg) {
+  if (!(arg instanceof service_pb.PreImageBuildRequestNotifyResponse)) {
+    throw new Error('Expected argument of type extension_service.PreImageBuildRequestNotifyResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_extension_service_PreImageBuildRequestNotifyResponse(buffer_arg) {
+  return service_pb.PreImageBuildRequestNotifyResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_extension_service_PreStartImageBuildWorkspaceNotifyRequest(arg) {
+  if (!(arg instanceof service_pb.PreStartImageBuildWorkspaceNotifyRequest)) {
+    throw new Error('Expected argument of type extension_service.PreStartImageBuildWorkspaceNotifyRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_extension_service_PreStartImageBuildWorkspaceNotifyRequest(buffer_arg) {
+  return service_pb.PreStartImageBuildWorkspaceNotifyRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_extension_service_PreStartImageBuildWorkspaceNotifyResponse(arg) {
+  if (!(arg instanceof service_pb.PreStartImageBuildWorkspaceNotifyResponse)) {
+    throw new Error('Expected argument of type extension_service.PreStartImageBuildWorkspaceNotifyResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_extension_service_PreStartImageBuildWorkspaceNotifyResponse(buffer_arg) {
+  return service_pb.PreStartImageBuildWorkspaceNotifyResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_extension_service_PreStartWorkspaceNotifyRequest(arg) {
   if (!(arg instanceof service_pb.PreStartWorkspaceNotifyRequest)) {
     throw new Error('Expected argument of type extension_service.PreStartWorkspaceNotifyRequest');
@@ -56,7 +100,8 @@ function deserialize_extension_service_PreStartWorkspaceNotifyResponse(buffer_ar
 
 
 var ExtensionServiceService = exports.ExtensionServiceService = {
-  preStartWorkspaceNotifyHook: {
+  // Hook point 1
+preStartWorkspaceNotifyHook: {
     path: '/extension_service.ExtensionService/preStartWorkspaceNotifyHook',
     requestStream: false,
     responseStream: false,
@@ -67,7 +112,8 @@ var ExtensionServiceService = exports.ExtensionServiceService = {
     responseSerialize: serialize_extension_service_PreStartWorkspaceNotifyResponse,
     responseDeserialize: deserialize_extension_service_PreStartWorkspaceNotifyResponse,
   },
-  postCreateWorkspacePodModifyHook: {
+  // Hook point 4
+postCreateWorkspacePodModifyHook: {
     path: '/extension_service.ExtensionService/PostCreateWorkspacePodModifyHook',
     requestStream: false,
     responseStream: false,
@@ -77,6 +123,30 @@ var ExtensionServiceService = exports.ExtensionServiceService = {
     requestDeserialize: deserialize_extension_service_PostCreateWorkspacePodModifyRequest,
     responseSerialize: serialize_extension_service_PostCreateWorkspacePodModifyResponse,
     responseDeserialize: deserialize_extension_service_PostCreateWorkspacePodModifyResponse,
+  },
+  // Hook point 3
+preStartImageBuildWorkspaceNotifyHook: {
+    path: '/extension_service.ExtensionService/PreStartImageBuildWorkspaceNotifyHook',
+    requestStream: false,
+    responseStream: false,
+    requestType: service_pb.PreStartImageBuildWorkspaceNotifyRequest,
+    responseType: service_pb.PreStartImageBuildWorkspaceNotifyResponse,
+    requestSerialize: serialize_extension_service_PreStartImageBuildWorkspaceNotifyRequest,
+    requestDeserialize: deserialize_extension_service_PreStartImageBuildWorkspaceNotifyRequest,
+    responseSerialize: serialize_extension_service_PreStartImageBuildWorkspaceNotifyResponse,
+    responseDeserialize: deserialize_extension_service_PreStartImageBuildWorkspaceNotifyResponse,
+  },
+  // Hook point 2
+preImageBuildRequestNotifyHook: {
+    path: '/extension_service.ExtensionService/PreImageBuildRequestNotifyHook',
+    requestStream: false,
+    responseStream: false,
+    requestType: service_pb.PreImageBuildRequestNotifyRequest,
+    responseType: service_pb.PreImageBuildRequestNotifyResponse,
+    requestSerialize: serialize_extension_service_PreImageBuildRequestNotifyRequest,
+    requestDeserialize: deserialize_extension_service_PreImageBuildRequestNotifyRequest,
+    responseSerialize: serialize_extension_service_PreImageBuildRequestNotifyResponse,
+    responseDeserialize: deserialize_extension_service_PreImageBuildRequestNotifyResponse,
   },
 };
 
