@@ -2,11 +2,17 @@ syntax = "proto3";
 
 package extension_service;
 
-option go_package = "github.com/gitpod-io/gitpod/extension-service/api";
+option go_package = "github.com/trilogy-group/cn-gitpod/extension-service/api";
 
 service ExtensionService {
+    // Hook point 1
     rpc preStartWorkspaceNotifyHook(PreStartWorkspaceNotifyRequest) returns (PreStartWorkspaceNotifyResponse) {}
+    // Hook point 4
     rpc PostCreateWorkspacePodModifyHook(PostCreateWorkspacePodModifyRequest) returns (PostCreateWorkspacePodModifyResponse) {}
+    // Hook point 3
+    rpc PreStartImageBuildWorkspaceNotifyHook(PreStartImageBuildWorkspaceNotifyRequest) returns (PreStartImageBuildWorkspaceNotifyResponse) {}
+    // Hook point 2
+    rpc PreImageBuildRequestNotifyHook(PreImageBuildRequestNotifyRequest) returns (PreImageBuildRequestNotifyResponse) {}
 }
 
 message PreStartWorkspaceNotifyRequest {
@@ -134,4 +140,22 @@ message PreferredSchedulingTerm {
 
     // A node selector term, associated with the corresponding weight.
     optional NodeSelectorTerm preference = 2;
+}
+
+message PreStartImageBuildWorkspaceNotifyRequest {
+    string workspaceImageRef = 1;
+    PreStartWorkspaceInstance instance = 2;
+}
+
+message PreStartImageBuildWorkspaceNotifyResponse {
+    string message = 1;
+}
+
+message PreImageBuildRequestNotifyRequest {
+    string workspaceImageRef = 1;
+    string buildId = 2;
+}
+
+message PreImageBuildRequestNotifyResponse {
+    string message = 1;
 }
