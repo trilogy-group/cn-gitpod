@@ -9,43 +9,10 @@ import { PreStartWorkspaceNotifyRequest, PreStartWorkspaceNotifyResponse } from 
 import { prismaClient } from "../utils/prisma";
 
 // ! original:
-// const preStartWorkspaceNotifyHookHandler: grpc.handleUnaryCall<
-//     PreStartWorkspaceNotifyRequest,
-//     PreStartWorkspaceNotifyResponse
-// > = (call, callback) => {
-//     console.log(`extension-service server: preStartWorkspaceNotifyHookHandler`);
-//     console.log("preStartWorkspaceNotifyHookHandler", call.request.toObject());
-
-//     const request = call.request.toObject();
-//     const response = new PreStartWorkspaceNotifyResponse();
-//     let message = ``;
-
-//     // * save in db
-//     prismaClient.workspaceInstance
-//         .create({
-//             data: {
-//                 instanceId: request.instance?.id,
-//                 arch: request.workspace?.config?.arch,
-//             },
-//         })
-//         .then((data) => {
-//             message = `Workspace instance id created with id: ${data.instanceId}`;
-//             response.setMessage(message);
-//         })
-//         .catch((err) => {
-//             message = `Error creating prisma create for id: ${request.instance?.id}`;
-//             response.setMessage(message);
-//         })
-//         .finally(() => {
-//             callback(null, response);
-//         });
-// };
-
-// ! async-await test:
 const preStartWorkspaceNotifyHookHandler: grpc.handleUnaryCall<
     PreStartWorkspaceNotifyRequest,
     PreStartWorkspaceNotifyResponse
-> = async (call) => {
+> = async (call, callback) => {
     console.log(`extension-service server: preStartWorkspaceNotifyHookHandler`);
     console.log("preStartWorkspaceNotifyHookHandler", call.request.toObject());
 
@@ -53,21 +20,26 @@ const preStartWorkspaceNotifyHookHandler: grpc.handleUnaryCall<
     const response = new PreStartWorkspaceNotifyResponse();
     let message = ``;
 
-    try {
-        // save in db
-        const data = await prismaClient.workspaceInstance.create({
+    // * save in db
+    await prismaClient.workspaceInstance
+        .create({
             data: {
                 instanceId: request.instance?.id,
                 arch: request.workspace?.config?.arch,
             },
+        })
+        .then((data) => {
+            message = `Workspace instance id created with id: ${data.instanceId}`;
+            console.log({ message });
+            response.setMessage(message);
+        })
+        .catch((err) => {
+            message = `Error creating prisma create for id: ${request.instance?.id}`;
+            response.setMessage(message);
+        })
+        .finally(() => {
+            callback(null, response);
         });
-        message = `Workspace instance id created with id: ${data.instanceId}`;
-    } catch (err) {
-        message = `Error creating prisma create for id: ${request.instance?.id}`;
-    }
-
-    response.setMessage(message);
-    return response;
 };
 
 export { preStartWorkspaceNotifyHookHandler };
