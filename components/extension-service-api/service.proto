@@ -12,7 +12,7 @@ service ExtensionService {
     // Hook point 3
     rpc PreStartImageBuildWorkspaceNotifyHook(PreStartImageBuildWorkspaceNotifyRequest) returns (PreStartImageBuildWorkspaceNotifyResponse) {}
     // Hook point 2
-    rpc PreImageBuildRequestNotifyHook(PreImageBuildRequestNotifyRequest) returns (PreImageBuildRequestNotifyResponse) {}
+    rpc PreCallImageBuilderNotifyHook(PreImageBuildRequestNotifyRequest) returns (PreImageBuildRequestNotifyResponse) {}
 }
 
 message PreStartWorkspaceNotifyRequest {
