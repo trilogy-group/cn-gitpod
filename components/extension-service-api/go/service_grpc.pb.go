@@ -26,8 +26,14 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ExtensionServiceClient interface {
+	// Hook point 1
 	PreStartWorkspaceNotifyHook(ctx context.Context, in *PreStartWorkspaceNotifyRequest, opts ...grpc.CallOption) (*PreStartWorkspaceNotifyResponse, error)
+	// Hook point 4
 	PostCreateWorkspacePodModifyHook(ctx context.Context, in *PostCreateWorkspacePodModifyRequest, opts ...grpc.CallOption) (*PostCreateWorkspacePodModifyResponse, error)
+	// Hook point 3
+	PreStartImageBuildWorkspaceNotifyHook(ctx context.Context, in *PreStartImageBuildWorkspaceNotifyRequest, opts ...grpc.CallOption) (*PreStartImageBuildWorkspaceNotifyResponse, error)
+	// Hook point 2
+	PreCallImageBuilderNotifyHook(ctx context.Context, in *PreCallImageBuilderNotifyRequest, opts ...grpc.CallOption) (*PreCallImageBuilderNotifyResponse, error)
 }
 
 type extensionServiceClient struct {
@@ -56,12 +62,36 @@ func (c *extensionServiceClient) PostCreateWorkspacePodModifyHook(ctx context.Co
 	return out, nil
 }
 
+func (c *extensionServiceClient) PreStartImageBuildWorkspaceNotifyHook(ctx context.Context, in *PreStartImageBuildWorkspaceNotifyRequest, opts ...grpc.CallOption) (*PreStartImageBuildWorkspaceNotifyResponse, error) {
+	out := new(PreStartImageBuildWorkspaceNotifyResponse)
+	err := c.cc.Invoke(ctx, "/extension_service.ExtensionService/PreStartImageBuildWorkspaceNotifyHook", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *extensionServiceClient) PreCallImageBuilderNotifyHook(ctx context.Context, in *PreCallImageBuilderNotifyRequest, opts ...grpc.CallOption) (*PreCallImageBuilderNotifyResponse, error) {
+	out := new(PreCallImageBuilderNotifyResponse)
+	err := c.cc.Invoke(ctx, "/extension_service.ExtensionService/PreCallImageBuilderNotifyHook", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ExtensionServiceServer is the server API for ExtensionService service.
 // All implementations must embed UnimplementedExtensionServiceServer
 // for forward compatibility
 type ExtensionServiceServer interface {
+	// Hook point 1
 	PreStartWorkspaceNotifyHook(context.Context, *PreStartWorkspaceNotifyRequest) (*PreStartWorkspaceNotifyResponse, error)
+	// Hook point 4
 	PostCreateWorkspacePodModifyHook(context.Context, *PostCreateWorkspacePodModifyRequest) (*PostCreateWorkspacePodModifyResponse, error)
+	// Hook point 3
+	PreStartImageBuildWorkspaceNotifyHook(context.Context, *PreStartImageBuildWorkspaceNotifyRequest) (*PreStartImageBuildWorkspaceNotifyResponse, error)
+	// Hook point 2
+	PreCallImageBuilderNotifyHook(context.Context, *PreCallImageBuilderNotifyRequest) (*PreCallImageBuilderNotifyResponse, error)
 	mustEmbedUnimplementedExtensionServiceServer()
 }
 
@@ -74,6 +104,12 @@ func (UnimplementedExtensionServiceServer) PreStartWorkspaceNotifyHook(context.C
 }
 func (UnimplementedExtensionServiceServer) PostCreateWorkspacePodModifyHook(context.Context, *PostCreateWorkspacePodModifyRequest) (*PostCreateWorkspacePodModifyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PostCreateWorkspacePodModifyHook not implemented")
+}
+func (UnimplementedExtensionServiceServer) PreStartImageBuildWorkspaceNotifyHook(context.Context, *PreStartImageBuildWorkspaceNotifyRequest) (*PreStartImageBuildWorkspaceNotifyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PreStartImageBuildWorkspaceNotifyHook not implemented")
+}
+func (UnimplementedExtensionServiceServer) PreCallImageBuilderNotifyHook(context.Context, *PreCallImageBuilderNotifyRequest) (*PreCallImageBuilderNotifyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PreCallImageBuilderNotifyHook not implemented")
 }
 func (UnimplementedExtensionServiceServer) mustEmbedUnimplementedExtensionServiceServer() {}
 
@@ -124,6 +160,42 @@ func _ExtensionService_PostCreateWorkspacePodModifyHook_Handler(srv interface{},
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ExtensionService_PreStartImageBuildWorkspaceNotifyHook_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PreStartImageBuildWorkspaceNotifyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExtensionServiceServer).PreStartImageBuildWorkspaceNotifyHook(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/extension_service.ExtensionService/PreStartImageBuildWorkspaceNotifyHook",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExtensionServiceServer).PreStartImageBuildWorkspaceNotifyHook(ctx, req.(*PreStartImageBuildWorkspaceNotifyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ExtensionService_PreCallImageBuilderNotifyHook_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PreCallImageBuilderNotifyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExtensionServiceServer).PreCallImageBuilderNotifyHook(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/extension_service.ExtensionService/PreCallImageBuilderNotifyHook",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExtensionServiceServer).PreCallImageBuilderNotifyHook(ctx, req.(*PreCallImageBuilderNotifyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ExtensionService_ServiceDesc is the grpc.ServiceDesc for ExtensionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -138,6 +210,14 @@ var ExtensionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PostCreateWorkspacePodModifyHook",
 			Handler:    _ExtensionService_PostCreateWorkspacePodModifyHook_Handler,
+		},
+		{
+			MethodName: "PreStartImageBuildWorkspaceNotifyHook",
+			Handler:    _ExtensionService_PreStartImageBuildWorkspaceNotifyHook_Handler,
+		},
+		{
+			MethodName: "PreCallImageBuilderNotifyHook",
+			Handler:    _ExtensionService_PreCallImageBuilderNotifyHook_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
