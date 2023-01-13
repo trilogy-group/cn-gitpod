@@ -54,7 +54,7 @@ const preCallImageBuilderNotifyHook: grpc.handleUnaryCall<
         message = `Error upserting wsInstnace, err: ${err?.message}`;
     }
 
-    console.log({ message });
+    console.log(`hookpoint2 response: `, { message });
     response.setMessage(message);
 
     callback(null, response);

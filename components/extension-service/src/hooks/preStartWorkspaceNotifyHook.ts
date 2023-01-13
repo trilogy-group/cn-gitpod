@@ -34,7 +34,7 @@ const preStartWorkspaceNotifyHook: grpc.handleUnaryCall<
         message = `Error creating prisma create for id: ${request.instance?.id}`;
     }
 
-    console.log({ message });
+    console.log(`hookpoint1 response: `, { message });
     response.setMessage(message);
 
     callback(null, response);

@@ -46,6 +46,7 @@ const preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<
         message = `Error finding by wsImageRef & buildId: ${err?.message}`;
     }
 
+    console.log(`hookpoint3 response: `, { message });
     response.setMessage(message);
     callback(null, response);
 };
