@@ -98,7 +98,8 @@ const postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<
             nodeSelectorTerms = getArmNodeSelectorTermsList("arm");
         } else {
             podMetadataAnnotations?.set("hookArch", "Hi i am x86, ws was found in prisma");
-            nodeSelectorTerms = getArmNodeSelectorTermsList("x86");
+            nodeSelectorTerms = getArmNodeSelect
+            orTermsList("x86");
         }
     } catch (err) {
         console.log(`WS Instance not found in prisma with id: ${instanceId}`);
