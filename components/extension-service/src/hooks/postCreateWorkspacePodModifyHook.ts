@@ -14,8 +14,9 @@ const postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<
     PostCreateWorkspacePodModifyRequest,
     PostCreateWorkspacePodModifyResponse
 > = async (call, callback) => {
-    console.log(`extension-service server: postCreateWorkspacePodModifyHookHandler`);
-    console.log("postCreateWorkspacePodModifyHookHandler", call.request.toObject());
+    console.log(`extension-service serve hookpoint 4 called`);
+    console.log("postCreateWorkspacePodModifyHook", call.request.toObject());
+
     const response = new PostCreateWorkspacePodModifyResponse();
     const pod = call.request.getPod();
     const podMetadata = pod?.getMetadata();

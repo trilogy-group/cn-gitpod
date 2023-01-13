@@ -16,7 +16,7 @@ const preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<
     PreStartImageBuildWorkspaceNotifyResponse
 > = async (call, callback) => {
     console.log(`extension-service serve hookpoint 3 called`);
-    console.log("preStartImageBuildWorkspaceNotifyHook", call.request.toObject());
+    console.log("preStartImageBuildWorkspaceNotifyHook  ", call.request.toObject());
 
     const request = call.request;
     const response = new PreStartImageBuildWorkspaceNotifyResponse();
