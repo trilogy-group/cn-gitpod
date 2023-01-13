@@ -32,16 +32,17 @@ const preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<
                 workspaceImageRef,
             },
         });
-        const wsInstance = await prismaClient?.workspaceInstance.update({
-            where: {
-                instanceId: buildId,
-            },
+        const wsInstance = await prismaClient?.workspaceInstance.create({
+            // where: {
+            //     instanceId: buildId,
+            // },
             data: {
+                instanceId: buildId,
                 arch: imageRef?.arch,
             },
         });
 
-        message = `Hookpoint3 - updated wsInstance with id: ${wsInstance?.instanceId}, arch: ${wsInstance?.arch}`;
+        message = `Hookpoint3 - created wsInstance with id: ${wsInstance?.instanceId}, arch: ${wsInstance?.arch}`;
     } catch (err) {
         message = `Error finding by wsImageRef & buildId: ${err?.message}`;
     }
