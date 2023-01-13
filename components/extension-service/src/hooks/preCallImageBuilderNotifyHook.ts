@@ -21,7 +21,7 @@ const preCallImageBuilderNotifyHook: grpc.handleUnaryCall<
     const request = call.request;
     const response = new PreCallImageBuilderNotifyResponse();
 
-    // const workspaceImageRef = request.getWorkspaceimageref();
+    const workspaceImageRef = request.getWorkspaceimageref();
     const instanceId = request.getInstance()?.getId();
 
     let message: string;
@@ -36,8 +36,20 @@ const preCallImageBuilderNotifyHook: grpc.handleUnaryCall<
             message = `Could not find wsInstance with id: ${instanceId}`;
         } else {
             // const imageRef = await prismaClient
+            const imageRef = await prismaClient.imageRefArch.upsert({
+                where: {
+                    workspaceImageRef,
+                },
+                create: {
+                    workspaceImageRef,
+                    arch: wsInstance.arch,
+                },
+                update: {
+                    arch: wsInstance.arch,
+                },
+            });
+            message = `Upserted image with ref: ${imageRef.workspaceImageRef}`;
         }
-        message = `Upserted wsInstance with id: ${1}`;
     } catch (err) {
         message = `Error upserting wsInstnace, err: ${err?.message}`;
     }

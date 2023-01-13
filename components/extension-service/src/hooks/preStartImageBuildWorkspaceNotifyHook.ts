@@ -15,6 +15,9 @@ const preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<
     PreStartImageBuildWorkspaceNotifyRequest,
     PreStartImageBuildWorkspaceNotifyResponse
 > = async (call, callback) => {
+    console.log(`extension-service serve hookpoint 3 called`);
+    console.log("preStartImageBuildWorkspaceNotifyHook", call.request.toObject());
+
     const request = call.request;
     const response = new PreStartImageBuildWorkspaceNotifyResponse();
 
@@ -24,14 +27,21 @@ const preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<
     let message: string = "";
 
     try {
-        // const wsInstance = await prismaClient?.workspaceInstance.findFirst({
-        //     where: {
-        //         workspaceImageRef,
-        //         buildId,
-        //     },
-        // });
+        const imageRef = await prismaClient?.imageRefArch.findUnique({
+            where: {
+                workspaceImageRef,
+            },
+        });
+        const wsInstance = await prismaClient?.workspaceInstance.update({
+            where: {
+                instanceId: buildId,
+            },
+            data: {
+                arch: imageRef?.arch,
+            },
+        });
 
-        message = `Found wsInstance with id: ${workspaceImageRef}, ${buildId}`;
+        message = `Hookpoint3 - updated wsInstance with id: ${wsInstance?.instanceId}, arch: ${wsInstance?.arch}`;
     } catch (err) {
         message = `Error finding by wsImageRef & buildId: ${err?.message}`;
     }
