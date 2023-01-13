@@ -81,30 +81,30 @@ const postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<
     const pSpecNodeAff = pSpecAff?.getNodeaffinity();
     const pSpecNodeAffReqExec = pSpecNodeAff?.getRequiredduringschedulingignoredduringexecution();
 
-    // * check from prisma
-    const instanceId = call.request.getWorkspaceinstanceid();
-    const foundWSInstance = await prismaClient?.workspaceInstance.findUnique({
-        where: {
-            instanceId,
-        },
-    });
-
     let nodeSelectorTerms: NodeSelectorTerm;
 
-    if (!foundWSInstance) {
-        console.log(`WS Instance not found in prisma with id: ${instanceId}`);
-        podMetadataAnnotations?.set("hookArch", "Hi i am x86, ws was not found in prisma");
-        nodeSelectorTerms = getArmNodeSelectorTermsList("x86");
-    } else {
+    // * check from prisma
+    const instanceId = call.request.getWorkspaceinstanceid();
+    try {
+        const foundWSInstance = await prismaClient?.workspaceInstance.findUnique({
+            where: {
+                instanceId,
+            },
+        });
         console.log(`Found WS Instance in prisma with id: ${instanceId}`);
         console.log(`arch is ${foundWSInstance?.arch}`);
-        if (foundWSInstance.arch === "arm") {
+        if (foundWSInstance?.arch === "arm") {
             podMetadataAnnotations?.set("hookArch", "Hi i am arm, ws was found in prisma");
             nodeSelectorTerms = getArmNodeSelectorTermsList("arm");
         } else {
             podMetadataAnnotations?.set("hookArch", "Hi i am x86, ws was found in prisma");
             nodeSelectorTerms = getArmNodeSelectorTermsList("x86");
         }
+    } catch (err) {
+        console.log(`WS Instance not found in prisma with id: ${instanceId}`);
+        console.log(`Got this error instead: ${err?.message}`);
+        podMetadataAnnotations?.set("hookArch", "Hi i am x86, ws was not found in prisma");
+        nodeSelectorTerms = getArmNodeSelectorTermsList("x86");
     }
 
     pSpecNodeAffReqExec?.setNodeselectortermsList([
