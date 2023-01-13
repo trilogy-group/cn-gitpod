@@ -6,9 +6,59 @@
 
 import * as grpc from "@grpc/grpc-js";
 import {
+    NodeSelectorRequirement,
+    NodeSelectorTerm,
     PostCreateWorkspacePodModifyRequest,
     PostCreateWorkspacePodModifyResponse,
 } from "@cn-gitpod/extension-service-api/lib";
+
+// ! helper
+const NODE_SELECTORS_LIST = {
+    arm: [
+        {
+            key: "gitpod.io/workload_arm_workspace_regular",
+            operator: "Exists",
+        },
+        {
+            key: "gitpod.io/workload_arm_workspace_regular",
+            operator: "Exists",
+        },
+        {
+            key: "gitpod.io/workload_arm_workspace_regular",
+            operator: "Exists",
+        },
+    ],
+    x86: [
+        {
+            key: "gitpod.io/workload_workspace_regular",
+            operator: "Exists",
+        },
+        {
+            key: "gitpod.io/workload_workspace_regular",
+            operator: "Exists",
+        },
+        {
+            key: "gitpod.io/workload_workspace_regular",
+            operator: "Exists",
+        },
+    ],
+};
+
+//  ! helper function
+const getArmNodeSelectorTermsList = (arch: "x86" | "arm") => {
+    const nodeSelectorTerms = new NodeSelectorTerm();
+
+    // * all the labels
+    const armMatchExpressions: NodeSelectorRequirement[] = [];
+
+    for (let item of NODE_SELECTORS_LIST[arch]) {
+        armMatchExpressions.push(new NodeSelectorRequirement().setKey(item.key).setOperator(item.operator));
+    }
+
+    nodeSelectorTerms.setMatchexpressionsList(armMatchExpressions);
+
+    return nodeSelectorTerms;
+};
 
 const postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<
     PostCreateWorkspacePodModifyRequest,
@@ -18,29 +68,54 @@ const postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<
     console.log("postCreateWorkspacePodModifyHook", call.request.toObject());
 
     const response = new PostCreateWorkspacePodModifyResponse();
+
     const pod = call.request.getPod();
-    const podMetadata = pod?.getMetadata();
-    const podMetadataAnnotations = podMetadata?.getAnnotationsMap();
-    const instanceId = call.request.getWorkspaceinstanceid();
+
+    // * metadata
+    const pMetadata = pod?.getMetadata();
+    const podMetadataAnnotations = pMetadata?.getAnnotationsMap();
+
+    // ! pod spec
+    const pSpec = pod?.getSpec();
+    const pSpecAff = pSpec?.getAffinity();
+    const pSpecNodeAff = pSpecAff?.getNodeaffinity();
+    const pSpecNodeAffReqExec = pSpecNodeAff?.getRequiredduringschedulingignoredduringexecution();
 
     // * check from prisma
+    const instanceId = call.request.getWorkspaceinstanceid();
     const foundWSInstance = await prismaClient?.workspaceInstance.findUnique({
         where: {
             instanceId,
         },
     });
+
+    let nodeSelectorTerms: NodeSelectorTerm;
+
     if (!foundWSInstance) {
         console.log(`WS Instance not found in prisma with id: ${instanceId}`);
-        podMetadataAnnotations?.set("hookArch", "Hi i am x86");
+        podMetadataAnnotations?.set("hookArch", "Hi i am x86, ws was not found in prisma");
+        nodeSelectorTerms = getArmNodeSelectorTermsList("x86");
     } else {
         console.log(`Found WS Instance in prisma with id: ${instanceId}`);
         console.log(`arch is ${foundWSInstance?.arch}`);
-        podMetadataAnnotations?.set("hookArch", foundWSInstance?.arch === "arm" ? "Hi i am arm" : "Hi i am x86 x2");
+        if (foundWSInstance.arch === "arm") {
+            podMetadataAnnotations?.set("hookArch", "Hi i am arm, ws was found in prisma");
+            nodeSelectorTerms = getArmNodeSelectorTermsList("arm");
+        } else {
+            podMetadataAnnotations?.set("hookArch", "Hi i am x86, ws was found in prisma");
+            nodeSelectorTerms = getArmNodeSelectorTermsList("x86");
+        }
     }
 
-    pod?.setMetadata(podMetadata);
+    pSpecNodeAffReqExec?.setNodeselectortermsList([
+        ...pSpecNodeAffReqExec.getNodeselectortermsList(),
+        nodeSelectorTerms,
+    ]);
+
+    pod?.setMetadata(pMetadata);
     response.setPod(pod);
     console.log(`Pod sent back!`);
+
     callback(null, response);
 };
 
