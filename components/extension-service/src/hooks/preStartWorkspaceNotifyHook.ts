@@ -7,8 +7,8 @@
 import * as grpc from "@grpc/grpc-js";
 import { PreStartWorkspaceNotifyRequest, PreStartWorkspaceNotifyResponse } from "@cn-gitpod/extension-service-api/lib";
 import { prismaClient } from "../utils/prisma";
+import { WorkspaceInstance } from "@prisma/client";
 
-// ! original:
 const preStartWorkspaceNotifyHook: grpc.handleUnaryCall<
     PreStartWorkspaceNotifyRequest,
     PreStartWorkspaceNotifyResponse
@@ -20,26 +20,24 @@ const preStartWorkspaceNotifyHook: grpc.handleUnaryCall<
     const response = new PreStartWorkspaceNotifyResponse();
     let message = ``;
 
+    let wsInstance: WorkspaceInstance;
     // * save in db
-    await prismaClient.workspaceInstance
-        .create({
+    try {
+        wsInstance = await prismaClient.workspaceInstance.create({
             data: {
                 instanceId: request.instance?.id,
                 arch: request.workspace?.config?.arch,
             },
-        })
-        .then((data) => {
-            message = `Workspace instance id created with id: ${data.instanceId}`;
-            console.log({ message });
-            response.setMessage(message);
-        })
-        .catch((err) => {
-            message = `Error creating prisma create for id: ${request.instance?.id}`;
-            response.setMessage(message);
-        })
-        .finally(() => {
-            callback(null, response);
         });
+        message = `Workspace instance id created with id: ${wsInstance.instanceId}`;
+    } catch (err) {
+        message = `Error creating prisma create for id: ${request.instance?.id}`;
+    }
+
+    console.log({ message });
+    response.setMessage(message);
+
+    callback(null, response);
 };
 
 export { preStartWorkspaceNotifyHook };

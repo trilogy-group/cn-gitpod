@@ -21,24 +21,23 @@ const preCallImageBuilderNotifyHook: grpc.handleUnaryCall<
     const request = call.request;
     const response = new PreCallImageBuilderNotifyResponse();
 
-    const workspaceImageRef = request.getWorkspaceimageref();
+    // const workspaceImageRef = request.getWorkspaceimageref();
     const instanceId = request.getInstance()?.getId();
 
     let message: string;
     try {
-        let wsInstance = await prismaClient.workspaceInstance.upsert({
+        // ! we have to update table2 via 1. First we fetch 1
+        const wsInstance = await prismaClient.workspaceInstance.findUnique({
             where: {
                 instanceId,
             },
-            create: {
-                instanceId,
-                workspaceImageRef,
-            },
-            update: {
-                workspaceImageRef,
-            },
         });
-        message = `Upserted wsInstance with id: ${wsInstance.instanceId}`;
+        if (!wsInstance) {
+            message = `Could not find wsInstance with id: ${instanceId}`;
+        } else {
+            // const imageRef = await prismaClient
+        }
+        message = `Upserted wsInstance with id: ${1}`;
     } catch (err) {
         message = `Error upserting wsInstnace, err: ${err?.message}`;
     }

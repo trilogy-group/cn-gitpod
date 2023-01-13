@@ -8,10 +8,11 @@ datasource db {
 }
 
 model WorkspaceInstance {
-  instanceId        String  @id @default(uuid())
-  arch              String?  @default("x86")
-  workspaceImageRef String?
-  buildId           String?
+  instanceId String  @id @default(uuid())
+  arch       String? @default("x86")
+}
 
-  @@index([workspaceImageRef, buildId])
+model ImageRefArch {
+  workspaceImageRef String  @id
+  arch              String? @default("x86")
 }
