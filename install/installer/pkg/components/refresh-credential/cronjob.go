@@ -23,7 +23,7 @@ func cronjob(ctx *common.RenderContext) ([]runtime.Object, error) {
 				Name:            Component,
 				Args:            []string{"ecr-update", "/config/config.json"},
 				Image:           ctx.ImageName(ctx.Config.Repository, Component, ctx.VersionManifest.Components.RefreshCredential.Version),
-				ImagePullPolicy: corev1.PullIfNotPresent,
+				ImagePullPolicy: corev1.PullAlways,
 				SecurityContext: &corev1.SecurityContext{
 					AllowPrivilegeEscalation: pointer.Bool(false),
 				},

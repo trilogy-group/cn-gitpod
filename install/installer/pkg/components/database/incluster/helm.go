@@ -40,7 +40,7 @@ var Helm = common.CompositeHelmFunc(
 					helm.ImagePullSecrets("mysql.metrics.image.pullSecrets", cfg),
 					helm.KeyValue("mysql.metrics.image.registry", imageRegistry),
 					helm.ImagePullSecrets("mysql.volumePermissions.image.pullSecrets", cfg),
-					helm.KeyValue("mysql.volumePermissions.image.pullPolicy", "IfNotPresent"),
+					helm.KeyValue("mysql.volumePermissions.image.pullPolicy", "Always"),
 					helm.KeyValue("mysql.volumePermissions.image.registry", imageRegistry),
 
 					// improve start time

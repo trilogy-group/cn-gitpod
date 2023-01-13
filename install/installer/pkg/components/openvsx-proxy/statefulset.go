@@ -115,7 +115,7 @@ func statefulset(ctx *common.RenderContext) ([]runtime.Object, error) {
 						SecurityContext: &v1.SecurityContext{
 							AllowPrivilegeEscalation: pointer.Bool(false),
 						},
-						ImagePullPolicy: v1.PullIfNotPresent,
+						ImagePullPolicy: v1.PullAlways,
 						Resources: common.ResourceRequirements(ctx, Component, Component, v1.ResourceRequirements{
 							Requests: v1.ResourceList{
 								"cpu":    resource.MustParse("1m"),
@@ -148,7 +148,7 @@ func statefulset(ctx *common.RenderContext) ([]runtime.Object, error) {
 							Name:  "MASTER",
 							Value: "true",
 						}},
-						ImagePullPolicy: "IfNotPresent",
+						ImagePullPolicy: "Always",
 						Ports: []v1.ContainerPort{{
 							ContainerPort: 6379,
 						}},

@@ -163,7 +163,7 @@ func deployment(ctx *common.RenderContext) ([]runtime.Object, error) {
 						InitContainers: []corev1.Container{{
 							Name:            "sysctl",
 							Image:           ctx.ImageName(common.ThirdPartyContainerRepo(ctx.Config.Repository, common.DockerRegistryURL), InitContainerImage, InitContainerTag),
-							ImagePullPolicy: corev1.PullIfNotPresent,
+							ImagePullPolicy: corev1.PullAlways,
 							SecurityContext: &corev1.SecurityContext{
 								Privileged: pointer.Bool(true),
 							},
@@ -176,7 +176,7 @@ func deployment(ctx *common.RenderContext) ([]runtime.Object, error) {
 						Containers: []corev1.Container{{
 							Name:            kubeRbacProxyContainerName,
 							Image:           ctx.ImageName(common.ThirdPartyContainerRepo(ctx.Config.Repository, KubeRBACProxyRepo), KubeRBACProxyImage, KubeRBACProxyTag),
-							ImagePullPolicy: corev1.PullIfNotPresent,
+							ImagePullPolicy: corev1.PullAlways,
 							Args: []string{
 								"--logtostderr",
 								fmt.Sprintf("--insecure-listen-address=[$(IP)]:%d", baseserver.BuiltinMetricsPort),
@@ -210,7 +210,7 @@ func deployment(ctx *common.RenderContext) ([]runtime.Object, error) {
 						}, {
 							Name:            Component,
 							Image:           ctx.ImageName(ctx.Config.Repository, Component, ctx.VersionManifest.Components.Proxy.Version),
-							ImagePullPolicy: corev1.PullIfNotPresent,
+							ImagePullPolicy: corev1.PullAlways,
 							Resources: common.ResourceRequirements(ctx, Component, Component, corev1.ResourceRequirements{
 								Requests: corev1.ResourceList{
 									"cpu":    resource.MustParse("100m"),

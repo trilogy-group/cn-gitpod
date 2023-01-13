@@ -245,7 +245,7 @@ fi
 						MountPath: "/mnt/sync-tmp",
 					},
 				},
-				ImagePullPolicy: corev1.PullIfNotPresent,
+				ImagePullPolicy: corev1.PullAlways,
 				SecurityContext: &corev1.SecurityContext{
 					Privileged: pointer.Bool(true),
 				},
@@ -289,7 +289,7 @@ fi
 					common.NodeNameEnv(ctx),
 					common.ProxyEnv(&ctx.Config),
 				)),
-				ImagePullPolicy: corev1.PullIfNotPresent,
+				ImagePullPolicy: corev1.PullAlways,
 				SecurityContext: &corev1.SecurityContext{
 					AllowPrivilegeEscalation: pointer.Bool(false),
 				},
