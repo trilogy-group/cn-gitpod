@@ -9,7 +9,7 @@ metadata:
 spec:
   chart:
     name: fluent-bit
-    chartVersion: 0.20.2
+    chartVersion: 0.21.7
   helmVersion: v3
   useHelmInstall: false
   weight: 10

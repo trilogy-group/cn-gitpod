@@ -7,7 +7,7 @@ domain_name = "gitpod-infra-hybrid.k8.devfactory.com"
 region = "us-east-1"
 
 # make sure the cidr do not have any conflicts and will have IP ranges enough to split into 5 subnets
-vpc_cidr = "10.100.0.0/16"
+vpc_cidr = "172.28.0.0/16"
 
 # should be atleast 2 zones
 vpc_availability_zones = ["us-east-1a", "us-east-1b"]
@@ -17,7 +17,7 @@ vpc_availability_zones = ["us-east-1a", "us-east-1b"]
 # https://cloud-images.ubuntu.com/docs/aws/eks/
 cluster_version = "1.23"
 
-image_id = "ami-0f89411984ff168ca"
+image_id = "ami-053a2c50bbd863e25"
 
 create_external_database = false
 create_external_storage  = true

@@ -20,13 +20,6 @@ module "vpc" {
   enable_dns_hostnames = true
 }
 
-module "aws_ebs_csi_driver" {
-  source                = "github.com/andreswebs/terraform-aws-eks-ebs-csi-driver"
-  cluster_name          = var.cluster_name
-  cluster_oidc_provider = module.eks.oidc_provider_arn
-  iam_role_name         = "ebs-csi-controller-${var.cluster_name}"
-}
-
 resource "aws_security_group_rule" "eks-worker-ingress-self" {
   description              = "Allow node to communicate with each other"
   from_port                = 0
@@ -57,7 +50,6 @@ resource "aws_security_group_rule" "eks-cluster-ingress-node-https" {
   to_port                  = 443
   type                     = "ingress"
 }
-
 
 resource "aws_security_group" "nodes" {
   name   = "nodes-sg-${var.cluster_name}"
@@ -211,7 +203,7 @@ module "eks" {
 
     ArmRegularWorkspaces = {
       instance_types = [var.arm_workspace_machine_type]
-      ami_id         = "ami-059f09228b2eed616"
+      ami_id         = "ami-04458375d2220b12f"
       name           = "ws-arm-regular-${var.cluster_name}"
       iam_role_name  = format("%s-%s", substr("${var.cluster_name}-arm-regular-ws-ng", 0, 58), random_string.ng_role_suffix.result)
       subnet_ids     = module.vpc.public_subnets
@@ -253,7 +245,7 @@ module "eks" {
 
     ArmHeadlessWorkspaces = {
       instance_types = [var.arm_workspace_machine_type]
-      ami_id         = "ami-059f09228b2eed616"
+      ami_id         = "ami-04458375d2220b12f"
       name           = "ws-arm-headless-${var.cluster_name}"
       iam_role_name  = format("%s-%s", substr("${var.cluster_name}-arm-headless-ws-ng", 0, 58), random_string.ng_role_suffix.result)
       subnet_ids     = module.vpc.public_subnets
