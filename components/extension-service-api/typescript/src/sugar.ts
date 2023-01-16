@@ -7,7 +7,7 @@
 import "reflect-metadata";
 import { inject, injectable } from "inversify";
 import { ExtensionServiceClient } from "./service_grpc_pb";
-import { PreStartWorkspaceNotifyRequest, PreStartWorkspaceNotifyResponse } from "./service_pb";
+import { PreCallImageBuilderNotifyRequest, PreCallImageBuilderNotifyResponse, PreStartWorkspaceNotifyRequest, PreStartWorkspaceNotifyResponse } from "./service_pb";
 import * as grpc from "@grpc/grpc-js";
 
 export const ExtensionServiceClientConfig = Symbol("ExtensionServiceClientConfig");
@@ -72,6 +72,21 @@ export class PromisifiedExtensionServiceClient {
         return new Promise<PreStartWorkspaceNotifyResponse>((resolve, reject) => {
             // TODO: pass span to extension-service for better tracing
             this.client.preStartWorkspaceNotifyHook(request, (err, resp) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(resp);
+                }
+            });
+        });
+    }
+
+    public preCallImageBuilderNotifyHook(
+        request: PreCallImageBuilderNotifyRequest,
+    ): Promise<PreCallImageBuilderNotifyResponse> {
+        return new Promise<PreStartWorkspaceNotifyResponse>((resolve, reject) => {
+            // TODO: pass span to extension-service for better tracing
+            this.client.preCallImageBuilderNotifyHook(request, (err, resp) => {
                 if (err) {
                     reject(err);
                 } else {

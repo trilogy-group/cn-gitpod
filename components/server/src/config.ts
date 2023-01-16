@@ -168,7 +168,7 @@ export interface ConfigSerialized {
      * Example: image-builder:8080
      */
     extensionServiceAddr: string;
-    // Devspaces-specific eb
+    // Devspaces-specific end
 
     /**
      * The address usage service clients connect to
