@@ -1364,10 +1364,9 @@ export class WorkspaceStarter {
                 instance,
             );
             let extensionServiceClient = await this.extensionServiceClientProvider.getClient();
-            // Hookpoint - 2. Hook notifies the extension service that a build with (workspaceImageReference, workspaceInstance)
-            // refstr = await client.ResolveWorkspaceImage({span}, req)
-            // preImageBuildRequestNotifyHook(refstr, workspaceInstance)
-            // To be consumed by Hookpoint - 3.
+            // Hookpoint - 2. Hook notifies the extension service that the ImageBuilder is about to be called for -
+            // build information (workspaceImageReference, workspaceInstance)
+            // This information would be consumed by Hookpoint - 3.
             let response = await extensionServiceClient.preCallImageBuilderNotifyHook(preCallImageBuilderNotifyRequest);
             log.info(
                 { workspace: workspace.id, instance: instance.id },

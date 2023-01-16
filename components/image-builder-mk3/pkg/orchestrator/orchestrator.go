@@ -372,6 +372,7 @@ func (o *Orchestrator) Build(req *protocol.BuildRequest, resp protocol.ImageBuil
 
 	// Devspaces-specific start
 	// Hookpoint - 3. Notifies extenstion-service that an ImageBuildWorkspace is gonna be spawned for a (workspaceImageReference, BuildID)
+	// This information would be consumed by hookpoint - 4.
 	hookRequest := &extserviceapi.PreStartImageBuildWorkspaceNotifyRequest{
 		WorkspaceImageRef: wsrefstr,
 		BuildId:           buildID,
