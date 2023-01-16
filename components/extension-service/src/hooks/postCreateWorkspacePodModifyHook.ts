@@ -111,8 +111,13 @@ const postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<
         ...pSpecNodeAffReqExec.getNodeselectortermsList(),
         nodeSelectorTerms,
     ]);
+    pSpecNodeAff?.setRequiredduringschedulingignoredduringexecution(pSpecNodeAffReqExec);
+    pSpecAff?.setNodeaffinity(pSpecNodeAff);
+    pSpec?.setAffinity(pSpecAff);
 
+    pod?.setSpec(pSpec);
     pod?.setMetadata(pMetadata);
+
     response.setPod(pod);
     console.log(`Pod sent back!`);
 
