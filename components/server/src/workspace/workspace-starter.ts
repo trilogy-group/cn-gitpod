@@ -482,16 +482,16 @@ export class WorkspaceStarter {
     protected preparePreStartWorkspaceNotifyRequest(
         workspace: Workspace,
         instance: WorkspaceInstance,
-    ): ExtServiceApi.PreStartWorkspaceNotifyRequest {
-        let req = ExtServiceApi.PreStartWorkspaceNotifyRequest;
+    ): ExtServiceApi.PreStartWorkspaceModifyRequest {
+        let req = new ExtServiceApi.PreStartWorkspaceModifyRequest();
         return req;
     }
 
-    protected preparePreCallImageBuilderNotifyRequest(
+    protected preparePreCallImageBuilderModifyRequest(
         workspaceImageRef: string,
         workspaceInstance: WorkspaceInstance,
-    ): ExtServiceApi.PreCallImageBuilderNotifyRequest {
-        let req = new ExtServiceApi.PreCallImageBuilderNotifyRequest();
+    ): ExtServiceApi.PreCallImageBuilderModifyRequest {
+        let req = new ExtServiceApi.PreCallImageBuilderModifyRequest();
         return req;
     }
     // Devspaces-specifc end
@@ -518,7 +518,7 @@ export class WorkspaceStarter {
         // To be consumed by Hookpoint - 4.
         let preStartWorkspaceNotifyRequest = this.preparePreStartWorkspaceNotifyRequest(workspace, instance);
         let extensionServiceClient = await this.extensionServiceClientProvider.getClient();
-        let response = await extensionServiceClient.preStartWorkspaceNotifyHook(preStartWorkspaceNotifyRequest);
+        let response = await extensionServiceClient.preStartWorkspaceModifyHook(preStartWorkspaceNotifyRequest);
         log.info(
             { workspace: workspace.id, instance: instance.id },
             `Got response from extensionService: ${response.toString()}`,
@@ -1340,7 +1340,7 @@ export class WorkspaceStarter {
             let hookWorkspaceImageRef = (
                 await client.resolveWorkspaceImage({ span }, resolveWorkspaceImageReq)
             ).getRef();
-            let preCallImageBuilderNotifyRequest = this.preparePreCallImageBuilderNotifyRequest(
+            let preCallImageBuilderNotifyRequest = this.preparePreCallImageBuilderModifyRequest(
                 hookWorkspaceImageRef,
                 instance,
             );
