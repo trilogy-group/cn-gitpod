@@ -18,37 +18,38 @@ const preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<
     console.log(`extension-service serve hookpoint 3 called`);
     console.log("preStartImageBuildWorkspaceNotifyHook  ", call.request.toObject());
 
-    const request = call.request;
+    // const request = call.request;
     const response = new PreStartImageBuildWorkspaceNotifyResponse();
 
-    const workspaceImageRef = request.getWorkspaceimageref();
-    const buildId = request.getBuildid();
+    // const workspaceImageRef = request.getWorkspaceimageref();
+    // const buildId = request.getBuildid();
 
-    let message: string = "";
+    // let message: string = "";
 
-    try {
-        const imageRef = await prismaClient?.imageRefArch.findUnique({
-            where: {
-                workspaceImageRef,
-            },
-        });
-        const wsInstance = await prismaClient?.workspaceInstance.create({
-            // where: {
-            //     instanceId: buildId,
-            // },
-            data: {
-                instanceId: buildId,
-                arch: imageRef?.arch,
-            },
-        });
+    // try {
+    //     const imageRef = await prismaClient?.imageRefArch.findUnique({
+    //         where: {
+    //             workspaceImageRef,
+    //         },
+    //     });
+    //     const wsInstance = await prismaClient?.workspaceInstance.create({
+    //         // where: {
+    //         //     instanceId: buildId,
+    //         // },
+    //         data: {
+    //             instanceId: buildId,
+    //             arch: imageRef?.arch,
+    //         },
+    //     });
 
-        message = `Hookpoint3 - created wsInstance with id: ${wsInstance?.instanceId}, arch: ${wsInstance?.arch}`;
-    } catch (err) {
-        message = `Error finding by wsImageRef & buildId: ${err?.message}`;
-    }
+    //     message = `Hookpoint3 - created wsInstance with id: ${wsInstance?.instanceId}, arch: ${wsInstance?.arch}`;
+    // } catch (err) {
+    //     message = `Error finding by wsImageRef & buildId: ${err?.message}`;
+    // }
 
-    console.log(`hookpoint3 response: `, { message });
-    response.setMessage(message);
+    // console.log(`hookpoint3 response: `, { message });
+    // response.setMessage(message);
+
     callback(null, response);
 };
 

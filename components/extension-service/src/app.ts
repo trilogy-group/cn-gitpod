@@ -9,8 +9,8 @@ import { ExtensionServiceService } from "@cn-gitpod/extension-service-api/lib";
 
 import { connectDB } from "./utils/prisma";
 import {
-    preStartWorkspaceNotifyHook,
-    preCallImageBuilderNotifyHook,
+    preStartWorkspaceModifyHook,
+    preCallImageBuilderModifyHook,
     preStartImageBuildWorkspaceNotifyHook,
     postCreateWorkspacePodModifyHook,
 } from "./hooks";
@@ -19,8 +19,8 @@ const server = new grpc.Server();
 
 // * adding services
 server.addService(ExtensionServiceService, {
-    preStartWorkspaceNotifyHook,
-    preCallImageBuilderNotifyHook,
+    preStartWorkspaceModifyHook,
+    preCallImageBuilderModifyHook,
     preStartImageBuildWorkspaceNotifyHook,
     postCreateWorkspacePodModifyHook,
 });

@@ -4,7 +4,7 @@
  * See License-AGPL.txt in the project root for license information.
  */
 
-export * from "./preStartWorkspaceNotifyHook";
+export * from "./preStartWorkspaceModifyHook";
+export * from "./preCallImageBuilderModifyHook";
+export * from "./preStartImageBuildWorkspaceNotifyHook";
 export * from "./postCreateWorkspacePodModifyHook";
-export * from './preStartImageBuildWorkspaceNotifyHook'
-export * from './preCallImageBuilderNotifyHook'
