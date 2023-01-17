@@ -12,29 +12,29 @@
 
 import * as jspb from "google-protobuf";
 
-export class PreStartWorkspacePayload extends jspb.Message {
+export class PreStartWorkspaceModifyPayload extends jspb.Message {
 
     hasWorkspace(): boolean;
     clearWorkspace(): void;
     getWorkspace(): Workspace | undefined;
-    setWorkspace(value?: Workspace): PreStartWorkspacePayload;
+    setWorkspace(value?: Workspace): PreStartWorkspaceModifyPayload;
 
     hasInstance(): boolean;
     clearInstance(): void;
     getInstance(): WorkspaceInstance | undefined;
-    setInstance(value?: WorkspaceInstance): PreStartWorkspacePayload;
+    setInstance(value?: WorkspaceInstance): PreStartWorkspaceModifyPayload;
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): PreStartWorkspacePayload.AsObject;
-    static toObject(includeInstance: boolean, msg: PreStartWorkspacePayload): PreStartWorkspacePayload.AsObject;
+    toObject(includeInstance?: boolean): PreStartWorkspaceModifyPayload.AsObject;
+    static toObject(includeInstance: boolean, msg: PreStartWorkspaceModifyPayload): PreStartWorkspaceModifyPayload.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: PreStartWorkspacePayload, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): PreStartWorkspacePayload;
-    static deserializeBinaryFromReader(message: PreStartWorkspacePayload, reader: jspb.BinaryReader): PreStartWorkspacePayload;
+    static serializeBinaryToWriter(message: PreStartWorkspaceModifyPayload, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): PreStartWorkspaceModifyPayload;
+    static deserializeBinaryFromReader(message: PreStartWorkspaceModifyPayload, reader: jspb.BinaryReader): PreStartWorkspaceModifyPayload;
 }
 
-export namespace PreStartWorkspacePayload {
+export namespace PreStartWorkspaceModifyPayload {
     export type AsObject = {
         workspace?: Workspace.AsObject,
         instance?: WorkspaceInstance.AsObject,
@@ -45,8 +45,8 @@ export class PreStartWorkspaceModifyRequest extends jspb.Message {
 
     hasPayload(): boolean;
     clearPayload(): void;
-    getPayload(): PreStartWorkspacePayload | undefined;
-    setPayload(value?: PreStartWorkspacePayload): PreStartWorkspaceModifyRequest;
+    getPayload(): PreStartWorkspaceModifyPayload | undefined;
+    setPayload(value?: PreStartWorkspaceModifyPayload): PreStartWorkspaceModifyRequest;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): PreStartWorkspaceModifyRequest.AsObject;
@@ -60,7 +60,7 @@ export class PreStartWorkspaceModifyRequest extends jspb.Message {
 
 export namespace PreStartWorkspaceModifyRequest {
     export type AsObject = {
-        payload?: PreStartWorkspacePayload.AsObject,
+        payload?: PreStartWorkspaceModifyPayload.AsObject,
     }
 }
 
@@ -68,8 +68,8 @@ export class PreStartWorkspaceModifyResponse extends jspb.Message {
 
     hasPayload(): boolean;
     clearPayload(): void;
-    getPayload(): PreStartWorkspacePayload | undefined;
-    setPayload(value?: PreStartWorkspacePayload): PreStartWorkspaceModifyResponse;
+    getPayload(): PreStartWorkspaceModifyPayload | undefined;
+    setPayload(value?: PreStartWorkspaceModifyPayload): PreStartWorkspaceModifyResponse;
     getError(): string;
     setError(value: string): PreStartWorkspaceModifyResponse;
 
@@ -85,7 +85,7 @@ export class PreStartWorkspaceModifyResponse extends jspb.Message {
 
 export namespace PreStartWorkspaceModifyResponse {
     export type AsObject = {
-        payload?: PreStartWorkspacePayload.AsObject,
+        payload?: PreStartWorkspaceModifyPayload.AsObject,
         error: string,
     }
 }

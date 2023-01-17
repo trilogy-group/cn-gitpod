@@ -15,17 +15,17 @@ service ExtensionService {
     rpc preCallImageBuilderModifyHook(PreCallImageBuilderModifyRequest) returns (PreCallImageBuilderModifyResponse) {}
 }
 
-message PreStartWorkspacePayload {
+message PreStartWorkspaceModifyPayload {
     Workspace workspace = 1;
     WorkspaceInstance instance = 2;
 }
 
 message PreStartWorkspaceModifyRequest {
-    PreStartWorkspacePayload payload = 1;
+    PreStartWorkspaceModifyPayload payload = 1;
 }
 
 message PreStartWorkspaceModifyResponse {
-    PreStartWorkspacePayload payload = 1;
+    PreStartWorkspaceModifyPayload payload = 1;
     string error = 2;
 }
 
