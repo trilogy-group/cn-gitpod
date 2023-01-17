@@ -6,33 +6,51 @@ option go_package = "github.com/trilogy-group/cn-gitpod/extension-service/api";
 
 service ExtensionService {
     // Hook point 1
-    rpc preStartWorkspaceNotifyHook(PreStartWorkspaceNotifyRequest) returns (PreStartWorkspaceNotifyResponse) {}
+    rpc preStartWorkspaceModifyHook(PreStartWorkspaceModifyRequest) returns (PreStartWorkspaceModifyResponse) {}
     // Hook point 4
     rpc PostCreateWorkspacePodModifyHook(PostCreateWorkspacePodModifyRequest) returns (PostCreateWorkspacePodModifyResponse) {}
     // Hook point 3
-    rpc PreStartImageBuildWorkspaceNotifyHook(PreStartImageBuildWorkspaceNotifyRequest) returns (PreStartImageBuildWorkspaceNotifyResponse) {}
+    rpc preStartImageBuildWorkspaceNotifyHook(PreStartImageBuildWorkspaceNotifyRequest) returns (PreStartImageBuildWorkspaceNotifyResponse) {}
     // Hook point 2
-    rpc PreCallImageBuilderNotifyHook(PreCallImageBuilderNotifyRequest) returns (PreCallImageBuilderNotifyResponse) {}
+    rpc preCallImageBuilderModifyHook(PreCallImageBuilderModifyRequest) returns (PreCallImageBuilderModifyResponse) {}
 }
 
-message PreStartWorkspaceNotifyRequest {
-    PreStartWorkspace workspace = 1;
-    PreStartWorkspaceInstance instance = 2;
+message PreStartWorkspacePayload {
+    Workspace workspace = 1;
+    WorkspaceInstance instance = 2;
 }
 
-message PreStartWorkspaceNotifyResponse {
-    string message = 1;
+message PreStartWorkspaceModifyRequest {
+    PreStartWorkspacePayload payload = 1;
 }
 
-message PreStartWorkspace {
-    PreStartWorkspaceConfig config = 1;
+message PreStartWorkspaceModifyResponse {
+    PreStartWorkspacePayload payload = 1;
+    string error = 2;
 }
 
-message PreStartWorkspaceConfig {
+message Workspace {
+    WorkspaceConfig config = 1;
+}
+
+message WorkspaceConfig {
     string arch = 1;
+    ImageConfig image = 2;
 }
 
-message PreStartWorkspaceInstance {
+message ImageConfig {
+    oneof from {
+        string configString  = 1;
+        ImageConfigFile configFile = 2;
+    }
+}
+
+message ImageConfigFile {
+    string file = 1;
+    optional string context = 2;
+}
+
+message WorkspaceInstance {
     string id = 1;
 }
 
@@ -143,19 +161,80 @@ message PreferredSchedulingTerm {
 }
 
 message PreStartImageBuildWorkspaceNotifyRequest {
-    string workspaceImageRef = 1;
+    BuildRequest buildRequest = 1;
     string buildId = 2;
 }
 
 message PreStartImageBuildWorkspaceNotifyResponse {
-    string message = 1;
+    string error = 1;
 }
 
-message PreCallImageBuilderNotifyRequest {
-    string workspaceImageRef = 1;
-    PreStartWorkspaceInstance instance = 2;
+message PreCallImageBuilderModifyPayload {
+    BuildRequest buildRequest = 1;
+    WorkspaceInstance instance = 2;
 }
 
-message PreCallImageBuilderNotifyResponse {
-    string message = 1;
+message PreCallImageBuilderModifyRequest {
+    PreCallImageBuilderModifyPayload payload = 1;
+}
+
+message PreCallImageBuilderModifyResponse {
+    PreCallImageBuilderModifyPayload payload = 1;
+    string error = 2;
+}
+
+message BuildRequest {
+    BuildSource source = 1;
+    BuildRegistryAuth auth = 2;
+    bool force_rebuild = 3;
+    string triggered_by = 4;
+}
+
+message BuildSource {
+    oneof from {
+        BuildSourceReference ref = 1;
+        BuildSourceDockerfile file = 2;
+    };
+}
+
+message BuildRegistryAuth {
+    oneof mode {
+        BuildRegistryAuthTotal total = 1;
+        BuildRegistryAuthSelective selective = 2;
+    }
+    map<string, string> additional = 3;
+}
+
+message BuildRegistryAuthTotal {
+    bool allow_all = 1;
+}
+
+message BuildRegistryAuthSelective {
+    bool allow_baserep = 1;
+    bool allow_workspacerep = 2;
+    repeated string any_of = 3;
+}
+
+message BuildSourceReference {
+    string ref = 1;
+}
+
+message BuildSourceDockerfile {
+    WorkspaceInitializer source = 1;
+    string dockerfile_version = 2;
+    string dockerfile_path = 3;
+    string context_path = 4;
+}
+
+message WorkspaceInitializer {
+    oneof spec {
+        GitInitializer git = 2;
+    }
+}
+
+message GitInitializer {
+    // remote_uri is the Git remote origin
+    string remote_uri = 1;
+	// the value for the clone target mode - use depends on the target mode
+	string clone_target = 2;
 }

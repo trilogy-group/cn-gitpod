@@ -12,113 +12,212 @@
 
 import * as jspb from "google-protobuf";
 
-export class PreStartWorkspaceNotifyRequest extends jspb.Message {
+export class PreStartWorkspacePayload extends jspb.Message {
 
     hasWorkspace(): boolean;
     clearWorkspace(): void;
-    getWorkspace(): PreStartWorkspace | undefined;
-    setWorkspace(value?: PreStartWorkspace): PreStartWorkspaceNotifyRequest;
+    getWorkspace(): Workspace | undefined;
+    setWorkspace(value?: Workspace): PreStartWorkspacePayload;
 
     hasInstance(): boolean;
     clearInstance(): void;
-    getInstance(): PreStartWorkspaceInstance | undefined;
-    setInstance(value?: PreStartWorkspaceInstance): PreStartWorkspaceNotifyRequest;
+    getInstance(): WorkspaceInstance | undefined;
+    setInstance(value?: WorkspaceInstance): PreStartWorkspacePayload;
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): PreStartWorkspaceNotifyRequest.AsObject;
-    static toObject(includeInstance: boolean, msg: PreStartWorkspaceNotifyRequest): PreStartWorkspaceNotifyRequest.AsObject;
+    toObject(includeInstance?: boolean): PreStartWorkspacePayload.AsObject;
+    static toObject(includeInstance: boolean, msg: PreStartWorkspacePayload): PreStartWorkspacePayload.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: PreStartWorkspaceNotifyRequest, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): PreStartWorkspaceNotifyRequest;
-    static deserializeBinaryFromReader(message: PreStartWorkspaceNotifyRequest, reader: jspb.BinaryReader): PreStartWorkspaceNotifyRequest;
+    static serializeBinaryToWriter(message: PreStartWorkspacePayload, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): PreStartWorkspacePayload;
+    static deserializeBinaryFromReader(message: PreStartWorkspacePayload, reader: jspb.BinaryReader): PreStartWorkspacePayload;
 }
 
-export namespace PreStartWorkspaceNotifyRequest {
+export namespace PreStartWorkspacePayload {
     export type AsObject = {
-        workspace?: PreStartWorkspace.AsObject,
-        instance?: PreStartWorkspaceInstance.AsObject,
+        workspace?: Workspace.AsObject,
+        instance?: WorkspaceInstance.AsObject,
     }
 }
 
-export class PreStartWorkspaceNotifyResponse extends jspb.Message {
-    getMessage(): string;
-    setMessage(value: string): PreStartWorkspaceNotifyResponse;
+export class PreStartWorkspaceModifyRequest extends jspb.Message {
+
+    hasPayload(): boolean;
+    clearPayload(): void;
+    getPayload(): PreStartWorkspacePayload | undefined;
+    setPayload(value?: PreStartWorkspacePayload): PreStartWorkspaceModifyRequest;
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): PreStartWorkspaceNotifyResponse.AsObject;
-    static toObject(includeInstance: boolean, msg: PreStartWorkspaceNotifyResponse): PreStartWorkspaceNotifyResponse.AsObject;
+    toObject(includeInstance?: boolean): PreStartWorkspaceModifyRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: PreStartWorkspaceModifyRequest): PreStartWorkspaceModifyRequest.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: PreStartWorkspaceNotifyResponse, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): PreStartWorkspaceNotifyResponse;
-    static deserializeBinaryFromReader(message: PreStartWorkspaceNotifyResponse, reader: jspb.BinaryReader): PreStartWorkspaceNotifyResponse;
+    static serializeBinaryToWriter(message: PreStartWorkspaceModifyRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): PreStartWorkspaceModifyRequest;
+    static deserializeBinaryFromReader(message: PreStartWorkspaceModifyRequest, reader: jspb.BinaryReader): PreStartWorkspaceModifyRequest;
 }
 
-export namespace PreStartWorkspaceNotifyResponse {
+export namespace PreStartWorkspaceModifyRequest {
     export type AsObject = {
-        message: string,
+        payload?: PreStartWorkspacePayload.AsObject,
     }
 }
 
-export class PreStartWorkspace extends jspb.Message {
+export class PreStartWorkspaceModifyResponse extends jspb.Message {
+
+    hasPayload(): boolean;
+    clearPayload(): void;
+    getPayload(): PreStartWorkspacePayload | undefined;
+    setPayload(value?: PreStartWorkspacePayload): PreStartWorkspaceModifyResponse;
+    getError(): string;
+    setError(value: string): PreStartWorkspaceModifyResponse;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): PreStartWorkspaceModifyResponse.AsObject;
+    static toObject(includeInstance: boolean, msg: PreStartWorkspaceModifyResponse): PreStartWorkspaceModifyResponse.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: PreStartWorkspaceModifyResponse, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): PreStartWorkspaceModifyResponse;
+    static deserializeBinaryFromReader(message: PreStartWorkspaceModifyResponse, reader: jspb.BinaryReader): PreStartWorkspaceModifyResponse;
+}
+
+export namespace PreStartWorkspaceModifyResponse {
+    export type AsObject = {
+        payload?: PreStartWorkspacePayload.AsObject,
+        error: string,
+    }
+}
+
+export class Workspace extends jspb.Message {
 
     hasConfig(): boolean;
     clearConfig(): void;
-    getConfig(): PreStartWorkspaceConfig | undefined;
-    setConfig(value?: PreStartWorkspaceConfig): PreStartWorkspace;
+    getConfig(): WorkspaceConfig | undefined;
+    setConfig(value?: WorkspaceConfig): Workspace;
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): PreStartWorkspace.AsObject;
-    static toObject(includeInstance: boolean, msg: PreStartWorkspace): PreStartWorkspace.AsObject;
+    toObject(includeInstance?: boolean): Workspace.AsObject;
+    static toObject(includeInstance: boolean, msg: Workspace): Workspace.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: PreStartWorkspace, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): PreStartWorkspace;
-    static deserializeBinaryFromReader(message: PreStartWorkspace, reader: jspb.BinaryReader): PreStartWorkspace;
+    static serializeBinaryToWriter(message: Workspace, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): Workspace;
+    static deserializeBinaryFromReader(message: Workspace, reader: jspb.BinaryReader): Workspace;
 }
 
-export namespace PreStartWorkspace {
+export namespace Workspace {
     export type AsObject = {
-        config?: PreStartWorkspaceConfig.AsObject,
+        config?: WorkspaceConfig.AsObject,
     }
 }
 
-export class PreStartWorkspaceConfig extends jspb.Message {
+export class WorkspaceConfig extends jspb.Message {
     getArch(): string;
-    setArch(value: string): PreStartWorkspaceConfig;
+    setArch(value: string): WorkspaceConfig;
+
+    hasImage(): boolean;
+    clearImage(): void;
+    getImage(): ImageConfig | undefined;
+    setImage(value?: ImageConfig): WorkspaceConfig;
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): PreStartWorkspaceConfig.AsObject;
-    static toObject(includeInstance: boolean, msg: PreStartWorkspaceConfig): PreStartWorkspaceConfig.AsObject;
+    toObject(includeInstance?: boolean): WorkspaceConfig.AsObject;
+    static toObject(includeInstance: boolean, msg: WorkspaceConfig): WorkspaceConfig.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: PreStartWorkspaceConfig, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): PreStartWorkspaceConfig;
-    static deserializeBinaryFromReader(message: PreStartWorkspaceConfig, reader: jspb.BinaryReader): PreStartWorkspaceConfig;
+    static serializeBinaryToWriter(message: WorkspaceConfig, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): WorkspaceConfig;
+    static deserializeBinaryFromReader(message: WorkspaceConfig, reader: jspb.BinaryReader): WorkspaceConfig;
 }
 
-export namespace PreStartWorkspaceConfig {
+export namespace WorkspaceConfig {
     export type AsObject = {
         arch: string,
+        image?: ImageConfig.AsObject,
     }
 }
 
-export class PreStartWorkspaceInstance extends jspb.Message {
-    getId(): string;
-    setId(value: string): PreStartWorkspaceInstance;
+export class ImageConfig extends jspb.Message {
+
+    hasConfigstring(): boolean;
+    clearConfigstring(): void;
+    getConfigstring(): string;
+    setConfigstring(value: string): ImageConfig;
+
+    hasConfigfile(): boolean;
+    clearConfigfile(): void;
+    getConfigfile(): ImageConfigFile | undefined;
+    setConfigfile(value?: ImageConfigFile): ImageConfig;
+
+    getFromCase(): ImageConfig.FromCase;
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): PreStartWorkspaceInstance.AsObject;
-    static toObject(includeInstance: boolean, msg: PreStartWorkspaceInstance): PreStartWorkspaceInstance.AsObject;
+    toObject(includeInstance?: boolean): ImageConfig.AsObject;
+    static toObject(includeInstance: boolean, msg: ImageConfig): ImageConfig.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: PreStartWorkspaceInstance, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): PreStartWorkspaceInstance;
-    static deserializeBinaryFromReader(message: PreStartWorkspaceInstance, reader: jspb.BinaryReader): PreStartWorkspaceInstance;
+    static serializeBinaryToWriter(message: ImageConfig, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): ImageConfig;
+    static deserializeBinaryFromReader(message: ImageConfig, reader: jspb.BinaryReader): ImageConfig;
 }
 
-export namespace PreStartWorkspaceInstance {
+export namespace ImageConfig {
+    export type AsObject = {
+        configstring: string,
+        configfile?: ImageConfigFile.AsObject,
+    }
+
+    export enum FromCase {
+        FROM_NOT_SET = 0,
+        CONFIGSTRING = 1,
+        CONFIGFILE = 2,
+    }
+
+}
+
+export class ImageConfigFile extends jspb.Message {
+    getFile(): string;
+    setFile(value: string): ImageConfigFile;
+
+    hasContext(): boolean;
+    clearContext(): void;
+    getContext(): string | undefined;
+    setContext(value: string): ImageConfigFile;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): ImageConfigFile.AsObject;
+    static toObject(includeInstance: boolean, msg: ImageConfigFile): ImageConfigFile.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: ImageConfigFile, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): ImageConfigFile;
+    static deserializeBinaryFromReader(message: ImageConfigFile, reader: jspb.BinaryReader): ImageConfigFile;
+}
+
+export namespace ImageConfigFile {
+    export type AsObject = {
+        file: string,
+        context?: string,
+    }
+}
+
+export class WorkspaceInstance extends jspb.Message {
+    getId(): string;
+    setId(value: string): WorkspaceInstance;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): WorkspaceInstance.AsObject;
+    static toObject(includeInstance: boolean, msg: WorkspaceInstance): WorkspaceInstance.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: WorkspaceInstance, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): WorkspaceInstance;
+    static deserializeBinaryFromReader(message: WorkspaceInstance, reader: jspb.BinaryReader): WorkspaceInstance;
+}
+
+export namespace WorkspaceInstance {
     export type AsObject = {
         id: string,
     }
@@ -411,8 +510,11 @@ export namespace PreferredSchedulingTerm {
 }
 
 export class PreStartImageBuildWorkspaceNotifyRequest extends jspb.Message {
-    getWorkspaceimageref(): string;
-    setWorkspaceimageref(value: string): PreStartImageBuildWorkspaceNotifyRequest;
+
+    hasBuildrequest(): boolean;
+    clearBuildrequest(): void;
+    getBuildrequest(): BuildRequest | undefined;
+    setBuildrequest(value?: BuildRequest): PreStartImageBuildWorkspaceNotifyRequest;
     getBuildid(): string;
     setBuildid(value: string): PreStartImageBuildWorkspaceNotifyRequest;
 
@@ -428,14 +530,14 @@ export class PreStartImageBuildWorkspaceNotifyRequest extends jspb.Message {
 
 export namespace PreStartImageBuildWorkspaceNotifyRequest {
     export type AsObject = {
-        workspaceimageref: string,
+        buildrequest?: BuildRequest.AsObject,
         buildid: string,
     }
 }
 
 export class PreStartImageBuildWorkspaceNotifyResponse extends jspb.Message {
-    getMessage(): string;
-    setMessage(value: string): PreStartImageBuildWorkspaceNotifyResponse;
+    getError(): string;
+    setError(value: string): PreStartImageBuildWorkspaceNotifyResponse;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): PreStartImageBuildWorkspaceNotifyResponse.AsObject;
@@ -449,52 +551,354 @@ export class PreStartImageBuildWorkspaceNotifyResponse extends jspb.Message {
 
 export namespace PreStartImageBuildWorkspaceNotifyResponse {
     export type AsObject = {
-        message: string,
+        error: string,
     }
 }
 
-export class PreCallImageBuilderNotifyRequest extends jspb.Message {
-    getWorkspaceimageref(): string;
-    setWorkspaceimageref(value: string): PreCallImageBuilderNotifyRequest;
+export class PreCallImageBuilderModifyPayload extends jspb.Message {
+
+    hasBuildrequest(): boolean;
+    clearBuildrequest(): void;
+    getBuildrequest(): BuildRequest | undefined;
+    setBuildrequest(value?: BuildRequest): PreCallImageBuilderModifyPayload;
 
     hasInstance(): boolean;
     clearInstance(): void;
-    getInstance(): PreStartWorkspaceInstance | undefined;
-    setInstance(value?: PreStartWorkspaceInstance): PreCallImageBuilderNotifyRequest;
+    getInstance(): WorkspaceInstance | undefined;
+    setInstance(value?: WorkspaceInstance): PreCallImageBuilderModifyPayload;
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): PreCallImageBuilderNotifyRequest.AsObject;
-    static toObject(includeInstance: boolean, msg: PreCallImageBuilderNotifyRequest): PreCallImageBuilderNotifyRequest.AsObject;
+    toObject(includeInstance?: boolean): PreCallImageBuilderModifyPayload.AsObject;
+    static toObject(includeInstance: boolean, msg: PreCallImageBuilderModifyPayload): PreCallImageBuilderModifyPayload.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: PreCallImageBuilderNotifyRequest, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): PreCallImageBuilderNotifyRequest;
-    static deserializeBinaryFromReader(message: PreCallImageBuilderNotifyRequest, reader: jspb.BinaryReader): PreCallImageBuilderNotifyRequest;
+    static serializeBinaryToWriter(message: PreCallImageBuilderModifyPayload, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): PreCallImageBuilderModifyPayload;
+    static deserializeBinaryFromReader(message: PreCallImageBuilderModifyPayload, reader: jspb.BinaryReader): PreCallImageBuilderModifyPayload;
 }
 
-export namespace PreCallImageBuilderNotifyRequest {
+export namespace PreCallImageBuilderModifyPayload {
     export type AsObject = {
-        workspaceimageref: string,
-        instance?: PreStartWorkspaceInstance.AsObject,
+        buildrequest?: BuildRequest.AsObject,
+        instance?: WorkspaceInstance.AsObject,
     }
 }
 
-export class PreCallImageBuilderNotifyResponse extends jspb.Message {
-    getMessage(): string;
-    setMessage(value: string): PreCallImageBuilderNotifyResponse;
+export class PreCallImageBuilderModifyRequest extends jspb.Message {
+
+    hasPayload(): boolean;
+    clearPayload(): void;
+    getPayload(): PreCallImageBuilderModifyPayload | undefined;
+    setPayload(value?: PreCallImageBuilderModifyPayload): PreCallImageBuilderModifyRequest;
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): PreCallImageBuilderNotifyResponse.AsObject;
-    static toObject(includeInstance: boolean, msg: PreCallImageBuilderNotifyResponse): PreCallImageBuilderNotifyResponse.AsObject;
+    toObject(includeInstance?: boolean): PreCallImageBuilderModifyRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: PreCallImageBuilderModifyRequest): PreCallImageBuilderModifyRequest.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: PreCallImageBuilderNotifyResponse, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): PreCallImageBuilderNotifyResponse;
-    static deserializeBinaryFromReader(message: PreCallImageBuilderNotifyResponse, reader: jspb.BinaryReader): PreCallImageBuilderNotifyResponse;
+    static serializeBinaryToWriter(message: PreCallImageBuilderModifyRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): PreCallImageBuilderModifyRequest;
+    static deserializeBinaryFromReader(message: PreCallImageBuilderModifyRequest, reader: jspb.BinaryReader): PreCallImageBuilderModifyRequest;
 }
 
-export namespace PreCallImageBuilderNotifyResponse {
+export namespace PreCallImageBuilderModifyRequest {
     export type AsObject = {
-        message: string,
+        payload?: PreCallImageBuilderModifyPayload.AsObject,
+    }
+}
+
+export class PreCallImageBuilderModifyResponse extends jspb.Message {
+
+    hasPayload(): boolean;
+    clearPayload(): void;
+    getPayload(): PreCallImageBuilderModifyPayload | undefined;
+    setPayload(value?: PreCallImageBuilderModifyPayload): PreCallImageBuilderModifyResponse;
+    getError(): string;
+    setError(value: string): PreCallImageBuilderModifyResponse;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): PreCallImageBuilderModifyResponse.AsObject;
+    static toObject(includeInstance: boolean, msg: PreCallImageBuilderModifyResponse): PreCallImageBuilderModifyResponse.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: PreCallImageBuilderModifyResponse, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): PreCallImageBuilderModifyResponse;
+    static deserializeBinaryFromReader(message: PreCallImageBuilderModifyResponse, reader: jspb.BinaryReader): PreCallImageBuilderModifyResponse;
+}
+
+export namespace PreCallImageBuilderModifyResponse {
+    export type AsObject = {
+        payload?: PreCallImageBuilderModifyPayload.AsObject,
+        error: string,
+    }
+}
+
+export class BuildRequest extends jspb.Message {
+
+    hasSource(): boolean;
+    clearSource(): void;
+    getSource(): BuildSource | undefined;
+    setSource(value?: BuildSource): BuildRequest;
+
+    hasAuth(): boolean;
+    clearAuth(): void;
+    getAuth(): BuildRegistryAuth | undefined;
+    setAuth(value?: BuildRegistryAuth): BuildRequest;
+    getForceRebuild(): boolean;
+    setForceRebuild(value: boolean): BuildRequest;
+    getTriggeredBy(): string;
+    setTriggeredBy(value: string): BuildRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): BuildRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: BuildRequest): BuildRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: BuildRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): BuildRequest;
+    static deserializeBinaryFromReader(message: BuildRequest, reader: jspb.BinaryReader): BuildRequest;
+}
+
+export namespace BuildRequest {
+    export type AsObject = {
+        source?: BuildSource.AsObject,
+        auth?: BuildRegistryAuth.AsObject,
+        forceRebuild: boolean,
+        triggeredBy: string,
+    }
+}
+
+export class BuildSource extends jspb.Message {
+
+    hasRef(): boolean;
+    clearRef(): void;
+    getRef(): BuildSourceReference | undefined;
+    setRef(value?: BuildSourceReference): BuildSource;
+
+    hasFile(): boolean;
+    clearFile(): void;
+    getFile(): BuildSourceDockerfile | undefined;
+    setFile(value?: BuildSourceDockerfile): BuildSource;
+
+    getFromCase(): BuildSource.FromCase;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): BuildSource.AsObject;
+    static toObject(includeInstance: boolean, msg: BuildSource): BuildSource.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: BuildSource, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): BuildSource;
+    static deserializeBinaryFromReader(message: BuildSource, reader: jspb.BinaryReader): BuildSource;
+}
+
+export namespace BuildSource {
+    export type AsObject = {
+        ref?: BuildSourceReference.AsObject,
+        file?: BuildSourceDockerfile.AsObject,
+    }
+
+    export enum FromCase {
+        FROM_NOT_SET = 0,
+        REF = 1,
+        FILE = 2,
+    }
+
+}
+
+export class BuildRegistryAuth extends jspb.Message {
+
+    hasTotal(): boolean;
+    clearTotal(): void;
+    getTotal(): BuildRegistryAuthTotal | undefined;
+    setTotal(value?: BuildRegistryAuthTotal): BuildRegistryAuth;
+
+    hasSelective(): boolean;
+    clearSelective(): void;
+    getSelective(): BuildRegistryAuthSelective | undefined;
+    setSelective(value?: BuildRegistryAuthSelective): BuildRegistryAuth;
+
+    getAdditionalMap(): jspb.Map<string, string>;
+    clearAdditionalMap(): void;
+
+    getModeCase(): BuildRegistryAuth.ModeCase;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): BuildRegistryAuth.AsObject;
+    static toObject(includeInstance: boolean, msg: BuildRegistryAuth): BuildRegistryAuth.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: BuildRegistryAuth, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): BuildRegistryAuth;
+    static deserializeBinaryFromReader(message: BuildRegistryAuth, reader: jspb.BinaryReader): BuildRegistryAuth;
+}
+
+export namespace BuildRegistryAuth {
+    export type AsObject = {
+        total?: BuildRegistryAuthTotal.AsObject,
+        selective?: BuildRegistryAuthSelective.AsObject,
+
+        additionalMap: Array<[string, string]>,
+    }
+
+    export enum ModeCase {
+        MODE_NOT_SET = 0,
+        TOTAL = 1,
+        SELECTIVE = 2,
+    }
+
+}
+
+export class BuildRegistryAuthTotal extends jspb.Message {
+    getAllowAll(): boolean;
+    setAllowAll(value: boolean): BuildRegistryAuthTotal;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): BuildRegistryAuthTotal.AsObject;
+    static toObject(includeInstance: boolean, msg: BuildRegistryAuthTotal): BuildRegistryAuthTotal.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: BuildRegistryAuthTotal, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): BuildRegistryAuthTotal;
+    static deserializeBinaryFromReader(message: BuildRegistryAuthTotal, reader: jspb.BinaryReader): BuildRegistryAuthTotal;
+}
+
+export namespace BuildRegistryAuthTotal {
+    export type AsObject = {
+        allowAll: boolean,
+    }
+}
+
+export class BuildRegistryAuthSelective extends jspb.Message {
+    getAllowBaserep(): boolean;
+    setAllowBaserep(value: boolean): BuildRegistryAuthSelective;
+    getAllowWorkspacerep(): boolean;
+    setAllowWorkspacerep(value: boolean): BuildRegistryAuthSelective;
+    clearAnyOfList(): void;
+    getAnyOfList(): Array<string>;
+    setAnyOfList(value: Array<string>): BuildRegistryAuthSelective;
+    addAnyOf(value: string, index?: number): string;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): BuildRegistryAuthSelective.AsObject;
+    static toObject(includeInstance: boolean, msg: BuildRegistryAuthSelective): BuildRegistryAuthSelective.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: BuildRegistryAuthSelective, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): BuildRegistryAuthSelective;
+    static deserializeBinaryFromReader(message: BuildRegistryAuthSelective, reader: jspb.BinaryReader): BuildRegistryAuthSelective;
+}
+
+export namespace BuildRegistryAuthSelective {
+    export type AsObject = {
+        allowBaserep: boolean,
+        allowWorkspacerep: boolean,
+        anyOfList: Array<string>,
+    }
+}
+
+export class BuildSourceReference extends jspb.Message {
+    getRef(): string;
+    setRef(value: string): BuildSourceReference;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): BuildSourceReference.AsObject;
+    static toObject(includeInstance: boolean, msg: BuildSourceReference): BuildSourceReference.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: BuildSourceReference, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): BuildSourceReference;
+    static deserializeBinaryFromReader(message: BuildSourceReference, reader: jspb.BinaryReader): BuildSourceReference;
+}
+
+export namespace BuildSourceReference {
+    export type AsObject = {
+        ref: string,
+    }
+}
+
+export class BuildSourceDockerfile extends jspb.Message {
+
+    hasSource(): boolean;
+    clearSource(): void;
+    getSource(): WorkspaceInitializer | undefined;
+    setSource(value?: WorkspaceInitializer): BuildSourceDockerfile;
+    getDockerfileVersion(): string;
+    setDockerfileVersion(value: string): BuildSourceDockerfile;
+    getDockerfilePath(): string;
+    setDockerfilePath(value: string): BuildSourceDockerfile;
+    getContextPath(): string;
+    setContextPath(value: string): BuildSourceDockerfile;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): BuildSourceDockerfile.AsObject;
+    static toObject(includeInstance: boolean, msg: BuildSourceDockerfile): BuildSourceDockerfile.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: BuildSourceDockerfile, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): BuildSourceDockerfile;
+    static deserializeBinaryFromReader(message: BuildSourceDockerfile, reader: jspb.BinaryReader): BuildSourceDockerfile;
+}
+
+export namespace BuildSourceDockerfile {
+    export type AsObject = {
+        source?: WorkspaceInitializer.AsObject,
+        dockerfileVersion: string,
+        dockerfilePath: string,
+        contextPath: string,
+    }
+}
+
+export class WorkspaceInitializer extends jspb.Message {
+
+    hasGit(): boolean;
+    clearGit(): void;
+    getGit(): GitInitializer | undefined;
+    setGit(value?: GitInitializer): WorkspaceInitializer;
+
+    getSpecCase(): WorkspaceInitializer.SpecCase;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): WorkspaceInitializer.AsObject;
+    static toObject(includeInstance: boolean, msg: WorkspaceInitializer): WorkspaceInitializer.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: WorkspaceInitializer, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): WorkspaceInitializer;
+    static deserializeBinaryFromReader(message: WorkspaceInitializer, reader: jspb.BinaryReader): WorkspaceInitializer;
+}
+
+export namespace WorkspaceInitializer {
+    export type AsObject = {
+        git?: GitInitializer.AsObject,
+    }
+
+    export enum SpecCase {
+        SPEC_NOT_SET = 0,
+        GIT = 2,
+    }
+
+}
+
+export class GitInitializer extends jspb.Message {
+    getRemoteUri(): string;
+    setRemoteUri(value: string): GitInitializer;
+    getCloneTarget(): string;
+    setCloneTarget(value: string): GitInitializer;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): GitInitializer.AsObject;
+    static toObject(includeInstance: boolean, msg: GitInitializer): GitInitializer.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: GitInitializer, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): GitInitializer;
+    static deserializeBinaryFromReader(message: GitInitializer, reader: jspb.BinaryReader): GitInitializer;
+}
+
+export namespace GitInitializer {
+    export type AsObject = {
+        remoteUri: string,
+        cloneTarget: string,
     }
 }
