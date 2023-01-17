@@ -61,6 +61,7 @@ import {
     EnvVarWithValue,
     BillingTier,
     Project,
+    ImageConfigString,
 } from "@gitpod/gitpod-protocol";
 import { IAnalyticsWriter } from "@gitpod/gitpod-protocol/lib/analytics";
 import { log } from "@gitpod/gitpod-protocol/lib/util/logging";
@@ -478,23 +479,77 @@ export class WorkspaceStarter {
     }
 
     // Devspaces-specifc start
-    // TODO: When the PreStartWorkspaceNotifyRequest's proto is updated with all necessary fields, update this function accordingly
-    protected preparePreStartWorkspaceNotifyRequest(
+    // TODO: When the PreStartWorkspaceModifyRequest's proto is updated with all necessary fields, update this function accordingly
+    protected preparePreStartWorkspaceModifyRequest(
         workspace: Workspace,
         instance: WorkspaceInstance,
     ): ExtServiceApi.PreStartWorkspaceModifyRequest {
         let req = new ExtServiceApi.PreStartWorkspaceModifyRequest();
+        let payload = new ExtServiceApi.PreStartWorkspaceModifyPayload();
+        let ws = new ExtServiceApi.Workspace();
+        let wsConfig = new ExtServiceApi.WorkspaceConfig();
+        // TODO: this default value should be handled before and not here.
+        let arch = workspace.config.arch ? workspace.config.arch : "x86";
+        let imageConfig = new ExtServiceApi.ImageConfig();
+        let actualImageConfig = workspace.config.image;
+        if (ImageConfigFile.is(actualImageConfig)) {
+            let imageConfigFile = new ExtServiceApi.ImageConfigFile();
+            imageConfigFile.setFile(actualImageConfig.file);
+            if (actualImageConfig.context) {
+                imageConfigFile.setContext(actualImageConfig.context);
+            }
+            imageConfig.setConfigfile(imageConfigFile);
+        } else if (ImageConfigString.is(actualImageConfig)) {
+            imageConfig.setConfigstring(actualImageConfig);
+        }
+        wsConfig.setImage(imageConfig);
+        wsConfig.setArch(arch);
+        ws.setConfig(wsConfig);
+        let wsInstance = new ExtServiceApi.WorkspaceInstance();
+        wsInstance.setId(instance.id);
+        payload.setInstance(wsInstance);
+        payload.setWorkspace(ws);
+        req.setPayload(payload);
         return req;
     }
 
+    protected parsePreStartWorkspaceModifyResponse(
+        response: ExtServiceApi.PreStartWorkspaceModifyResponse,
+        workspace: Workspace,
+        instance: WorkspaceInstance,
+    ): { workspace: Workspace; instance: WorkspaceInstance } {
+        let payload = response.getPayload()!;
+        let payloadObject = payload.toObject();
+        instance.id = payloadObject.instance!.id;
+        workspace.config.arch = payloadObject.workspace!.config!.arch;
+        let imageConfig = payload.getWorkspace()!.getConfig()!.getImage()!;
+        if (imageConfig.hasConfigfile()) {
+            let imageConfigFile: ImageConfigFile = {
+                file: imageConfig.getConfigfile()!.getFile(),
+                context: imageConfig.getConfigfile()!.getContext(),
+            };
+            workspace.config.image = imageConfigFile;
+        } else if (imageConfig.hasConfigstring()) {
+            workspace.config.image = imageConfig.getConfigstring();
+        }
+        return { workspace, instance };
+    }
+
     protected preparePreCallImageBuilderModifyRequest(
-        workspaceImageRef: string,
-        workspaceInstance: WorkspaceInstance,
+        buildRequest: BuildRequest,
+        instance: WorkspaceInstance,
     ): ExtServiceApi.PreCallImageBuilderModifyRequest {
         let req = new ExtServiceApi.PreCallImageBuilderModifyRequest();
         return req;
     }
-    // Devspaces-specifc end
+
+    protected parsePreCallImageBuilderModifyResponse(
+        response: ExtServiceApi.PreCallImageBuilderModifyResponse,
+        buildRequest: BuildRequest,
+        instance: WorkspaceInstance,
+    ): { buildRequest: BuildRequest; instance: WorkspaceInstance } {
+        return { buildRequest, instance };
+    }
 
     // Note: this function does not expect to be awaited for by its caller. This means that it takes care of error handling itself.
     protected async actuallyStartWorkspace(
@@ -514,15 +569,23 @@ export class WorkspaceStarter {
         // Devpsaces-specifc start
         // Hookpoint - 1. Hook notifies extension service saying that an "instance" of a "workspace" is about to be started.
         // The extension-service returns a possibly modified (instance, worksapce) pair which is updated.
-        // preStartWorkspaceNotifyHook(workspace, instance)
+        // PreStartWorkspaceModifyHook(workspace, instance)
         // To be consumed by Hookpoint - 4.
-        let preStartWorkspaceNotifyRequest = this.preparePreStartWorkspaceNotifyRequest(workspace, instance);
+        let preStartWorkspaceModifyRequest = this.preparePreStartWorkspaceModifyRequest(workspace, instance);
         let extensionServiceClient = await this.extensionServiceClientProvider.getClient();
-        let response = await extensionServiceClient.preStartWorkspaceModifyHook(preStartWorkspaceNotifyRequest);
-        log.info(
-            { workspace: workspace.id, instance: instance.id },
-            `Got response from extensionService: ${response.toString()}`,
-        );
+        let response = await extensionServiceClient.preStartWorkspaceModifyHook(preStartWorkspaceModifyRequest);
+        if (response.getError() === "") {
+            ({ workspace, instance } = this.parsePreStartWorkspaceModifyResponse(response, workspace, instance));
+            log.info(
+                { workspace: workspace.id, instance: instance.id },
+                `preStartWorkspaceModifyHook: Got a successful response from extensionService. `,
+            );
+        } else {
+            log.error(
+                { workspace: workspace.id, instance: instance.id },
+                `preStartWorkspaceModifyHook: Got an error response from extensionService: ${response.getError()}`,
+            );
+        }
         // Devspaces-specifc end
 
         try {
@@ -1333,26 +1396,34 @@ export class WorkspaceStarter {
                     }),
                 );
             // Devspaces-specific start
-            // Let's get wsrefstr from imageBuilder
-            let resolveWorkspaceImageReq = new ResolveWorkspaceImageRequest();
-            resolveWorkspaceImageReq.setAuth(auth);
-            resolveWorkspaceImageReq.setSource(src);
-            let hookWorkspaceImageRef = (
-                await client.resolveWorkspaceImage({ span }, resolveWorkspaceImageReq)
-            ).getRef();
-            let preCallImageBuilderNotifyRequest = this.preparePreCallImageBuilderModifyRequest(
-                hookWorkspaceImageRef,
-                instance,
-            );
+            let preCallImageBuilderNotifyRequest = this.preparePreCallImageBuilderModifyRequest(req, instance);
             let extensionServiceClient = await this.extensionServiceClientProvider.getClient();
             // Hookpoint - 2. Hook notifies the extension service that the ImageBuilder is about to be called for -
-            // build information (workspaceImageReference, workspaceInstance)
+            // build information (buildRequest, workspaceInstance)
+            // The extension-service returns a possibly modified (buildRequest, workspaceInstance) pair which is updated.
             // This information would be consumed by Hookpoint - 3.
             let response = await extensionServiceClient.preCallImageBuilderModifyHook(preCallImageBuilderNotifyRequest);
-            log.info(
-                { workspace: workspace.id, instance: instance.id },
-                `Got response from extensionService: ${response.toString()}`,
-            );
+            if (response.getError() === "") {
+                let resBuildReq = new BuildRequest();
+                ({ buildRequest: resBuildReq, instance } = this.parsePreCallImageBuilderModifyResponse(
+                    response,
+                    req,
+                    instance,
+                ));
+                req.setSource(resBuildReq.getSource());
+                req.setAuth(resBuildReq.getAuth());
+                req.setForceRebuild(resBuildReq.getForceRebuild());
+                req.setTriggeredBy(resBuildReq.getTriggeredBy());
+                log.info(
+                    { workspace: workspace.id, instance: instance.id },
+                    `preCallImageBuilderModifyHook: Got a successful response from extensionService. `,
+                );
+            } else {
+                log.error(
+                    { workspace: workspace.id, instance: instance.id },
+                    `preCallImageBuilderModifyHook: Got an error response from extensionService: ${response.getError()}`,
+                );
+            }
             // Devspaces-specific end
             const result = await client.build({ span }, req, imageBuildLogInfo);
 
