@@ -59,7 +59,8 @@ const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
     response.setPayload(payload);
     response.setError("");
 
-    console.log(`hookpoint1 - : `, message);
+    console.log(`hookpoint1 - message: `, message);
+    console.log(`hookpoint1 - response: `, response.toObject());
     callback(null, response);
 };
 

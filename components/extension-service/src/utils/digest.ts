@@ -55,5 +55,3 @@ const resolveDockerTag = async (tag: string) => {
     // return the absolute digest form of the tag
     return `${registry}/${image}@${imageInfo.Id}`;
 };
-
-getDigest();

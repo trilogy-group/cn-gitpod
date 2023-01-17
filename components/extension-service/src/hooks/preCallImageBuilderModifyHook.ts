@@ -67,6 +67,7 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
     try {
     } catch (err) {}
 
+    console.log(`hookpoint2 - response: `, response.toObject());
     response.setPayload(payload);
     callback(null, response);
 };

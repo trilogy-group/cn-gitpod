@@ -19,6 +19,7 @@ const preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<
     console.log("preStartImageBuildWorkspaceNotifyHook  ", call.request.toObject());
 
     // const request = call.request;
+    // request.buildrequest?.forceRebuild
     const response = new PreStartImageBuildWorkspaceNotifyResponse();
 
     // const workspaceImageRef = request.getWorkspaceimageref();
@@ -50,6 +51,7 @@ const preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<
     // console.log(`hookpoint3 response: `, { message });
     // response.setMessage(message);
 
+    console.log(`hookpoint3 - response: `, response.toObject());
     callback(null, response);
 };
 
