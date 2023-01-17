@@ -43,7 +43,7 @@ func job(ctx *common.RenderContext) ([]runtime.Object, error) {
 					Containers: []corev1.Container{{
 						Name:            Component,
 						Image:           ctx.ImageName(ctx.Config.Repository, "db-migrations", ctx.VersionManifest.Components.DBMigrations.Version),
-						ImagePullPolicy: corev1.PullIfNotPresent,
+						ImagePullPolicy: corev1.PullAlways,
 						Env: common.CustomizeEnvvar(ctx, Component, common.MergeEnv(
 							common.DatabaseEnv(&ctx.Config),
 							common.DefaultEnv(&ctx.Config),

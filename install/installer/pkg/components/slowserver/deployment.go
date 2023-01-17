@@ -389,7 +389,7 @@ func deployment(ctx *common.RenderContext) ([]runtime.Object, error) {
 						Containers: []corev1.Container{{
 							Name:            Component,
 							Image:           ctx.ImageName(ctx.Config.Repository, common.ServerComponent, ctx.VersionManifest.Components.Server.Version),
-							ImagePullPolicy: corev1.PullIfNotPresent,
+							ImagePullPolicy: corev1.PullAlways,
 							Resources: common.ResourceRequirements(ctx, common.ServerComponent, common.ServerComponent, corev1.ResourceRequirements{
 								Requests: corev1.ResourceList{
 									"cpu":    resource.MustParse("200m"),

@@ -216,7 +216,7 @@ func daemonset(ctx *common.RenderContext) ([]runtime.Object, error) {
 					Containers: []corev1.Container{{
 						Name:            Component,
 						Image:           ctx.ImageName(ctx.Config.Repository, Component, ctx.VersionManifest.Components.RegistryFacade.Version),
-						ImagePullPolicy: corev1.PullIfNotPresent,
+						ImagePullPolicy: corev1.PullAlways,
 						Args:            []string{"run", "/mnt/config/config.json"},
 						Resources: common.ResourceRequirements(ctx, Component, Component, corev1.ResourceRequirements{
 							Requests: corev1.ResourceList{
@@ -309,7 +309,7 @@ func daemonset(ctx *common.RenderContext) ([]runtime.Object, error) {
 								common.NodeNameEnv(ctx),
 								common.ProxyEnv(&ctx.Config),
 							)),
-							ImagePullPolicy: corev1.PullIfNotPresent,
+							ImagePullPolicy: corev1.PullAlways,
 							Lifecycle: &corev1.Lifecycle{
 								PreStop: &corev1.LifecycleHandler{
 									Exec: &corev1.ExecAction{
