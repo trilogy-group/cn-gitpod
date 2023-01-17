@@ -66,12 +66,12 @@ export class PromisifiedExtensionServiceClient {
         );
     }
 
-    public preStartWorkspaceNotifyHook(
+    public preStartWorkspaceModifyHook(
         request: PreStartWorkspaceNotifyRequest,
     ): Promise<PreStartWorkspaceNotifyResponse> {
         return new Promise<PreStartWorkspaceNotifyResponse>((resolve, reject) => {
             // TODO: pass span to extension-service for better tracing
-            this.client.preStartWorkspaceNotifyHook(request, (err, resp) => {
+            this.client.preStartWorkspaceModifyHook(request, (err, resp) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -81,12 +81,12 @@ export class PromisifiedExtensionServiceClient {
         });
     }
 
-    public preCallImageBuilderNotifyHook(
+    public preCallImageBuilderModifyHook(
         request: PreCallImageBuilderNotifyRequest,
     ): Promise<PreCallImageBuilderNotifyResponse> {
         return new Promise<PreStartWorkspaceNotifyResponse>((resolve, reject) => {
             // TODO: pass span to extension-service for better tracing
-            this.client.preCallImageBuilderNotifyHook(request, (err, resp) => {
+            this.client.preCallImageBuilderModifyHook(request, (err, resp) => {
                 if (err) {
                     reject(err);
                 } else {

@@ -82,14 +82,7 @@ import {
 import { StartWorkspaceSpec, WorkspaceFeatureFlag, StartWorkspaceResponse, IDEImage } from "@gitpod/ws-manager/lib";
 import { WorkspaceManagerClientProvider } from "@gitpod/ws-manager/lib/client-provider";
 // Devspaces-specific start
-import {
-    ExtensionServiceClientProvider,
-    PreStartWorkspace,
-    PreStartWorkspaceConfig,
-    PreStartWorkspaceInstance,
-    PreStartWorkspaceNotifyRequest,
-    PreCallImageBuilderNotifyRequest,
-} from "@cn-gitpod/extension-service-api/lib";
+import * as ExtServiceApi from "@cn-gitpod/extension-service-api/lib";
 // Devspaces-specific end
 import {
     AdmissionLevel,
@@ -295,8 +288,8 @@ export class WorkspaceStarter {
     @inject(EntitlementService) protected readonly entitlementService: EntitlementService;
     @inject(BillingModes) protected readonly billingModes: BillingModes;
     // Devspaces-specific start
-    @inject(ExtensionServiceClientProvider)
-    protected readonly extensionServiceClientProvider: ExtensionServiceClientProvider;
+    @inject(ExtServiceApi.ExtensionServiceClientProvider)
+    protected readonly extensionServiceClientProvider: ExtServiceApi.ExtensionServiceClientProvider;
     // Devspaces-specifc end
 
     public async startWorkspace(
@@ -489,29 +482,16 @@ export class WorkspaceStarter {
     protected preparePreStartWorkspaceNotifyRequest(
         workspace: Workspace,
         instance: WorkspaceInstance,
-    ): PreStartWorkspaceNotifyRequest {
-        let reqWorkspace = new PreStartWorkspace();
-        let config = new PreStartWorkspaceConfig();
-        // TODO: Ideally, this null value must be handled and default should be set before it reaches this function and not here.
-        config.setArch(workspace.config.arch ? workspace.config.arch : "x86");
-        reqWorkspace.setConfig(config);
-        let reqInsance = new PreStartWorkspaceInstance();
-        reqInsance.setId(instance.id);
-        let req = new PreStartWorkspaceNotifyRequest();
-        req.setWorkspace(reqWorkspace);
-        req.setInstance(reqInsance);
+    ): ExtServiceApi.PreStartWorkspaceNotifyRequest {
+        let req = ExtServiceApi.PreStartWorkspaceNotifyRequest;
         return req;
     }
 
     protected preparePreCallImageBuilderNotifyRequest(
         workspaceImageRef: string,
         workspaceInstance: WorkspaceInstance,
-    ): PreCallImageBuilderNotifyRequest {
-        let req = new PreCallImageBuilderNotifyRequest();
-        req.setWorkspaceimageref(workspaceImageRef);
-        let reqInstance = new PreStartWorkspaceInstance();
-        reqInstance.setId(workspaceInstance.id);
-        req.setInstance(reqInstance);
+    ): ExtServiceApi.PreCallImageBuilderNotifyRequest {
+        let req = new ExtServiceApi.PreCallImageBuilderNotifyRequest();
         return req;
     }
     // Devspaces-specifc end
@@ -533,6 +513,7 @@ export class WorkspaceStarter {
 
         // Devpsaces-specifc start
         // Hookpoint - 1. Hook notifies extension service saying that an "instance" of a "workspace" is about to be started.
+        // The extension-service returns a possibly modified (instance, worksapce) pair which is updated.
         // preStartWorkspaceNotifyHook(workspace, instance)
         // To be consumed by Hookpoint - 4.
         let preStartWorkspaceNotifyRequest = this.preparePreStartWorkspaceNotifyRequest(workspace, instance);
@@ -1367,7 +1348,7 @@ export class WorkspaceStarter {
             // Hookpoint - 2. Hook notifies the extension service that the ImageBuilder is about to be called for -
             // build information (workspaceImageReference, workspaceInstance)
             // This information would be consumed by Hookpoint - 3.
-            let response = await extensionServiceClient.preCallImageBuilderNotifyHook(preCallImageBuilderNotifyRequest);
+            let response = await extensionServiceClient.preCallImageBuilderModifyHook(preCallImageBuilderNotifyRequest);
             log.info(
                 { workspace: workspace.id, instance: instance.id },
                 `Got response from extensionService: ${response.toString()}`,
