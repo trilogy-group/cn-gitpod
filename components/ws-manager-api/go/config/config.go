@@ -117,7 +117,20 @@ type Configuration struct {
 	WorkspaceClasses map[string]*WorkspaceClass `json:"workspaceClass"`
 	// DebugWorkspacePod adds extra finalizer to workspace to prevent it from shutting down. Helps to debug.
 	DebugWorkspacePod bool `json:"debugWorkspacePod,omitempty"`
+	// Devspaces-specific start
+	ExtensionService ExtensionServiceConfig `json:"extService"`
+	// Devspaces-specific end
 }
+
+// Devspaces-specific start
+type ExtensionServiceConfig struct {
+	Address string `json:"addr"`
+	// expected to be a extservice.ExtensionServiceClient - use to avoid dependency on extserviceapi
+	// this field is used for testing only
+	Client interface{} `json:"-"`
+}
+
+// Devspaces-specific end
 
 type WorkspaceClass struct {
 	Name        string                            `json:"name"`

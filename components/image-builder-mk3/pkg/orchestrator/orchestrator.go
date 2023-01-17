@@ -40,6 +40,10 @@ import (
 	"github.com/gitpod-io/gitpod/image-builder/pkg/auth"
 	"github.com/gitpod-io/gitpod/image-builder/pkg/resolve"
 	wsmanapi "github.com/gitpod-io/gitpod/ws-manager/api"
+
+	// Devspaces-specific start
+	extserviceapi "github.com/trilogy-group/cn-gitpod/extension-service/api"
+	// Devspaces-specific end
 )
 
 const (
@@ -96,6 +100,22 @@ func NewOrchestratingBuilder(cfg config.Configuration) (res *Orchestrator, err e
 		wsman = wsmanapi.NewWorkspaceManagerClient(conn)
 	}
 
+	// Devspaces-specific start
+	var extservice extserviceapi.ExtensionServiceClient
+	if c, ok := cfg.ExtensionService.Client.(extserviceapi.ExtensionServiceClient); ok {
+		extservice = c
+	} else {
+		grpcOpts := common_grpc.DefaultClientOptions()
+
+		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err := grpc.Dial(cfg.ExtensionService.Address, grpcOpts...)
+		if err != nil {
+			return nil, err
+		}
+		extservice = extserviceapi.NewExtensionServiceClient(conn)
+	}
+	// Devspaces-specific end
+
 	o := &Orchestrator{
 		Config: cfg,
 		Auth:   authentication,
@@ -105,7 +125,10 @@ func NewOrchestratingBuilder(cfg config.Configuration) (res *Orchestrator, err e
 		},
 		RefResolver: &resolve.StandaloneRefResolver{},
 
-		wsman:         wsman,
+		wsman: wsman,
+		// Devspaces-specific start
+		extservice: extservice,
+		// Devspaces-specific end
 		buildListener: make(map[string]map[buildListener]struct{}),
 		logListener:   make(map[string]map[logListener]struct{}),
 		censorship:    make(map[string][]string),
@@ -124,6 +147,10 @@ type Orchestrator struct {
 	RefResolver  resolve.DockerRefResolver
 
 	wsman wsmanapi.WorkspaceManagerClient
+
+	// Devspaces-specific start
+	extservice extserviceapi.ExtensionServiceClient
+	// Devspaces-specific end
 
 	buildListener map[string]map[buildListener]struct{}
 	logListener   map[string]map[logListener]struct{}
@@ -343,9 +370,22 @@ func (o *Orchestrator) Build(req *protocol.BuildRequest, resp protocol.ImageBuil
 		}
 	}
 
-	// Hookpoint - 3. Notifies extenstion-service that an ImageBuildWorkspace is gonna be spawned for a wsrefstr with "buildID"
-	// preStartImageBuildWorkspaceNotifyHook(req, buildID)
+	// Devspaces-specific start
+	// Hookpoint - 3. Notifies extenstion-service that an ImageBuildWorkspace is gonna be spawned for a (workspaceImageReference, BuildID)
+	// This information would be consumed by hookpoint - 4.
+	hookRequest := &extserviceapi.PreStartImageBuildWorkspaceNotifyRequest{
+		WorkspaceImageRef: wsrefstr,
+		BuildId:           buildID,
+	}
+	log.Info("Calling PreStartImageBuildWorkspaceNotifyHook")
+	// TODO: Mock this hook for tests to succeed
+	hookReponse, err := o.extservice.PreStartImageBuildWorkspaceNotifyHook(ctx, hookRequest)
+	if err != nil {
+		return xerrors.Errorf("error occurred while calling hook PreCallImageBuilderNotifyHook: %w", err)
+	}
+	log.Info("Received successful response from PreStartImageBuildWorkspaceNotifyHook: ", hookReponse.Message)
 	// To be consumed by Hookpoint - 4
+	// Devspaces-specific end
 	var swr *wsmanapi.StartWorkspaceResponse
 	err = retry(ctx, func(ctx context.Context) (err error) {
 		swr, err = o.wsman.StartWorkspace(ctx, &wsmanapi.StartWorkspaceRequest{

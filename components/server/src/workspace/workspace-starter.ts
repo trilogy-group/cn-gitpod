@@ -82,13 +82,7 @@ import {
 import { StartWorkspaceSpec, WorkspaceFeatureFlag, StartWorkspaceResponse, IDEImage } from "@gitpod/ws-manager/lib";
 import { WorkspaceManagerClientProvider } from "@gitpod/ws-manager/lib/client-provider";
 // Devspaces-specific start
-import {
-    ExtensionServiceClientProvider,
-    PreStartWorkspace,
-    PreStartWorkspaceConfig,
-    PreStartWorkspaceInstance,
-    PreStartWorkspaceNotifyRequest,
-} from "@cn-gitpod/extension-service-api/lib";
+import * as ExtServiceApi from "@cn-gitpod/extension-service-api/lib";
 // Devspaces-specific end
 import {
     AdmissionLevel,
@@ -294,8 +288,8 @@ export class WorkspaceStarter {
     @inject(EntitlementService) protected readonly entitlementService: EntitlementService;
     @inject(BillingModes) protected readonly billingModes: BillingModes;
     // Devspaces-specific start
-    @inject(ExtensionServiceClientProvider)
-    protected readonly extensionServiceClientProvider: ExtensionServiceClientProvider;
+    @inject(ExtServiceApi.ExtensionServiceClientProvider)
+    protected readonly extensionServiceClientProvider: ExtServiceApi.ExtensionServiceClientProvider;
     // Devspaces-specifc end
 
     public async startWorkspace(
@@ -488,17 +482,16 @@ export class WorkspaceStarter {
     protected preparePreStartWorkspaceNotifyRequest(
         workspace: Workspace,
         instance: WorkspaceInstance,
-    ): PreStartWorkspaceNotifyRequest {
-        let reqWorkspace = new PreStartWorkspace();
-        let config = new PreStartWorkspaceConfig();
-        // TODO: Ideally, this null value must be handled and default should be set before it reaches this function and not here.
-        config.setArch(workspace.config.arch ? workspace.config.arch : "x86");
-        reqWorkspace.setConfig(config);
-        let reqInsance = new PreStartWorkspaceInstance();
-        reqInsance.setId(instance.id);
-        let req = new PreStartWorkspaceNotifyRequest();
-        req.setWorkspace(reqWorkspace);
-        req.setInstance(reqInsance);
+    ): ExtServiceApi.PreStartWorkspaceModifyRequest {
+        let req = new ExtServiceApi.PreStartWorkspaceModifyRequest();
+        return req;
+    }
+
+    protected preparePreCallImageBuilderModifyRequest(
+        workspaceImageRef: string,
+        workspaceInstance: WorkspaceInstance,
+    ): ExtServiceApi.PreCallImageBuilderModifyRequest {
+        let req = new ExtServiceApi.PreCallImageBuilderModifyRequest();
         return req;
     }
     // Devspaces-specifc end
@@ -520,11 +513,12 @@ export class WorkspaceStarter {
 
         // Devpsaces-specifc start
         // Hookpoint - 1. Hook notifies extension service saying that an "instance" of a "workspace" is about to be started.
+        // The extension-service returns a possibly modified (instance, worksapce) pair which is updated.
         // preStartWorkspaceNotifyHook(workspace, instance)
         // To be consumed by Hookpoint - 4.
         let preStartWorkspaceNotifyRequest = this.preparePreStartWorkspaceNotifyRequest(workspace, instance);
         let extensionServiceClient = await this.extensionServiceClientProvider.getClient();
-        let response = await extensionServiceClient.preStartWorkspaceNotifyHook(preStartWorkspaceNotifyRequest);
+        let response = await extensionServiceClient.preStartWorkspaceModifyHook(preStartWorkspaceNotifyRequest);
         log.info(
             { workspace: workspace.id, instance: instance.id },
             `Got response from extensionService: ${response.toString()}`,
@@ -1338,10 +1332,28 @@ export class WorkspaceStarter {
                         workspaceId: instance.workspaceId,
                     }),
                 );
-
-            // Hookpoint - 2. Hook notifies the extension service that a build with "req" (BuildRequest) for "workspace" is going to be built.
-            // preImageBuildRequestNotifyHook(req, workspace)
-            // To be consumed by Hookpoint - 3.
+            // Devspaces-specific start
+            // Let's get wsrefstr from imageBuilder
+            let resolveWorkspaceImageReq = new ResolveWorkspaceImageRequest();
+            resolveWorkspaceImageReq.setAuth(auth);
+            resolveWorkspaceImageReq.setSource(src);
+            let hookWorkspaceImageRef = (
+                await client.resolveWorkspaceImage({ span }, resolveWorkspaceImageReq)
+            ).getRef();
+            let preCallImageBuilderNotifyRequest = this.preparePreCallImageBuilderModifyRequest(
+                hookWorkspaceImageRef,
+                instance,
+            );
+            let extensionServiceClient = await this.extensionServiceClientProvider.getClient();
+            // Hookpoint - 2. Hook notifies the extension service that the ImageBuilder is about to be called for -
+            // build information (workspaceImageReference, workspaceInstance)
+            // This information would be consumed by Hookpoint - 3.
+            let response = await extensionServiceClient.preCallImageBuilderModifyHook(preCallImageBuilderNotifyRequest);
+            log.info(
+                { workspace: workspace.id, instance: instance.id },
+                `Got response from extensionService: ${response.toString()}`,
+            );
+            // Devspaces-specific end
             const result = await client.build({ span }, req, imageBuildLogInfo);
 
             if (result.actuallyNeedsBuild) {
