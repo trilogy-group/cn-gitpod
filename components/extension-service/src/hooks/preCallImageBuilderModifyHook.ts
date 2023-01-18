@@ -62,7 +62,7 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
     const payload = request.getPayload();
 
     const buildRequest = payload?.getBuildrequest();
-    const wsInstance = payload?.getInstance();
+    // const wsInstance = payload?.getInstance();
 
     // buildRequest?.getSource() -> unique hash
     // ! if input is of form ref -> simply store it
