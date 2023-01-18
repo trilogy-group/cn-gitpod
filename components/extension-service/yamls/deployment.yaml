@@ -4,14 +4,14 @@ kind: Deployment
 metadata:
   annotations:
     meta.helm.sh/release-name: gitpod
-    meta.helm.sh/release-namespace: gitpod-infra-hybrid
+    meta.helm.sh/release-namespace: gitpod-infra-test
 # * labels
   labels:
     app: gitpod
     app.kubernetes.io/name: extension-service
     component: extension-service
   name: extension-service
-  namespace: gitpod-infra-hybrid
+  namespace: gitpod-infra-test
 spec:
   replicas: 1
   selector:
@@ -29,7 +29,7 @@ spec:
         app: gitpod
         component: extension-service
       name: extension-service
-      namespace: gitpod-infra-hybrid
+      namespace: gitpod-infra-test
     spec:
       affinity:
         nodeAffinity:
