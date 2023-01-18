@@ -51,7 +51,6 @@ resource "aws_security_group_rule" "eks-cluster-ingress-node-https" {
   type                     = "ingress"
 }
 
-
 resource "aws_security_group" "nodes" {
   name   = "nodes-sg-${var.cluster_name}"
   vpc_id = module.vpc.vpc_id
@@ -126,7 +125,7 @@ module "eks" {
       subnet_ids                 = module.vpc.public_subnets
       min_size                   = 1
       max_size                   = 4
-      desired_size               = 2
+      desired_size               = 1
       block_device_mappings = [{
         device_name = "/dev/sda1"
 
@@ -179,10 +178,94 @@ module "eks" {
           delete_on_termination = true
         }]
       }]
-      desired_size               = 2
+      desired_size               = 1
       enable_bootstrap_user_data = true
       labels = {
         "gitpod.io/workload_workspace_regular" = true
+      }
+
+      tags = {
+        "k8s.io/cluster-autoscaler/enabled" = true
+        "k8s.io/cluster-autoscaler/gitpod"  = "owned"
+      }
+
+      pre_bootstrap_user_data = <<-EOT
+        #!/bin/bash
+        set -ex
+        cat <<-EOF > /etc/profile.d/bootstrap.sh
+        export CONTAINER_RUNTIME="containerd"
+        export USE_MAX_PODS=false
+        EOF
+        # Source extra environment variables in bootstrap script
+        sed -i '/^set -o errexit/a\\nsource /etc/profile.d/bootstrap.sh' /etc/eks/bootstrap.sh
+        EOT
+    }
+
+    ArmRegularWorkspaces = {
+      instance_types = [var.arm_workspace_machine_type]
+      ami_id         = "ami-04458375d2220b12f"
+      name           = "ws-arm-regular-${var.cluster_name}"
+      iam_role_name  = format("%s-%s", substr("${var.cluster_name}-arm-regular-ws-ng", 0, 58), random_string.ng_role_suffix.result)
+      subnet_ids     = module.vpc.public_subnets
+      min_size       = 1
+      max_size       = 50
+      block_device_mappings = [{
+        device_name = "/dev/sda1"
+
+        ebs = [{
+          volume_size           = 512
+          volume_type           = "gp3"
+          throughput            = 500
+          iops                  = 6000
+          delete_on_termination = true
+        }]
+      }]
+      desired_size               = 1
+      enable_bootstrap_user_data = true
+      labels = {
+        "gitpod.io/workload_arm_workspace_regular" = true
+      }
+
+      tags = {
+        "k8s.io/cluster-autoscaler/enabled" = true
+        "k8s.io/cluster-autoscaler/gitpod"  = "owned"
+      }
+
+      pre_bootstrap_user_data = <<-EOT
+        #!/bin/bash
+        set -ex
+        cat <<-EOF > /etc/profile.d/bootstrap.sh
+        export CONTAINER_RUNTIME="containerd"
+        export USE_MAX_PODS=false
+        EOF
+        # Source extra environment variables in bootstrap script
+        sed -i '/^set -o errexit/a\\nsource /etc/profile.d/bootstrap.sh' /etc/eks/bootstrap.sh
+        EOT
+    }
+
+    ArmHeadlessWorkspaces = {
+      instance_types = [var.arm_workspace_machine_type]
+      ami_id         = "ami-04458375d2220b12f"
+      name           = "ws-arm-headless-${var.cluster_name}"
+      iam_role_name  = format("%s-%s", substr("${var.cluster_name}-arm-headless-ws-ng", 0, 58), random_string.ng_role_suffix.result)
+      subnet_ids     = module.vpc.public_subnets
+      min_size       = 1
+      max_size       = 50
+      block_device_mappings = [{
+        device_name = "/dev/sda1"
+
+        ebs = [{
+          volume_size           = 512
+          volume_type           = "gp3"
+          throughput            = 500
+          iops                  = 6000
+          delete_on_termination = true
+        }]
+      }]
+      desired_size               = 1
+      enable_bootstrap_user_data = true
+      labels = {
+        "gitpod.io/workload_arm_workspace_headless" = true
       }
 
       tags = {
@@ -220,7 +303,7 @@ module "eks" {
           delete_on_termination = true
         }]
       }]
-      desired_size               = 2
+      desired_size               = 1
       enable_bootstrap_user_data = true
       labels = {
         "gitpod.io/workload_workspace_headless" = true
