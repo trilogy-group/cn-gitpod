@@ -23,37 +23,6 @@ const preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<
     const request = call.request;
     const response = new PreStartImageBuildWorkspaceNotifyResponse();
 
-    // const workspaceImageRef = request.getWorkspaceimageref();
-    // const buildId = request.getBuildid();
-
-    // let message: string = "";
-
-    // try {
-    //     const imageRef = await prismaClient?.imageRefArch.findUnique({
-    //         where: {
-    //             workspaceImageRef,
-    //         },
-    //     });
-    //     const wsInstance = await prismaClient?.workspaceInstance.create({
-    //         // where: {
-    //         //     instanceId: buildId,
-    //         // },
-    //         data: {
-    //             instanceId: buildId,
-    //             arch: imageRef?.arch,
-    //         },
-    //     });
-
-    //     message = `Hookpoint3 - created wsInstance with id: ${wsInstance?.instanceId}, arch: ${wsInstance?.arch}`;
-    // } catch (err) {
-    //     message = `Error finding by wsImageRef & buildId: ${err?.message}`;
-    // }
-
-    // console.log(`hookpoint3 response: `, { message });
-    // response.setMessage(message);
-
-    // so how we stored it in hookpoint 2, we fetch again here in the same way
-
     // ! updated implementation
     const buildRequest = request.getBuildrequest();
     const buildId = request.getBuildid();

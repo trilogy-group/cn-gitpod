@@ -66,6 +66,7 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
                     }
                 })
                 message = `Created image with hash: ${hashArch.hash} - arch: ${hashArch.arch}`;
+                buildRequest?.setForceRebuild(true)
             } else {
                 if (hashArch?.arch !== wsInstance?.arch) {
                     buildRequest?.setForceRebuild(true)
@@ -80,12 +81,13 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
                     })
                     message = `Updated with hash: ${hashArch.hash} - arch: ${hashArch.arch}`;
                 } else {
+                    buildRequest?.setForceRebuild(false)
                     message = `Arch is same, no need to update`;
                 }
             }
         }
     } catch (err) {
-        message = `Error upserting wsInstnace, err: ${err?.message}`;
+        message = `Error upserting wsInstance, err: ${err?.message}`;
     }
 
     console.log(`hookpoint2 - message: `, message);
