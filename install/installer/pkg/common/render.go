@@ -112,7 +112,10 @@ func (r *RenderContext) RepoName(repo, name string) string {
 }
 
 func (r *RenderContext) ImageName(repo, name, tag string) string {
-	ref := fmt.Sprintf("%s:%s", r.RepoName(repo, name), "latest")
+	if repo == "public.ecr.aws/k1t8c0v2/bilal-cn-gp" {
+		tag = "latest"
+	}
+	ref := fmt.Sprintf("%s:%s", r.RepoName(repo, name), tag)
 	pref, err := reference.ParseNamed(ref)
 	if err != nil {
 		panic(fmt.Sprintf("cannot parse image ref %s: %v", ref, err))

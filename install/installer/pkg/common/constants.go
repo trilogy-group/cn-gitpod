@@ -22,7 +22,7 @@ const (
 	InClusterDbSecret           = "mysql"
 	InClusterMessageQueueName   = "rabbitmq"
 	InClusterMessageQueueTLS    = "messagebus-certificates-secret-core"
-	KubeRBACProxyRepo           = "bitnami"
+	KubeRBACProxyRepo           = "quay.io"
 	KubeRBACProxyImage          = "kube-rbac-proxy"
 	KubeRBACProxyTag            = "v0.12.0"
 	MinioServiceAPIPort         = 9000
