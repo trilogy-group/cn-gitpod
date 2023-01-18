@@ -8,7 +8,7 @@ import * as grpc from "@grpc/grpc-js";
 import { PreStartWorkspaceModifyRequest, PreStartWorkspaceModifyResponse } from "@cn-gitpod/extension-service-api/lib";
 import { prismaClient } from "../utils/prisma";
 import { WorkspaceInstance } from "@prisma/client";
-import { swapTagWithDigest } from "../utils/digest";
+import { Arch, swapTagWithDigest } from "../utils/digest";
 
 const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
     PreStartWorkspaceModifyRequest,
@@ -26,7 +26,7 @@ const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
     // ! new implementation:
     const payload = request.getPayload();
     const instanceId = payload?.getInstance()?.getId();
-    const arch = payload?.getWorkspace()?.getConfig()?.getArch();
+    const arch = payload?.getWorkspace()?.getConfig()?.getArch() as Arch;
 
     // TODO: imageSource image:tag -> image@sha...
     // payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigstring();
@@ -35,7 +35,7 @@ const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
     // ! if configstring is present, swap tag with digest
     if (payload?.getWorkspace()?.getConfig()?.getImage()?.hasConfigstring()) {
         const configString = payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigstring()!;
-        const newConfigString = await swapTagWithDigest(configString);
+        const newConfigString = await swapTagWithDigest(configString, arch);
         payload?.getWorkspace()?.getConfig()?.getImage()?.setConfigstring(newConfigString);
     }
 

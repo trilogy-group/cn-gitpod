@@ -39,7 +39,7 @@ spec:
               - key: gitpod.io/workload_workspace_regular
                 operator: Exists
       containers:
-        - image: 346945241475.dkr.ecr.us-east-1.amazonaws.com/gitpod-infra-test/extension-service:arm-support
+        - image: 346945241475.dkr.ecr.us-east-1.amazonaws.com/gitpod-infra-test/extension-service:arm-edge-case
           imagePullPolicy: Always
           name: extension-service
           ports:
@@ -54,7 +54,7 @@ spec:
                 key: mysql-root-password
                 optional: false
           - name: PRISMA_DB_URL
-            value: mysql://root:$(DB_PASSWORD)@mysql.gitpod-infra-hybrid.svc.cluster.local:3306/extensionservice
+            value: mysql://root:$(DB_PASSWORD)@mysql.gitpod-infra-test.svc.cluster.local:3306/extensionservice
           # * change resources accordingly
           resources:
             limits:

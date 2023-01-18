@@ -7,7 +7,7 @@
 // * helper function to get the digest of an image from its tag
 import { execSync } from "child_process";
 
-type Arch = "x86" | "arm";
+export type Arch = "x86" | "arm";
 const fixArch = (arch: Arch) => {
     switch (arch) {
         case "x86":
@@ -89,7 +89,7 @@ const getDigestFromImage = async (image: string, arch: Arch) => {
  * @param image string
  * @returns string
  */
-export const swapTagWithDigest = (image: string) => {
+export const swapTagWithDigest = (image: string, arch: Arch) => {
     // TODO: handle all cases
 
     // ! in case the image name is already a digest, we dont need to do anything
@@ -111,8 +111,8 @@ export const swapTagWithDigest = (image: string) => {
     }
 
     // ! now we have a valid image name, we can get the digest
-    const digest = getDigestFromImage(image, "arm");
+    const digest = getDigestFromImage(image, arch);
     return digest;
 };
 
-console.log(swapTagWithDigest("alpine:latest"));
+// console.log(swapTagWithDigest("alpine:latest", "arm"));
