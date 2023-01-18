@@ -15,11 +15,19 @@ FROM node:16.13.0-slim
 ENV NODE_OPTIONS="--unhandled-rejections=warn --max_old_space_size=2048"
 # Using ssh-keygen for RSA keypair generation
 RUN apt-get update && apt-get install -yq \
-        openssh-client \
-        procps \
-        net-tools \
-        nano \
-        curl \
+    openssh-client \
+    procps \
+    net-tools \
+    nano \
+    curl \
+    # install docker
+    apt-transport-https \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    && curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
+    && echo "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list \
+    # end
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/*
 
 EXPOSE 8080
