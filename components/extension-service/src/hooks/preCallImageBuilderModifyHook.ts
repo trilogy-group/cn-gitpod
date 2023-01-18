@@ -68,6 +68,7 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
     const hash = getPayloadHash(payload);
     console.log(`hookpoint2 - hash: `, hash);
 
+    let message: string;
     // ! prisma stuff
     try {
         // ! we have to update table2 via 1. First we fetch 1
@@ -78,13 +79,28 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
         });
 
         if (!wsInstance) {
-            console.log(`Could not find wsInstance with id: ${payload?.getInstance()?.getId()}`);
+            message = `Could not find wsInstance with id: ${payload?.getInstance()?.getId()}`;
+        } else {
+            // ! now we need to create HashArch
+            const hashArch = await prismaClient.hashArch.upsert({
+                where: {
+                    hash,
+                },
+                create: {
+                    hash,
+                    arch: wsInstance?.arch,
+                },
+                update: {
+                    arch: wsInstance?.arch,
+                },
+            });
+            message = `Upserted image with ref: ${hashArch.hash} - arch: ${hashArch.arch}`;
         }
+    } catch (err) {
+        message = `Error upserting wsInstnace, err: ${err?.message}`;
+    }
 
-        // ! now we need to create HashArch
-        // const hashArch = await prismaClient.hashArch
-    } catch (err) {}
-
+    console.log(`hookpoint2 - message: `, message);
     console.log(`hookpoint2 - response: `, response.toObject());
     response.setPayload(payload);
     callback(null, response);
