@@ -481,17 +481,21 @@ export class WorkspaceStarter {
     // Devspaces-specifc start
     // TODO: When the PreStartWorkspaceModifyRequest's proto is updated with all necessary fields, update this function accordingly
     protected preparePreStartWorkspaceModifyRequest(
-        workspace: Workspace,
-        instance: WorkspaceInstance,
+        actualWorkspace: Workspace,
+        actualInstance: WorkspaceInstance,
     ): ExtServiceApi.PreStartWorkspaceModifyRequest {
         let req = new ExtServiceApi.PreStartWorkspaceModifyRequest();
         let payload = new ExtServiceApi.PreStartWorkspaceModifyPayload();
-        let ws = new ExtServiceApi.Workspace();
-        let wsConfig = new ExtServiceApi.WorkspaceConfig();
+        // actualWorkspace is of type (gitpod's) gitpod-protocol.Workspace
+        // workspace is of type (cn-gitpod's) extension-service-api.Workspace
+        // Same format is followed for other fields as well
+        let workspace = new ExtServiceApi.Workspace();
+        let instance = new ExtServiceApi.WorkspaceInstance();
+        let workspaceConfig = new ExtServiceApi.WorkspaceConfig();
         // TODO: this default value should be handled before and not here.
-        let arch = workspace.config.arch ? workspace.config.arch : "x86";
+        let arch = actualWorkspace.config.arch ? actualWorkspace.config.arch : "x86";
         let imageConfig = new ExtServiceApi.ImageConfig();
-        let actualImageConfig = workspace.config.image;
+        let actualImageConfig = actualWorkspace.config.image;
         if (ImageConfigFile.is(actualImageConfig)) {
             let imageConfigFile = new ExtServiceApi.ImageConfigFile();
             imageConfigFile.setFile(actualImageConfig.file);
@@ -502,52 +506,66 @@ export class WorkspaceStarter {
         } else if (ImageConfigString.is(actualImageConfig)) {
             imageConfig.setConfigstring(actualImageConfig);
         }
-        wsConfig.setImage(imageConfig);
-        wsConfig.setArch(arch);
-        ws.setConfig(wsConfig);
-        let wsInstance = new ExtServiceApi.WorkspaceInstance();
-        wsInstance.setId(instance.id);
-        payload.setInstance(wsInstance);
-        payload.setWorkspace(ws);
+        workspaceConfig.setImage(imageConfig);
+        workspaceConfig.setArch(arch);
+        workspace.setConfig(workspaceConfig);
+        instance.setId(actualInstance.id);
+        payload.setInstance(instance);
+        payload.setWorkspace(workspace);
         req.setPayload(payload);
         return req;
     }
 
     protected parsePreStartWorkspaceModifyResponse(
         response: ExtServiceApi.PreStartWorkspaceModifyResponse,
-        workspace: Workspace,
-        instance: WorkspaceInstance,
-    ): { workspace: Workspace; instance: WorkspaceInstance } {
-        let payload = response.getPayload()!;
-        let payloadObject = payload.toObject();
-        instance.id = payloadObject.instance!.id;
-        workspace.config.arch = payloadObject.workspace!.config!.arch;
-        let imageConfig = payload.getWorkspace()!.getConfig()!.getImage()!;
-        if (imageConfig.hasConfigfile()) {
-            let imageConfigFile: ImageConfigFile = {
-                file: imageConfig.getConfigfile()!.getFile(),
-                context: imageConfig.getConfigfile()!.getContext(),
-            };
-            workspace.config.image = imageConfigFile;
-        } else if (imageConfig.hasConfigstring()) {
-            workspace.config.image = imageConfig.getConfigstring();
+        actualWorkspace: Workspace,
+        actualInstance: WorkspaceInstance,
+    ): { actualWorkspace: Workspace; actualInstance: WorkspaceInstance } {
+        if (response.hasPayload()) {
+            let payload = response.getPayload()!;
+            if (payload.hasInstance()) {
+                let instance = payload.getInstance()!;
+                actualInstance.id = instance.getId();
+            }
+            if (payload.hasWorkspace() && payload.getWorkspace()!.hasConfig()) {
+                let config = payload.getWorkspace()!.getConfig()!;
+                actualWorkspace.config.arch = config.getArch();
+                if (config.hasImage()) {
+                    let imageConfig = config.getImage()!;
+                    if (imageConfig.hasConfigfile()) {
+                        let imageConfigFile = imageConfig.getConfigfile()!;
+                        let actualImageConfigFile: ImageConfigFile = {
+                            file: imageConfigFile.getFile(),
+                            context: imageConfigFile.getContext(),
+                        };
+                        actualWorkspace.config.image = actualImageConfigFile;
+                    } else if (imageConfig.hasConfigstring()) {
+                        actualWorkspace.config.image = imageConfig.getConfigstring();
+                    }
+                }
+            }
         }
-        return { workspace, instance };
+
+        return { actualWorkspace, actualInstance };
     }
 
     protected preparePreCallImageBuilderModifyRequest(
         actualBuildReq: BuildRequest,
-        instance: WorkspaceInstance,
+        actualInstance: WorkspaceInstance,
     ): ExtServiceApi.PreCallImageBuilderModifyRequest {
         let req = new ExtServiceApi.PreCallImageBuilderModifyRequest();
-        // let payload = new ExtServiceApi.PreCallImageBuilderModifyPayload();
+        let payload = new ExtServiceApi.PreCallImageBuilderModifyPayload();
+        // actualBuildReq is of type (gitpod's) image-builder-api.BuildRequest
+        // buildReq is of type (cn-gitpod's) extension-service-api.BuildRequest
+        // Same format is followed for other fields as well
         let buildReq = new ExtServiceApi.BuildRequest();
         if (actualBuildReq.hasSource()) {
             let buildSrc = new ExtServiceApi.BuildSource();
             let actualBuildSrc = actualBuildReq.getSource()!;
             if (actualBuildSrc.hasRef()) {
                 let ref = new ExtServiceApi.BuildSourceReference();
-                ref.setRef(actualBuildSrc.getRef()!.getRef());
+                let actualRef = actualBuildSrc.getRef()!;
+                ref.setRef(actualRef.getRef());
                 buildSrc.setRef(ref);
             } else if (actualBuildSrc.hasFile()) {
                 let file = new ExtServiceApi.BuildSourceDockerfile();
@@ -578,24 +596,91 @@ export class WorkspaceStarter {
                 buildAuth.setTotal(total);
             } else if (actualBuildAuth.hasSelective()) {
                 let selective = new ExtServiceApi.BuildRegistryAuthSelective();
-                let actualSelective = new ExtServiceApi.BuildRegistryAuthSelective();
+                let actualSelective = actualBuildAuth.getSelective()!;
                 selective.setAllowBaserep(actualSelective.getAllowBaserep());
                 selective.setAllowWorkspacerep(actualSelective.getAllowBaserep());
                 selective.setAnyOfList(actualSelective.getAnyOfList());
                 buildAuth.setSelective(selective);
             }
-            actualBuildAuth.getAdditionalMap();
+            actualBuildAuth.getAdditionalMap().forEach((val, key) => buildAuth.getAdditionalMap().set(key, val));
             buildReq.setAuth(buildAuth);
         }
+        let instance = new ExtServiceApi.WorkspaceInstance();
+        instance.setId(actualInstance.id);
+        payload.setBuildrequest(buildReq);
+        payload.setInstance(instance);
+        req.setPayload(payload);
         return req;
     }
 
     protected parsePreCallImageBuilderModifyResponse(
         response: ExtServiceApi.PreCallImageBuilderModifyResponse,
-        buildRequest: BuildRequest,
-        instance: WorkspaceInstance,
-    ): { buildRequest: BuildRequest; instance: WorkspaceInstance } {
-        return { buildRequest, instance };
+        actualBuildReq: BuildRequest,
+        actualInstance: WorkspaceInstance,
+    ): { actualBuildReq: BuildRequest; actualInstance: WorkspaceInstance } {
+        if (response.hasPayload()) {
+            let payload = response.getPayload()!;
+            if (payload.hasBuildrequest()) {
+                // actualBuildReq is of type (gitpod's) image-builder-api.BuildRequest
+                // buildReq is of type (cn-gitpod's) extension-service-api.BuildRequest
+                // Same format is followed for other fields as well
+                let buildReq = payload.getBuildrequest()!;
+                if (actualBuildReq.hasSource()) {
+                    let buildSrc = buildReq.getSource()!;
+                    let actualBuildSrc = actualBuildReq.getSource()!;
+                    if (actualBuildSrc.hasRef()) {
+                        let ref = buildSrc.getRef()!;
+                        let actualRef = actualBuildSrc.getRef()!;
+                        actualRef.setRef(ref.getRef());
+                        actualBuildSrc.setRef(actualRef);
+                    } else if (actualBuildSrc.hasFile()) {
+                        let file = buildSrc.getFile()!;
+                        let actualFile = actualBuildSrc.getFile()!;
+                        if (actualFile.hasSource()) {
+                            let src = file.getSource()!;
+                            let actualSrc = actualFile.getSource()!;
+                            if (actualSrc.hasGit()) {
+                                let git = src.getGit()!;
+                                let actualGit = actualSrc.getGit()!;
+                                actualGit.setRemoteUri(git.getRemoteUri());
+                                actualGit.setCloneTaget(git.getCloneTarget());
+                                actualSrc.setGit(actualGit);
+                            }
+                            actualFile.setSource(actualSrc);
+                        }
+                        actualBuildSrc.setFile(actualFile);
+                    }
+                    actualBuildReq.setSource(actualBuildSrc);
+                }
+                if (actualBuildReq.hasAuth()) {
+                    let buildAuth = buildReq.getAuth()!;
+                    let actualBuildAuth = actualBuildReq.getAuth()!;
+                    if (actualBuildAuth.hasTotal()) {
+                        let total = buildAuth.getTotal()!;
+                        let actualTotal = actualBuildAuth.getTotal()!;
+                        actualTotal.setAllowAll(total.getAllowAll());
+                        actualBuildAuth.setTotal(actualTotal);
+                    } else if (actualBuildAuth.hasSelective()) {
+                        let selective = new ExtServiceApi.BuildRegistryAuthSelective();
+                        let actualSelective = actualBuildAuth.getSelective()!;
+                        actualSelective.setAllowBaserep(selective.getAllowBaserep());
+                        actualSelective.setAllowWorkspacerep(selective.getAllowBaserep());
+                        actualSelective.setAnyOfList(selective.getAnyOfList());
+                        actualBuildAuth.setSelective(actualSelective);
+                    }
+                    buildAuth
+                        .getAdditionalMap()
+                        .forEach((val, key) => actualBuildAuth.getAdditionalMap().set(key, val));
+                    actualBuildReq.setAuth(actualBuildAuth);
+                }
+            }
+            if (payload.hasInstance()) {
+                let instance = response.getPayload()!.getInstance()!;
+                actualInstance.id = instance.getId();
+            }
+        }
+
+        return { actualBuildReq, actualInstance };
     }
 
     // Note: this function does not expect to be awaited for by its caller. This means that it takes care of error handling itself.
@@ -622,7 +707,11 @@ export class WorkspaceStarter {
         let extensionServiceClient = await this.extensionServiceClientProvider.getClient();
         let response = await extensionServiceClient.preStartWorkspaceModifyHook(preStartWorkspaceModifyRequest);
         if (response.getError() === "") {
-            ({ workspace, instance } = this.parsePreStartWorkspaceModifyResponse(response, workspace, instance));
+            ({ actualWorkspace: workspace, actualInstance: instance } = this.parsePreStartWorkspaceModifyResponse(
+                response,
+                workspace,
+                instance,
+            ));
             log.info(
                 { workspace: workspace.id, instance: instance.id },
                 `preStartWorkspaceModifyHook: Got a successful response from extensionService. `,
@@ -1453,11 +1542,8 @@ export class WorkspaceStarter {
             if (response.getError() === "") {
                 let resBuildReq = new BuildRequest();
                 // We cannot directly assign to "req" here because it's a constant
-                ({ buildRequest: resBuildReq, instance } = this.parsePreCallImageBuilderModifyResponse(
-                    response,
-                    req,
-                    instance,
-                ));
+                ({ actualBuildReq: resBuildReq, actualInstance: instance } =
+                    this.parsePreCallImageBuilderModifyResponse(response, req, instance));
                 req.setSource(resBuildReq.getSource());
                 req.setAuth(resBuildReq.getAuth());
                 req.setForceRebuild(resBuildReq.getForceRebuild());
