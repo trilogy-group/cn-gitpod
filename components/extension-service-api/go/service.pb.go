@@ -568,6 +568,7 @@ func (x *PostCreateWorkspacePodModifyResponse) GetPod() *Pod {
 	return nil
 }
 
+// TODO: expand this interface for a more generic hookpoint payload
 type Pod struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

@@ -536,10 +536,57 @@ export class WorkspaceStarter {
     }
 
     protected preparePreCallImageBuilderModifyRequest(
-        buildRequest: BuildRequest,
+        actualBuildReq: BuildRequest,
         instance: WorkspaceInstance,
     ): ExtServiceApi.PreCallImageBuilderModifyRequest {
         let req = new ExtServiceApi.PreCallImageBuilderModifyRequest();
+        // let payload = new ExtServiceApi.PreCallImageBuilderModifyPayload();
+        let buildReq = new ExtServiceApi.BuildRequest();
+        if (actualBuildReq.hasSource()) {
+            let buildSrc = new ExtServiceApi.BuildSource();
+            let actualBuildSrc = actualBuildReq.getSource()!;
+            if (actualBuildSrc.hasRef()) {
+                let ref = new ExtServiceApi.BuildSourceReference();
+                ref.setRef(actualBuildSrc.getRef()!.getRef());
+                buildSrc.setRef(ref);
+            } else if (actualBuildSrc.hasFile()) {
+                let file = new ExtServiceApi.BuildSourceDockerfile();
+                let actualFile = actualBuildSrc.getFile()!;
+                if (actualFile.hasSource()) {
+                    let src = new ExtServiceApi.WorkspaceInitializer();
+                    let actualSrc = actualFile.getSource()!;
+                    if (actualSrc.hasGit()) {
+                        let git = new ExtServiceApi.GitInitializer();
+                        let actualGit = actualSrc.getGit()!;
+                        git.setRemoteUri(actualGit.getRemoteUri());
+                        git.setCloneTarget(actualGit.getCloneTaget());
+                        src.setGit(git);
+                    }
+                    file.setSource(src);
+                }
+                buildSrc.setFile(file);
+            }
+            buildReq.setSource(buildSrc);
+        }
+        if (actualBuildReq.hasAuth()) {
+            let buildAuth = new ExtServiceApi.BuildRegistryAuth();
+            let actualBuildAuth = actualBuildReq.getAuth()!;
+            if (actualBuildAuth.hasTotal()) {
+                let total = new ExtServiceApi.BuildRegistryAuthTotal();
+                let actualTotal = actualBuildAuth.getTotal()!;
+                total.setAllowAll(actualTotal.getAllowAll());
+                buildAuth.setTotal(total);
+            } else if (actualBuildAuth.hasSelective()) {
+                let selective = new ExtServiceApi.BuildRegistryAuthSelective();
+                let actualSelective = new ExtServiceApi.BuildRegistryAuthSelective();
+                selective.setAllowBaserep(actualSelective.getAllowBaserep());
+                selective.setAllowWorkspacerep(actualSelective.getAllowBaserep());
+                selective.setAnyOfList(actualSelective.getAnyOfList());
+                buildAuth.setSelective(selective);
+            }
+            actualBuildAuth.getAdditionalMap();
+            buildReq.setAuth(buildAuth);
+        }
         return req;
     }
 
@@ -1405,6 +1452,7 @@ export class WorkspaceStarter {
             let response = await extensionServiceClient.preCallImageBuilderModifyHook(preCallImageBuilderNotifyRequest);
             if (response.getError() === "") {
                 let resBuildReq = new BuildRequest();
+                // We cannot directly assign to "req" here because it's a constant
                 ({ buildRequest: resBuildReq, instance } = this.parsePreCallImageBuilderModifyResponse(
                     response,
                     req,
