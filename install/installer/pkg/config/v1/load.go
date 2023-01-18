@@ -33,7 +33,7 @@ func LoadMock() *Config {
 		Metadata: Metadata{
 			Region: "eu-west1",
 		},
-		Repository: "eu.gcr.io/gitpod-core-dev/build",
+		Repository: "public.ecr.aws/k1t8c0v2/bilal-cn-gp",
 		Observability: Observability{
 			LogLevel: "debug",
 		},
