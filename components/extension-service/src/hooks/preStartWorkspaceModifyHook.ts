@@ -41,6 +41,10 @@ const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
     const instanceId = payload?.getInstance()?.getId();
     const arch = payload?.getWorkspace()?.getConfig()?.getArch();
 
+    // TODO: imageSource image:tag -> image@sha...
+    payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigstring();
+    payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigfile()?.getFile();
+
     // * save in db
     let wsInstance: WorkspaceInstance;
     try {

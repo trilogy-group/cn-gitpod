@@ -81,11 +81,14 @@ export const swapTagWithDigest = (image: string) => {
     // 3. alpine:latest
     //      -> docker.io/library/alpine@sha256:25d33b2d291ce47c3e4059589766ed98fadab639577efe5e9c89e4a4b50888fc
 
+
+    // TODO: handle all cases
     if (image.includes("@")) {
         return image;
     }
 
     if (!image.includes(":")) {
+        // !
         image = `${image}:latest`;
     }
 

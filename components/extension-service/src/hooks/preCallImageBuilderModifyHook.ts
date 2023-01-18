@@ -61,8 +61,15 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
     // ! updated implementation:
     const payload = request.getPayload();
 
-    // const buildRequest = payload?.getBuildrequest();
-    // const wsInstance = payload?.getInstance();
+    const buildRequest = payload?.getBuildrequest();
+    const wsInstance = payload?.getInstance();
+
+    // buildRequest?.getSource() -> unique hash
+    // ! if input is of form ref -> simply store it
+    buildRequest?.getSource()?.getRef()?.getRef();
+
+    // only compute hash for this case:
+    buildRequest?.getSource()?.getFile();
 
     try {
     } catch (err) {}

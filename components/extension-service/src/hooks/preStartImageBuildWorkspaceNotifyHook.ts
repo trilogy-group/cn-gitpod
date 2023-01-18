@@ -51,6 +51,8 @@ const preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<
     // console.log(`hookpoint3 response: `, { message });
     // response.setMessage(message);
 
+    // so how we stored it in hookpoint 2, we fetch again here in the same way
+
     console.log(`hookpoint3 - response: `, response.toObject());
     callback(null, response);
 };
