@@ -8,6 +8,7 @@ import * as grpc from "@grpc/grpc-js";
 import { PreStartWorkspaceModifyRequest, PreStartWorkspaceModifyResponse } from "@cn-gitpod/extension-service-api/lib";
 import { prismaClient } from "../utils/prisma";
 import { WorkspaceInstance } from "@prisma/client";
+import { swapTagWithDigest } from "../utils/digest";
 
 const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
     PreStartWorkspaceModifyRequest,
@@ -22,28 +23,21 @@ const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
     // ! previous implementation
     let message = ``;
 
-    // let wsInstance: WorkspaceInstance;
-    // // * save in db
-    // try {
-    //     wsInstance = await prismaClient.workspaceInstance.create({
-    //         data: {
-    //             instanceId: request.instance?.id,
-    //             arch: request.workspace?.config?.arch,
-    //         },
-    //     });
-    //     message = `Workspace instance id created with id: ${wsInstance.instanceId}`;
-    // } catch (err) {
-    //     message = `Error creating prisma create for id: ${request.instance?.id}`;
-    // }
-
     // ! new implementation:
     const payload = request.getPayload();
     const instanceId = payload?.getInstance()?.getId();
     const arch = payload?.getWorkspace()?.getConfig()?.getArch();
 
     // TODO: imageSource image:tag -> image@sha...
-    payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigstring();
-    payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigfile()?.getFile();
+    // payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigstring();
+    // payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigfile()?.getFile();
+
+    // ! if configstring is present, swap tag with digest
+    if (payload?.getWorkspace()?.getConfig()?.getImage()?.hasConfigstring()) {
+        const configString = payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigstring()!;
+        const newConfigString = await swapTagWithDigest(configString);
+        payload?.getWorkspace()?.getConfig()?.getImage()?.setConfigstring(newConfigString);
+    }
 
     // * save in db
     let wsInstance: WorkspaceInstance;

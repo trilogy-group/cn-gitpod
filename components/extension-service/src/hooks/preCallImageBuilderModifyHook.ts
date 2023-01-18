@@ -9,7 +9,8 @@ import {
     PreCallImageBuilderModifyRequest,
     PreCallImageBuilderModifyResponse,
 } from "@cn-gitpod/extension-service-api/lib";
-// import { prismaClient } from "../utils/prisma";
+import { prismaClient } from "../utils/prisma";
+import { getPayloadHash } from "../utils/hash";
 
 const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
     PreCallImageBuilderModifyRequest,
@@ -58,20 +59,30 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
     // console.log(`hookpoint2 response: `, { message });
     // response.setMessage(message);
 
-    // ! updated implementation:
+    // ! new implementation:
     const payload = request.getPayload();
-
-    const buildRequest = payload?.getBuildrequest();
-    // const wsInstance = payload?.getInstance();
-
     // buildRequest?.getSource() -> unique hash
     // ! if input is of form ref -> simply store it
-    buildRequest?.getSource()?.getRef()?.getRef();
+    // buildRequest?.getSource()?.getRef()?.getRef();
 
-    // only compute hash for this case:
-    buildRequest?.getSource()?.getFile();
+    const hash = getPayloadHash(payload);
+    console.log(`hookpoint2 - hash: `, hash);
 
+    // ! prisma stuff
     try {
+        // ! we have to update table2 via 1. First we fetch 1
+        const wsInstance = await prismaClient.workspaceInstance.findUnique({
+            where: {
+                instanceId: payload?.getInstance()?.getId(),
+            },
+        });
+
+        if (!wsInstance) {
+            console.log(`Could not find wsInstance with id: ${payload?.getInstance()?.getId()}`);
+        }
+
+        // ! now we need to create HashArch
+        // const hashArch = await prismaClient.hashArch
     } catch (err) {}
 
     console.log(`hookpoint2 - response: `, response.toObject());

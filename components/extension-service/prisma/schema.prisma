@@ -12,7 +12,7 @@ model WorkspaceInstance {
   arch       String? @default("x86")
 }
 
-model ImageRefArch {
-  workspaceImageRef String  @id
-  arch              String? @default("x86")
+model HashArch {
+  hash String  @id
+  arch String? @default("x86")
 }
