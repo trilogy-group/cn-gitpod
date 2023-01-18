@@ -22,50 +22,14 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
     const request = call.request;
     const response = new PreCallImageBuilderModifyResponse();
 
-    // ! previous implementation
-    // const workspaceImageRef = request.getWorkspaceimageref();
-    // const instanceId = request.getInstance()?.getId();
-
-    // let message: string;
-    // try {
-    //     // ! we have to update table2 via 1. First we fetch 1
-    //     const wsInstance = await prismaClient.workspaceInstance.findUnique({
-    //         where: {
-    //             instanceId,
-    //         },
-    //     });
-    //     if (!wsInstance) {
-    //         message = `Could not find wsInstance with id: ${instanceId}`;
-    //     } else {
-    //         // const imageRef = await prismaClient
-    //         const imageRef = await prismaClient.imageRefArch.upsert({
-    //             where: {
-    //                 workspaceImageRef,
-    //             },
-    //             create: {
-    //                 workspaceImageRef,
-    //                 arch: wsInstance.arch,
-    //             },
-    //             update: {
-    //                 arch: wsInstance.arch,
-    //             },
-    //         });
-    //         message = `Upserted image with ref: ${imageRef.workspaceImageRef}`;
-    //     }
-    // } catch (err) {
-    //     message = `Error upserting wsInstnace, err: ${err?.message}`;
-    // }
-
-    // console.log(`hookpoint2 response: `, { message });
-    // response.setMessage(message);
-
     // ! new implementation:
     const payload = request.getPayload();
+    const buildRequest = payload?.getBuildrequest()
     // buildRequest?.getSource() -> unique hash
     // ! if input is of form ref -> simply store it
     // buildRequest?.getSource()?.getRef()?.getRef();
 
-    const hash = getPayloadHash(payload);
+    const hash = getPayloadHash(buildRequest);
     console.log(`hookpoint2 - hash: `, hash);
 
     let message: string;
@@ -81,20 +45,44 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
         if (!wsInstance) {
             message = `Could not find wsInstance with id: ${payload?.getInstance()?.getId()}`;
         } else {
-            // ! now we need to create HashArch
-            const hashArch = await prismaClient.hashArch.upsert({
+            // ! check if hash is already present in db
+            // If yes, check if the arch matches with the WorkspaceInstance.Config.Arch
+            // If not, mark BuildRequest.forceRebuild = True
+            // If yes, do nothing.
+            // message = `Upserted image with ref: ${hashArch.hash} - arch: ${hashArch.arch}`;
+
+            let hashArch = await prismaClient.hashArch.findUnique({
                 where: {
-                    hash,
-                },
-                create: {
-                    hash,
-                    arch: wsInstance?.arch,
-                },
-                update: {
-                    arch: wsInstance?.arch,
-                },
-            });
-            message = `Upserted image with ref: ${hashArch.hash} - arch: ${hashArch.arch}`;
+                    hash
+                }
+            })
+
+            if (!hashArch) {
+                // If not mark BuildRequest.forceRebuild = True
+                hashArch = await prismaClient.hashArch.create({
+                    data: {
+                        hash,
+                        arch: wsInstance?.arch
+                    }
+                })
+                message = `Created image with hash: ${hashArch.hash} - arch: ${hashArch.arch}`;
+            } else {
+                if (hashArch?.arch !== wsInstance?.arch) {
+                    buildRequest?.setForceRebuild(true)
+                    hashArch = await prismaClient.hashArch.update({
+                        where: {
+                            hash
+                        },
+                        data: {
+                            hash,
+                            arch: wsInstance?.arch
+                        }
+                    })
+                    message = `Updated with hash: ${hashArch.hash} - arch: ${hashArch.arch}`;
+                } else {
+                    message = `Arch is same, no need to update`;
+                }
+            }
         }
     } catch (err) {
         message = `Error upserting wsInstnace, err: ${err?.message}`;
@@ -102,6 +90,7 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
 
     console.log(`hookpoint2 - message: `, message);
     console.log(`hookpoint2 - response: `, response.toObject());
+    payload?.setBuildrequest(buildRequest)
     response.setPayload(payload);
     callback(null, response);
 };

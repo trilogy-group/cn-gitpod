@@ -11,6 +11,8 @@ import {
     PreStartImageBuildWorkspaceNotifyResponse,
 } from "@cn-gitpod/extension-service-api/lib";
 
+import { getPayloadHash } from "../utils/hash";
+
 const preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<
     PreStartImageBuildWorkspaceNotifyRequest,
     PreStartImageBuildWorkspaceNotifyResponse
@@ -18,8 +20,7 @@ const preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<
     console.log(`extension-service serve hookpoint 3 called`);
     console.log("preStartImageBuildWorkspaceNotifyHook  ", call.request.toObject());
 
-    // const request = call.request;
-    // request.buildrequest?.forceRebuild
+    const request = call.request;
     const response = new PreStartImageBuildWorkspaceNotifyResponse();
 
     // const workspaceImageRef = request.getWorkspaceimageref();
@@ -53,6 +54,33 @@ const preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<
 
     // so how we stored it in hookpoint 2, we fetch again here in the same way
 
+    // ! updated implementation
+    const buildRequest = request.getBuildrequest();
+    const buildId = request.getBuildid();
+
+    const hash = getPayloadHash(buildRequest);
+
+    let message: string;
+    try {
+        const hashArch = await prismaClient?.hashArch.findUnique({
+            where: {
+                hash,
+            },
+        });
+        const wsInstance = await prismaClient?.workspaceInstance.create({
+            data: {
+                instanceId: buildId,
+                arch: hashArch?.arch,
+            },
+        });
+        message = `Hookpoint3 - created wsInstance with id: ${wsInstance?.instanceId}, arch: ${wsInstance?.arch}`;
+        response.setError("");
+    } catch (err) {
+        message = `Error finding by wsImageRef & buildId: ${err?.message}`;
+        response.setError(message);
+    }
+
+    console.log(`hookpoint3 - message: `, message);
     console.log(`hookpoint3 - response: `, response.toObject());
     callback(null, response);
 };

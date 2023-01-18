@@ -4,7 +4,7 @@
  * See License-AGPL.txt in the project root for license information.
  */
 import * as crypto from "crypto";
-import { BuildSourceDockerfile, PreCallImageBuilderModifyPayload } from "@cn-gitpod/extension-service-api/lib";
+import { BuildRequest, BuildSourceDockerfile,  } from "@cn-gitpod/extension-service-api/lib";
 
 // ! utility function to calculate hash that mimics the gitpod's functionality. To be used in hookpoints 2, 3.
 interface IFile {
@@ -80,17 +80,17 @@ const getHashInput = (file: BuildSourceDockerfile | undefined) => {
 };
 
 // ! main function to be used in hookpoint 2 & 3
-export const getPayloadHash = (payload: PreCallImageBuilderModifyPayload | undefined) => {
+export const getPayloadHash = (buildRequest: BuildRequest | undefined) => {
     let hash = ``;
     // only compute hash for this case:
-    if (payload?.getBuildrequest()?.getSource()?.hasFile()) {
-        const file = payload?.getBuildrequest()?.getSource()?.getFile();
+    if (buildRequest?.getSource()?.hasFile()) {
+        const file = buildRequest?.getSource()?.getFile();
         // ! now we need to find the hash
         const hashInput = getHashInput(file);
         hash = calculateHash(hashInput);
-    } else if (payload?.getBuildrequest()?.getSource()?.hasRef()) {
+    } else if (buildRequest?.getSource()?.hasRef()) {
         // ! in this case we can simply store the ref as hash
-        hash = payload?.getBuildrequest()?.getSource()?.getRef()?.getRef()!;
+        hash = buildRequest?.getSource()?.getRef()?.getRef()!;
     }
 
     return hash;
