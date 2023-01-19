@@ -15,7 +15,7 @@ const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
     PreStartWorkspaceModifyResponse
 > = async (call, callback) => {
     console.log(`extension-service serve hookpoint 1 called`);
-    console.log("preStartWorkspaceNotifyHookHandler", call.request.toObject());
+    console.log("preStartWorkspaceNotifyHookHandler", JSON.stringify(call.request.toObject(), null, 1));
 
     const request = call.request;
     const response = new PreStartWorkspaceModifyResponse();
@@ -58,7 +58,7 @@ const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
     response.setError("");
 
     console.log(`hookpoint1 - message: `, message);
-    console.log(`hookpoint1 - response: `, response.toObject());
+    console.log(`hookpoint1 - response: `, JSON.stringify(response.toObject(), null, 1));
     callback(null, response);
 };
 

@@ -115,4 +115,4 @@ export const swapTagWithDigest = (image: string, arch: Arch) => {
     return digest;
 };
 
-// console.log(swapTagWithDigest("alpine:latest", "arm"));
+console.log(swapTagWithDigest("alpine:latest", "arm"));

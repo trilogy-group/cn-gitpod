@@ -17,7 +17,7 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
     PreCallImageBuilderModifyResponse
 > = async (call, callback) => {
     console.log(`extension-service serve hookpoint 2 called`);
-    console.log("preCallImageBuilderModifyHook", call.request.toObject());
+    console.log("preCallImageBuilderModifyHook", JSON.stringify(call.request.toObject(), null, 1));
 
     const request = call.request;
     const response = new PreCallImageBuilderModifyResponse();
@@ -91,9 +91,9 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
     }
 
     console.log(`hookpoint2 - message: `, message);
-    console.log(`hookpoint2 - response: `, response.toObject());
     payload?.setBuildrequest(buildRequest)
     response.setPayload(payload);
+    console.log(`hookpoint2 - response: `, JSON.stringify(response.toObject(), null, 1));
     callback(null, response);
 };
 
