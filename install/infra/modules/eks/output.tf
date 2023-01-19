@@ -51,15 +51,15 @@ output "name_servers" {
   value = formatlist("%s.", resource.aws_route53_zone.gitpod[0].name_servers)
 }
 
-output "database" {
-  sensitive = true
-  value = try({
-    host     = "${aws_db_instance.gitpod[0].address}"
-    username = "${aws_db_instance.gitpod[0].username}"
-    password = random_password.password[0].result
-    port     = 3306
-  }, "No database created")
-}
+# output "database" {
+#   sensitive = true
+#   value = try({
+#     host     = "${aws_db_instance.gitpod[0].address}"
+#     username = "${aws_db_instance.gitpod[0].username}"
+#     password = random_password.password[0].result
+#     port     = 3306
+#   }, "No database created")
+# }
 
 output "registry" {
   sensitive = true

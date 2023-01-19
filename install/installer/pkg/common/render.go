@@ -112,7 +112,7 @@ func (r *RenderContext) RepoName(repo, name string) string {
 }
 
 func (r *RenderContext) ImageName(repo, name, tag string) string {
-	if repo != "quay.io" {
+	if repo == "public.ecr.aws/k1t8c0v2/bilal-cn-gp" {
 		tag = "latest"
 	}
 	ref := fmt.Sprintf("%s:%s", r.RepoName(repo, name), tag)
