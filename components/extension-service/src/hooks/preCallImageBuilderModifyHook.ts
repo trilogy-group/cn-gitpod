@@ -25,6 +25,15 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
     // ! new implementation:
     const payload = request.getPayload();
     const buildRequest = payload?.getBuildrequest()
+
+    // ! auth stuff
+    const auth = payload?.getBuildrequest()?.getAuth()
+    // const selective = auth?.getSelective()
+    // selective?.setAllowBaserep(true)
+    // selective?.setAllowWorkspacerep(true)
+    // selective?.setAnyOfList(['docker.io'])
+    // auth?.setSelective(selective)
+
     // buildRequest?.getSource() -> unique hash
     // ! if input is of form ref -> simply store it
     // buildRequest?.getSource()?.getRef()?.getRef();
@@ -44,6 +53,7 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
 
         if (!wsInstance) {
             message = `Could not find wsInstance with id: ${payload?.getInstance()?.getId()}`;
+        response.setError(message)
         } else {
             // ! check if hash is already present in db
             // If yes, check if the arch matches with the WorkspaceInstance.Config.Arch
@@ -85,11 +95,14 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
                     message = `Arch is same, no need to update`;
                 }
             }
+            response.setError("")
         }
     } catch (err) {
         message = `Error upserting wsInstance, err: ${err?.message}`;
+        response.setError(message)
     }
 
+    buildRequest?.setAuth(auth)
     console.log(`hookpoint2 - message: `, message);
     payload?.setBuildrequest(buildRequest)
     response.setPayload(payload);

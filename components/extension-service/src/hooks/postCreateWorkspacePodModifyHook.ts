@@ -14,33 +14,20 @@ import {
 
 // ! helper
 const NODE_SELECTORS_LIST = {
+    // dont touch existing labels
     arm: [
         {
-            key: "gitpod.io/workload_arm_workspace_regular",
-            operator: "Exists",
-        },
-        {
-            key: "gitpod.io/workload_arm_workspace_regular",
-            operator: "Exists",
-        },
-        {
-            key: "gitpod.io/workload_arm_workspace_regular",
-            operator: "Exists",
-        },
+            key: "kubernetes.io/arch",
+            operator: "In",
+            values: ["arm64"]
+        }
     ],
     x86: [
         {
-            key: "gitpod.io/workload_workspace_regular",
-            operator: "Exists",
-        },
-        {
-            key: "gitpod.io/workload_workspace_regular",
-            operator: "Exists",
-        },
-        {
-            key: "gitpod.io/workload_workspace_regular",
-            operator: "Exists",
-        },
+            key: "kubernetes.io/arch",
+            operator: "In",
+            values: ["amd64"]
+        }
     ],
 };
 
@@ -52,7 +39,7 @@ const getArmNodeSelectorTermsList = (arch: "x86" | "arm") => {
     const armMatchExpressions: NodeSelectorRequirement[] = [];
 
     for (let item of NODE_SELECTORS_LIST[arch]) {
-        armMatchExpressions.push(new NodeSelectorRequirement().setKey(item.key).setOperator(item.operator));
+        armMatchExpressions.push(new NodeSelectorRequirement().setKey(item.key).setOperator(item.operator).setValuesList(item.values));
     }
 
     nodeSelectorTerms.setMatchexpressionsList(armMatchExpressions);
@@ -65,7 +52,7 @@ const postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<
     PostCreateWorkspacePodModifyResponse
 > = async (call, callback) => {
     console.log(`extension-service serve hookpoint 4 called`);
-    console.log("postCreateWorkspacePodModifyHook", JSON.stringify(call.request.toObject(), null, 1));
+    // console.log("postCreateWorkspacePodModifyHook", JSON.stringify(call.request.toObject(), null, 1));
 
     const response = new PostCreateWorkspacePodModifyResponse();
 
@@ -111,6 +98,8 @@ const postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<
         ...pSpecNodeAffReqExec.getNodeselectortermsList(),
         nodeSelectorTerms,
     ]);
+
+
     pSpecNodeAff?.setRequiredduringschedulingignoredduringexecution(pSpecNodeAffReqExec);
     pSpecAff?.setNodeaffinity(pSpecNodeAff);
     pSpec?.setAffinity(pSpecAff);
@@ -119,7 +108,8 @@ const postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<
     pod?.setMetadata(pMetadata);
 
     response.setPod(pod);
-    console.log(`Pod sent back!`, JSON.stringify(response.toObject(), null, 1));
+    // console.log(`Pod sent back!`, JSON.stringify(response.toObject(), null, 1));
+    console.log(`Pod sent back!`);
 
     callback(null, response);
 };
