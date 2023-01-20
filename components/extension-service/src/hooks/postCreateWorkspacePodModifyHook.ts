@@ -7,45 +7,71 @@
 import * as grpc from "@grpc/grpc-js";
 import {
     NodeSelectorRequirement,
-    NodeSelectorTerm,
     PostCreateWorkspacePodModifyRequest,
     PostCreateWorkspacePodModifyResponse,
 } from "@cn-gitpod/extension-service-api/lib";
+import { Arch } from "../utils/digest";
 
 // ! helper
 const NODE_SELECTORS_LIST = {
     // dont touch existing labels
-    arm: [
+    arm:
+    [
+        {
+            key: 'gitpod.io/workload_workspace_regular',
+            operator: 'Exists'
+        },
+        {
+            key: 'gitpod.io/ws-daemon_ready_ns_gitpod-infra-test',
+            operator: 'Exists'
+        },
+        {
+            key: 'gitpod.io/registry-facade_ready_ns_gitpod-infra-test',
+            operator: 'Exists'
+        },
         {
             key: "kubernetes.io/arch",
             operator: "In",
             values: ["arm64"]
-        }
+        },
     ],
-    x86: [
+    x86:
+    [
+        {
+            key: 'gitpod.io/workload_workspace_regular',
+            operator: 'Exists'
+        },
+        {
+            key: 'gitpod.io/ws-daemon_ready_ns_gitpod-infra-test',
+            operator: 'Exists'
+        },
+        {
+            key: 'gitpod.io/registry-facade_ready_ns_gitpod-infra-test',
+            operator: 'Exists'
+        },
         {
             key: "kubernetes.io/arch",
             operator: "In",
             values: ["amd64"]
         }
-    ],
+    ]
 };
 
 //  ! helper function
-const getArmNodeSelectorTermsList = (arch: "x86" | "arm") => {
-    const nodeSelectorTerms = new NodeSelectorTerm();
+const constructNodeAffinity = (arch: Arch) => {
+    const affinityItems = NODE_SELECTORS_LIST[arch]
+    const newMatchExpressionList = affinityItems.map(item=>{
+        const requirement = new NodeSelectorRequirement()
+        requirement.setKey(item.key)
+        requirement.setOperator(item.operator)
+        if(item.values?.length) {
+            requirement?.setValuesList(item.values)
+        }
 
-    // * all the labels
-    const armMatchExpressions: NodeSelectorRequirement[] = [];
-
-    for (let item of NODE_SELECTORS_LIST[arch]) {
-        armMatchExpressions.push(new NodeSelectorRequirement().setKey(item.key).setOperator(item.operator).setValuesList(item.values));
-    }
-
-    nodeSelectorTerms.setMatchexpressionsList(armMatchExpressions);
-
-    return nodeSelectorTerms;
-};
+        return requirement
+    })
+    return newMatchExpressionList
+}
 
 const postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<
     PostCreateWorkspacePodModifyRequest,
@@ -68,8 +94,6 @@ const postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<
     const pSpecNodeAff = pSpecAff?.getNodeaffinity();
     const pSpecNodeAffReqExec = pSpecNodeAff?.getRequiredduringschedulingignoredduringexecution();
 
-    let nodeSelectorTerms: NodeSelectorTerm;
-
     // * check from prisma
     const instanceId = call.request.getWorkspaceinstanceid();
     try {
@@ -82,23 +106,23 @@ const postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<
         console.log(`arch is ${foundWSInstance?.arch}`);
         if (foundWSInstance?.arch === "arm") {
             podMetadataAnnotations?.set("hookArch", "Hi i am arm, ws was found in prisma");
-            nodeSelectorTerms = getArmNodeSelectorTermsList("arm");
+            // nodeSelectorTerms = getArmNodeSelectorTermsList("arm");
+
+           const matchExpressions =  constructNodeAffinity("arm")
+           pSpecNodeAffReqExec?.getNodeselectortermsList()[0]?.setMatchexpressionsList(matchExpressions)
         } else {
             podMetadataAnnotations?.set("hookArch", "Hi i am x86, ws was found in prisma");
-            nodeSelectorTerms = getArmNodeSelectorTermsList("x86");
+            const matchExpressions =  constructNodeAffinity("x86")
+            pSpecNodeAffReqExec?.getNodeselectortermsList()[0]?.setMatchexpressionsList(matchExpressions)
+
         }
     } catch (err) {
         console.log(`ERROR: WS Instance not found in prisma with id: ${instanceId}`);
         console.log(`Got this error instead: ${err?.message}`);
         podMetadataAnnotations?.set("hookArch", "Hi i am x86, ws was not found in prisma");
-        nodeSelectorTerms = getArmNodeSelectorTermsList("x86");
+        const matchExpressions =  constructNodeAffinity("x86")
+        pSpecNodeAffReqExec?.getNodeselectortermsList()[0]?.setMatchexpressionsList(matchExpressions)
     }
-
-    pSpecNodeAffReqExec?.setNodeselectortermsList([
-        ...pSpecNodeAffReqExec.getNodeselectortermsList(),
-        nodeSelectorTerms,
-    ]);
-
 
     pSpecNodeAff?.setRequiredduringschedulingignoredduringexecution(pSpecNodeAffReqExec);
     pSpecAff?.setNodeaffinity(pSpecNodeAff);
