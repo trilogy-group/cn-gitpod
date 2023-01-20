@@ -652,27 +652,29 @@ export class WorkspaceStarter {
                     }
                     actualBuildReq.setSource(actualBuildSrc);
                 }
-                if (actualBuildReq.hasAuth()) {
-                    let buildAuth = buildReq.getAuth()!;
-                    let actualBuildAuth = actualBuildReq.getAuth()!;
-                    if (actualBuildAuth.hasTotal()) {
-                        let total = buildAuth.getTotal()!;
-                        let actualTotal = actualBuildAuth.getTotal()!;
-                        actualTotal.setAllowAll(total.getAllowAll());
-                        actualBuildAuth.setTotal(actualTotal);
-                    } else if (actualBuildAuth.hasSelective()) {
-                        let selective = new ExtServiceApi.BuildRegistryAuthSelective();
-                        let actualSelective = actualBuildAuth.getSelective()!;
-                        actualSelective.setAllowBaserep(selective.getAllowBaserep());
-                        actualSelective.setAllowWorkspacerep(selective.getAllowBaserep());
-                        actualSelective.setAnyOfList(selective.getAnyOfList());
-                        actualBuildAuth.setSelective(actualSelective);
-                    }
-                    buildAuth
-                        .getAdditionalMap()
-                        .forEach((val, key) => actualBuildAuth.getAdditionalMap().set(key, val));
-                    actualBuildReq.setAuth(actualBuildAuth);
-                }
+                // if (actualBuildReq.hasAuth()) {
+                //     let buildAuth = buildReq.getAuth()!;
+                //     let actualBuildAuth = actualBuildReq.getAuth()!;
+                //     if (actualBuildAuth.hasTotal()) {
+                //         let total = buildAuth.getTotal()!;
+                //         let actualTotal = actualBuildAuth.getTotal()!;
+                //         actualTotal.setAllowAll(total.getAllowAll());
+                //         actualBuildAuth.setTotal(actualTotal);
+                //     } else if (actualBuildAuth.hasSelective()) {
+                //         let selective = new ExtServiceApi.BuildRegistryAuthSelective();
+                //         let actualSelective = actualBuildAuth.getSelective()!;
+                //         actualSelective.setAllowBaserep(selective.getAllowBaserep());
+                //         actualSelective.setAllowWorkspacerep(selective.getAllowBaserep());
+                //         actualSelective.setAnyOfList(selective.getAnyOfList());
+                //         actualBuildAuth.setSelective(actualSelective);
+                //     }
+                //     buildAuth
+                //         .getAdditionalMap()
+                //         .forEach((val, key) => actualBuildAuth.getAdditionalMap().set(key, val));
+                //     actualBuildReq.setAuth(actualBuildAuth);
+                // }
+                // forcebuild
+                actualBuildReq.setForceRebuild(!!payload.getBuildrequest()?.getForceRebuild());
             }
             if (payload.hasInstance()) {
                 let instance = response.getPayload()!.getInstance()!;
@@ -1545,13 +1547,14 @@ export class WorkspaceStarter {
                 ({ actualBuildReq: resBuildReq, actualInstance: instance } =
                     this.parsePreCallImageBuilderModifyResponse(response, req, instance));
                 req.setSource(resBuildReq.getSource());
-                req.setAuth(resBuildReq.getAuth());
+                // req.setAuth(resBuildReq.getAuth());
                 req.setForceRebuild(resBuildReq.getForceRebuild());
                 req.setTriggeredBy(resBuildReq.getTriggeredBy());
                 log.info(
                     { workspace: workspace.id, instance: instance.id },
                     `preCallImageBuilderModifyHook: Got a successful response from extensionService. `,
                 );
+                log.info(`b-log: `, { auth: JSON.stringify(req.toObject(), null, 1) });
             } else {
                 log.error(
                     { workspace: workspace.id, instance: instance.id },
