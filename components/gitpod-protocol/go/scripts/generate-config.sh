@@ -35,3 +35,4 @@ else
 fi
 
 git diff --exit-code "$GITPOD_CONFIG_TYPE_PATH"
+echo $?

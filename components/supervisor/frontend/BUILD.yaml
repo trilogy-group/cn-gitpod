@@ -19,4 +19,4 @@ packages:
         build:
          - sh
          - -c
-         - yq w -i config.json commit commit-${__git_commit} -j && yarn build
+         - yarn build

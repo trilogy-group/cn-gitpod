@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo rm /etc/apt/sources.list.d/docker.list /etc/apt/sources.list.d/kubernetes.list /etc/apt/sources.list.d/kubernetes.list.save
 sudo apt install -y build-essential
 # leeway install
 curl -L https://github.com/gitpod-io/leeway/releases/download/v0.7.3/leeway_0.7.3_Linux_arm64.tar.gz -o leeway_arm64.tar.gz
@@ -25,7 +26,7 @@ sudo apt-get install \
     curl \
     gnupg \
     lsb-release -y
-sudo mkdir -p /etc/apt/keyrings
+sudo mkdir -p -y /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
 echo \
@@ -46,15 +47,14 @@ npm install -g yarn
 pip install pre-commit
 
 # install protobuf compiler & grpc-tools for ARM
-sudo apt update && sudo apt install -y protobuf-compiler
-curl -L https://github.com/trilogy-group/grpc-node/releases/download/v1.11.2-arm64/node-package-linux-aarch64.tar.gz -o grpc-tools.tar.gz
-cd /workspace/gitpod/components/supervisor-api/typescript-grpc/ || exit
-yarn install
-cd node_modules || exit
-mkdir grpc-tools
-cd /workspace/gitpod || exit
-tar xvf grpc-tools.tar.gz -C /workspace/gitpod/components/supervisor-api/typescript-grpc/node_modules/grpc-tools
-rm grpc-tools.tar.gz
+sudo apt update
+sudo apt install -y protobuf-compiler
+# curl -L https://github.com/trilogy-group/grpc-node/releases/download/v1.11.2-arm64/node-package-linux-aarch64.tar.gz -o grpc-tools.tar.gz
+# cd node_modules || exit
+# mkdir grpc-tools
+# cd /workspace/gitpod || exit
+# tar xvf grpc-tools.tar.gz -C /workspace/gitpod/node_modules/grpc-tools
+# rm grpc-tools.tar.gz
 
 # install yq
 sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64
