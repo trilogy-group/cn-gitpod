@@ -57,6 +57,7 @@ tasks:
       mkdir grpc-tools
       cd /workspace/gitpod || exit
       tar xvf grpc-tools.tar.gz -C /workspace/gitpod/node_modules/grpc-tools
+      rm grpc-tools.tar.gz
     command: |
       echo "Installed grpc-tools for ARM in node_modules"
 vscode:
