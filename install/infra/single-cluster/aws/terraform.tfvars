@@ -2,7 +2,7 @@
 cluster_name = "gitpod-devspaces"
 
 # a route53 zone and certificate request will be created for this domain; surround the domain name within double quotes
-domain_name = "hybrid.devspaces.com"
+domain_name = "hybrid-devspaces.k8.devfactory.com"
 
 region = "us-east-1"
 
