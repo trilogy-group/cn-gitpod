@@ -7,6 +7,7 @@
 import * as grpc from "@grpc/grpc-js";
 import {
     NodeSelectorRequirement,
+    NodeSelectorTerm,
     PostCreateWorkspacePodModifyRequest,
     PostCreateWorkspacePodModifyResponse,
 } from "@cn-gitpod/extension-service-api/lib";
@@ -14,7 +15,6 @@ import { Arch } from "../utils/digest";
 
 // ! helper
 const NODE_SELECTORS_LIST = {
-    // dont touch existing labels
     arm:
     [
         {
@@ -58,7 +58,33 @@ const NODE_SELECTORS_LIST = {
 };
 
 //  ! helper function
-const constructNodeAffinity = (arch: Arch) => {
+const constructNodeAffinity = (arch: Arch, nodeSelectorTerm: NodeSelectorTerm|undefined) => {
+    const matchExpressions = nodeSelectorTerm?.getMatchexpressionsList()
+
+    // ! when we already have existing selector terms
+    if (matchExpressions?.length) {
+        const newMatchExpressionList = matchExpressions.map(item=>{
+            const requirement = new NodeSelectorRequirement()
+            requirement.setKey(item?.getKey()!)
+            requirement.setOperator(item?.getOperator()!)
+            if(item.getValuesList()?.length) {
+                requirement?.setValuesList(item.getValuesList())
+            }
+
+            return requirement
+        })
+
+        // ! we want to add the arch expression as well
+        const archReq = new NodeSelectorRequirement()
+        archReq.setKey("kubernetes.io/arc")
+        archReq.setOperator("In")
+        archReq.setValuesList([arch==="arm"?"arm64":"amd64"])
+        newMatchExpressionList.push(archReq)
+
+        return newMatchExpressionList
+    }
+
+    // ! default case
     const affinityItems = NODE_SELECTORS_LIST[arch]
     const newMatchExpressionList = affinityItems.map(item=>{
         const requirement = new NodeSelectorRequirement()
@@ -72,6 +98,10 @@ const constructNodeAffinity = (arch: Arch) => {
     })
     return newMatchExpressionList
 }
+
+// const getCurrentMatchExpression = () => {
+
+// }
 
 const postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<
     PostCreateWorkspacePodModifyRequest,
@@ -93,7 +123,7 @@ const postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<
     const pSpecAff = pSpec?.getAffinity();
     const pSpecNodeAff = pSpecAff?.getNodeaffinity();
     const pSpecNodeAffReqExec = pSpecNodeAff?.getRequiredduringschedulingignoredduringexecution();
-
+    const pSpecNodeAffReqExecMatchExp = pSpecNodeAffReqExec?.getNodeselectortermsList()[0]
     // * check from prisma
     const instanceId = call.request.getWorkspaceinstanceid();
     try {
@@ -108,11 +138,11 @@ const postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<
             podMetadataAnnotations?.set("hookArch", "Hi i am arm, ws was found in prisma");
             // nodeSelectorTerms = getArmNodeSelectorTermsList("arm");
 
-           const matchExpressions =  constructNodeAffinity("arm")
+           const matchExpressions =  constructNodeAffinity("arm", pSpecNodeAffReqExecMatchExp)
            pSpecNodeAffReqExec?.getNodeselectortermsList()[0]?.setMatchexpressionsList(matchExpressions)
         } else {
             podMetadataAnnotations?.set("hookArch", "Hi i am x86, ws was found in prisma");
-            const matchExpressions =  constructNodeAffinity("x86")
+           const matchExpressions =  constructNodeAffinity("x86", pSpecNodeAffReqExecMatchExp)
             pSpecNodeAffReqExec?.getNodeselectortermsList()[0]?.setMatchexpressionsList(matchExpressions)
 
         }
@@ -120,7 +150,7 @@ const postCreateWorkspacePodModifyHook: grpc.handleUnaryCall<
         console.log(`ERROR: WS Instance not found in prisma with id: ${instanceId}`);
         console.log(`Got this error instead: ${err?.message}`);
         podMetadataAnnotations?.set("hookArch", "Hi i am x86, ws was not found in prisma");
-        const matchExpressions =  constructNodeAffinity("x86")
+           const matchExpressions =  constructNodeAffinity("x86", pSpecNodeAffReqExecMatchExp)
         pSpecNodeAffReqExec?.getNodeselectortermsList()[0]?.setMatchexpressionsList(matchExpressions)
     }
 
