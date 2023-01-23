@@ -581,6 +581,9 @@ export class WorkspaceStarter {
                         src.setGit(git);
                     }
                     file.setSource(src);
+                    file.setDockerfilePath(actualFile.getDockerfilePath());
+                    file.setContextPath(actualFile.getContextPath());
+                    file.setDockerfileVersion(actualFile.getDockerfileVersion());
                 }
                 buildSrc.setFile(file);
             }
