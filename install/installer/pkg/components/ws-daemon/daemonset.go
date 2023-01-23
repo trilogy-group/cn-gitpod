@@ -308,7 +308,7 @@ fi
 		DNSPolicy:                     "ClusterFirst",
 		ServiceAccountName:            Component,
 		HostPID:                       true,
-		Affinity:                      common.NodeAffinity(cluster.AffinityLabelWorkspacesRegular, cluster.AffinityLabelWorkspacesHeadless),
+		Affinity:                      common.NodeAffinity(cluster.AffinityLabelWorkspacesRegular, cluster.AffinityLabelWorkspacesHeadless, cluster.AffinityLabelArmWorkspacesHeadless, cluster.AffinityLabelArmWorkspacesRegular),
 		Tolerations: []corev1.Toleration{
 			{
 				Key:      "node.kubernetes.io/disk-pressure",
