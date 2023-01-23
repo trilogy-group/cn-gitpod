@@ -19,7 +19,7 @@ const fixArch = (arch: Arch) => {
     }
 };
 
-const getDigestFromImage = async (image: string, arch: Arch) => {
+const getDigestFromImage = (image: string, arch: Arch) => {
     const fixedArch = fixArch(arch);
     // * we have to run the command: docker manifest inspect <image>
     // * example:
@@ -31,7 +31,7 @@ const getDigestFromImage = async (image: string, arch: Arch) => {
     //     {
     //       "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
     //       "size": 525,
-    //       "digest": "sha256:25d33
+    //       "digest": "sha256:25d33..."
     //       "platform": {
     //         "architecture": "amd64",
     //         "os": "linux"
@@ -94,7 +94,7 @@ export const swapTagWithDigest = (image: string, arch: Arch) => {
 
     // ! in case the image name is already a digest, we dont need to do anything
     if (image.includes("@sha256")) {
-        return Promise.resolve(image);
+        return image;
     }
 
     // The image may be what Docker calls a "familiar" name, e.g. ubuntu:latest instead of docker.io/library/ubuntu:latest.

@@ -76,7 +76,7 @@ const constructNodeAffinity = (arch: Arch, nodeSelectorTerm: NodeSelectorTerm|un
 
         // ! we want to add the arch expression as well
         const archReq = new NodeSelectorRequirement()
-        archReq.setKey("kubernetes.io/arc")
+        archReq.setKey("kubernetes.io/arch")
         archReq.setOperator("In")
         archReq.setValuesList([arch==="arm"?"arm64":"amd64"])
         newMatchExpressionList.push(archReq)
