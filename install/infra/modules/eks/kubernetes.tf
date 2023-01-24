@@ -265,7 +265,7 @@ module "eks" {
       desired_size               = 1
       enable_bootstrap_user_data = true
       labels = {
-        "gitpod.io/workload_arm_workspace_regular" = true
+        "gitpod.io/workload_workspace_regular" = true
       }
 
       tags = {
@@ -307,7 +307,7 @@ module "eks" {
       desired_size               = 1
       enable_bootstrap_user_data = true
       labels = {
-        "gitpod.io/workload_arm_workspace_headless" = true
+        "gitpod.io/workload_workspace_headless" = true
       }
 
       tags = {
