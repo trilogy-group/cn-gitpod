@@ -35,13 +35,26 @@ const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
     // ! if configstring is present, swap tag with digest
     // ws.getimagesource.hasref
     // ignore hasdocker
-    if (payload?.getWorkspace()?.getConfig()?.getImage()?.hasConfigstring()) {
+    // if (payload?.getWorkspace()?.getConfig()?.getImage()?.hasConfigstring()) {
+    // ! previous implementation:
+    // console.log(`hookpoint1 - swapping tag with digest`);
+    // const configString = payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigstring()!;
+    // console.log(`hookpoint1 - current configstring: `, configString);
+    // const newConfigString = await swapTagWithDigest(configString, arch);
+    // console.log(`hookpoint1 - updated configstring: `, newConfigString);
+    // payload?.getWorkspace()?.getConfig()?.getImage()?.setConfigstring(newConfigString);
+
+    // ! updated implementation:
+    // const configString = payload?.getWorkspace()?.getImagesource()?.get;
+    // }
+    if (payload?.getWorkspace()?.getImagesource()?.hasReference()) {
         console.log(`hookpoint1 - swapping tag with digest`);
-        const configString = payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigstring()!;
-        console.log(`hookpoint1 - current configstring: `, configString);
-        const newConfigString = await swapTagWithDigest(configString, arch);
-        console.log(`hookpoint1 - updated configstring: `, newConfigString);
-        payload?.getWorkspace()?.getConfig()?.getImage()?.setConfigstring(newConfigString);
+        // const configString = payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigstring()!;
+        const baseImgResolved = payload?.getWorkspace()?.getImagesource()?.getReference()?.getBaseimageresolved()!;
+        console.log(`hookpoint1 - current baseImgResolved: `, baseImgResolved);
+        const newBaseImage = await swapTagWithDigest(baseImgResolved, arch);
+        console.log(`hookpoint1 - updated baseImgResolved: `, newBaseImage);
+        payload?.getWorkspace()?.getImagesource()?.getReference()?.setBaseimageresolved(newBaseImage);
     }
 
     // * save in db
