@@ -28,18 +28,10 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
 
     // ! auth stuff
     const auth = payload?.getBuildrequest()?.getAuth()
-    // const selective = auth?.getSelective()
-    // selective?.setAllowBaserep(true)
-    // selective?.setAllowWorkspacerep(true)
-    // selective?.setAnyOfList(['docker.io'])
-    // auth?.setSelective(selective)
 
     // buildRequest?.getSource() -> unique hash
     // ! if input is of form ref -> simply store it
     // buildRequest?.getSource()?.getRef()?.getRef();
-
-    const hash = getPayloadHash(buildRequest);
-    console.log(`hookpoint2 - hash: `, hash);
 
     let message: string;
     // ! prisma stuff
@@ -53,8 +45,11 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
 
         if (!wsInstance) {
             message = `Could not find wsInstance with id: ${payload?.getInstance()?.getId()}`;
-        response.setError(message)
+            response.setError(message)
         } else {
+            const hash = getPayloadHash(buildRequest);
+            console.log(`hookpoint2 - hash: `, hash);
+
             // ! check if hash is already present in db
             // If yes, check if the arch matches with the WorkspaceInstance.Config.Arch
             // If not, mark BuildRequest.forceRebuild = True
