@@ -1562,7 +1562,11 @@ export class WorkspaceStarter {
                     { workspace: workspace.id, instance: instance.id },
                     `preCallImageBuilderModifyHook: Got a successful response from extensionService. `,
                 );
-                log.info(`b-log: `, { auth: JSON.stringify(req.toObject(), null, 1) });
+                log.info(
+                    "Updated BuildRequest and Instance objects",
+                    JSON.stringify(req, null, 1),
+                    JSON.stringify(instance, null, 1),
+                );
             } else {
                 log.error(
                     { workspace: workspace.id, instance: instance.id },
