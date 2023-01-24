@@ -33,6 +33,8 @@ const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
     // payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigfile()?.getFile();
 
     // ! if configstring is present, swap tag with digest
+    // ws.getimagesource.hasref
+    // ignore hasdocker
     if (payload?.getWorkspace()?.getConfig()?.getImage()?.hasConfigstring()) {
         console.log(`hookpoint1 - swapping tag with digest`);
         const configString = payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigstring()!;
