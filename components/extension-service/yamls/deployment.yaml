@@ -4,14 +4,14 @@ kind: Deployment
 metadata:
   annotations:
     meta.helm.sh/release-name: gitpod
-    meta.helm.sh/release-namespace: gitpod-infra-hybrid
+    meta.helm.sh/release-namespace: gitpod-infra-test
 # * labels
   labels:
     app: gitpod
     app.kubernetes.io/name: extension-service
     component: extension-service
   name: extension-service
-  namespace: gitpod-infra-hybrid
+  namespace: gitpod-infra-test
 spec:
   replicas: 1
   selector:
@@ -29,7 +29,7 @@ spec:
         app: gitpod
         component: extension-service
       name: extension-service
-      namespace: gitpod-infra-hybrid
+      namespace: gitpod-infra-test
     spec:
       affinity:
         nodeAffinity:
@@ -39,7 +39,7 @@ spec:
               - key: gitpod.io/workload_workspace_regular
                 operator: Exists
       containers:
-        - image: 346945241475.dkr.ecr.us-east-1.amazonaws.com/gitpod-infra-test/extension-service:arm-support
+        - image: 346945241475.dkr.ecr.us-east-1.amazonaws.com/gitpod-infra-test/extension-service:arm-edge-case
           imagePullPolicy: Always
           name: extension-service
           ports:
@@ -54,7 +54,17 @@ spec:
                 key: mysql-root-password
                 optional: false
           - name: PRISMA_DB_URL
-            value: mysql://root:$(DB_PASSWORD)@mysql.gitpod-infra-hybrid.svc.cluster.local:3306/extensionservice
+            value: mysql://root:$(DB_PASSWORD)@mysql.gitpod-infra-test.svc.cluster.local:3306/extensionservice
+          - name: DOCKERHUB_USER
+            valueFrom:
+              secretKeyRef:
+                name: dockerhubcreds
+                key: user
+          - name: DOCKERHUB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: dockerhubcreds
+                key: password
           # * change resources accordingly
           resources:
             limits:

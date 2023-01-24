@@ -8,13 +8,14 @@ import * as grpc from "@grpc/grpc-js";
 import { PreStartWorkspaceModifyRequest, PreStartWorkspaceModifyResponse } from "@cn-gitpod/extension-service-api/lib";
 import { prismaClient } from "../utils/prisma";
 import { WorkspaceInstance } from "@prisma/client";
+import { Arch, swapTagWithDigest } from "../utils/digest";
 
 const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
     PreStartWorkspaceModifyRequest,
     PreStartWorkspaceModifyResponse
 > = async (call, callback) => {
     console.log(`extension-service serve hookpoint 1 called`);
-    console.log("preStartWorkspaceNotifyHookHandler", call.request.toObject());
+    console.log("preStartWorkspaceNotifyHookHandler", JSON.stringify(call.request.toObject(), null, 1));
 
     const request = call.request;
     const response = new PreStartWorkspaceModifyResponse();
@@ -22,24 +23,26 @@ const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
     // ! previous implementation
     let message = ``;
 
-    // let wsInstance: WorkspaceInstance;
-    // // * save in db
-    // try {
-    //     wsInstance = await prismaClient.workspaceInstance.create({
-    //         data: {
-    //             instanceId: request.instance?.id,
-    //             arch: request.workspace?.config?.arch,
-    //         },
-    //     });
-    //     message = `Workspace instance id created with id: ${wsInstance.instanceId}`;
-    // } catch (err) {
-    //     message = `Error creating prisma create for id: ${request.instance?.id}`;
-    // }
-
     // ! new implementation:
     const payload = request.getPayload();
     const instanceId = payload?.getInstance()?.getId();
-    const arch = payload?.getWorkspace()?.getConfig()?.getArch();
+    const arch = payload?.getWorkspace()?.getConfig()?.getArch() as Arch;
+
+    // TODO: imageSource image:tag -> image@sha...
+    // payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigstring();
+    // payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigfile()?.getFile();
+
+    // ! if configstring is present, swap tag with digest
+    // ws.getimagesource.hasref
+    // ignore hasdocker
+    if (payload?.getWorkspace()?.getConfig()?.getImage()?.hasConfigstring()) {
+        console.log(`hookpoint1 - swapping tag with digest`);
+        const configString = payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigstring()!;
+        console.log(`hookpoint1 - current configstring: `, configString);
+        const newConfigString = await swapTagWithDigest(configString, arch);
+        console.log(`hookpoint1 - updated configstring: `, newConfigString);
+        payload?.getWorkspace()?.getConfig()?.getImage()?.setConfigstring(newConfigString);
+    }
 
     // * save in db
     let wsInstance: WorkspaceInstance;
@@ -51,16 +54,16 @@ const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
             },
         });
         message = `Workspace instance id created with id: ${wsInstance.instanceId}`;
+        response.setError("");
     } catch (err) {
         message = `Error creating prisma create for id: ${instanceId}`;
         response.setError(err?.message || message);
     }
 
     response.setPayload(payload);
-    response.setError("");
 
     console.log(`hookpoint1 - message: `, message);
-    console.log(`hookpoint1 - response: `, response.toObject());
+    console.log(`hookpoint1 - response: `, JSON.stringify(response.toObject(), null, 1));
     callback(null, response);
 };
 

@@ -11,47 +11,47 @@ import {
     PreStartImageBuildWorkspaceNotifyResponse,
 } from "@cn-gitpod/extension-service-api/lib";
 
+import { getPayloadHash } from "../utils/hash";
+
 const preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<
     PreStartImageBuildWorkspaceNotifyRequest,
     PreStartImageBuildWorkspaceNotifyResponse
 > = async (call, callback) => {
     console.log(`extension-service serve hookpoint 3 called`);
-    console.log("preStartImageBuildWorkspaceNotifyHook  ", call.request.toObject());
+    console.log("preStartImageBuildWorkspaceNotifyHook  ", JSON.stringify(call.request.toObject(), null, 1));
 
-    // const request = call.request;
-    // request.buildrequest?.forceRebuild
+    const request = call.request;
     const response = new PreStartImageBuildWorkspaceNotifyResponse();
 
-    // const workspaceImageRef = request.getWorkspaceimageref();
-    // const buildId = request.getBuildid();
+    // ! updated implementation
+    const buildRequest = request.getBuildrequest();
+    const buildId = request.getBuildid();
 
-    // let message: string = "";
+    const hash = getPayloadHash(buildRequest);
 
-    // try {
-    //     const imageRef = await prismaClient?.imageRefArch.findUnique({
-    //         where: {
-    //             workspaceImageRef,
-    //         },
-    //     });
-    //     const wsInstance = await prismaClient?.workspaceInstance.create({
-    //         // where: {
-    //         //     instanceId: buildId,
-    //         // },
-    //         data: {
-    //             instanceId: buildId,
-    //             arch: imageRef?.arch,
-    //         },
-    //     });
+    let message: string;
+    try {
+        const hashArch = await prismaClient?.hashArch.findUnique({
+            where: {
+                hash,
+            },
+        });
+        console.log(`hookpoint 3 - Got hasharch: `, hashArch);
+        const wsInstance = await prismaClient?.workspaceInstance.create({
+            data: {
+                instanceId: buildId,
+                arch: hashArch?.arch,
+            },
+        });
+        message = `Hookpoint3 - created wsInstance with id: ${wsInstance?.instanceId}, arch: ${wsInstance?.arch}`;
+        response.setError("");
+    } catch (err) {
+        message = `Error finding by wsImageRef & buildId: ${err?.message}`;
+        response.setError(message);
+    }
 
-    //     message = `Hookpoint3 - created wsInstance with id: ${wsInstance?.instanceId}, arch: ${wsInstance?.arch}`;
-    // } catch (err) {
-    //     message = `Error finding by wsImageRef & buildId: ${err?.message}`;
-    // }
-
-    // console.log(`hookpoint3 response: `, { message });
-    // response.setMessage(message);
-
-    console.log(`hookpoint3 - response: `, response.toObject());
+    console.log(`hookpoint3 - message: `, message);
+    console.log(`hookpoint3 - response: `, JSON.stringify(response.toObject(), null, 1));
     callback(null, response);
 };
 
