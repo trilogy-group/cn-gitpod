@@ -721,6 +721,11 @@ export class WorkspaceStarter {
                 { workspace: workspace.id, instance: instance.id },
                 `preStartWorkspaceModifyHook: Got a successful response from extensionService. `,
             );
+            log.info(
+                "Updated Workspace and Instance objects",
+                JSON.stringify(workspace, null, 1),
+                JSON.stringify(instance, null, 1),
+            );
         } else {
             log.error(
                 { workspace: workspace.id, instance: instance.id },
