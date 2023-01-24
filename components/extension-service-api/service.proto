@@ -31,11 +31,60 @@ message PreStartWorkspaceModifyResponse {
 
 message Workspace {
     WorkspaceConfig config = 1;
+    WorkspaceImageSource imageSource = 2;
 }
 
 message WorkspaceConfig {
     string arch = 1;
     ImageConfig image = 2;
+}
+
+message WorkspaceImageSource {
+    oneof from {
+        WorkspaceImageSourceDocker docker  = 1;
+        WorkspaceImageSourceReference reference = 2;
+    }
+}
+
+message WorkspaceImageSourceReference {
+    string baseImageResolved = 1;
+}
+
+message WorkspaceImageSourceDocker {
+    string dockerFilePath = 1;
+    string dockerFileHash = 2;
+    optional Commit dockerFileSource = 3;
+}
+
+message Commit {
+    Repository repository = 1;
+    string revision = 2;
+    optional string ref = 3;
+    optional RefType refType = 4;
+}
+
+enum RefType {
+    branch = 0;
+    tag = 1;
+    revision = 2;
+}
+
+message Repository {
+    string host = 1;
+    string owner = 2;
+    string name = 3;
+    string cloneUrl = 4;
+    optional string repoKind = 5;
+    optional string description = 6;
+    optional string avatarUrl = 7;
+    optional string webUrl = 8;
+    optional string defaultBranch = 9;
+    optional bool private = 10;
+    optional ParentRepository fork  = 11;
+}
+
+message ParentRepository {
+    Repository parent = 1;
 }
 
 message ImageConfig {

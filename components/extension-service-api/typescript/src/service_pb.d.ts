@@ -97,6 +97,11 @@ export class Workspace extends jspb.Message {
     getConfig(): WorkspaceConfig | undefined;
     setConfig(value?: WorkspaceConfig): Workspace;
 
+    hasImagesource(): boolean;
+    clearImagesource(): void;
+    getImagesource(): WorkspaceImageSource | undefined;
+    setImagesource(value?: WorkspaceImageSource): Workspace;
+
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): Workspace.AsObject;
     static toObject(includeInstance: boolean, msg: Workspace): Workspace.AsObject;
@@ -110,6 +115,7 @@ export class Workspace extends jspb.Message {
 export namespace Workspace {
     export type AsObject = {
         config?: WorkspaceConfig.AsObject,
+        imagesource?: WorkspaceImageSource.AsObject,
     }
 }
 
@@ -136,6 +142,225 @@ export namespace WorkspaceConfig {
     export type AsObject = {
         arch: string,
         image?: ImageConfig.AsObject,
+    }
+}
+
+export class WorkspaceImageSource extends jspb.Message {
+
+    hasDocker(): boolean;
+    clearDocker(): void;
+    getDocker(): WorkspaceImageSourceDocker | undefined;
+    setDocker(value?: WorkspaceImageSourceDocker): WorkspaceImageSource;
+
+    hasReference(): boolean;
+    clearReference(): void;
+    getReference(): WorkspaceImageSourceReference | undefined;
+    setReference(value?: WorkspaceImageSourceReference): WorkspaceImageSource;
+
+    getFromCase(): WorkspaceImageSource.FromCase;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): WorkspaceImageSource.AsObject;
+    static toObject(includeInstance: boolean, msg: WorkspaceImageSource): WorkspaceImageSource.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: WorkspaceImageSource, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): WorkspaceImageSource;
+    static deserializeBinaryFromReader(message: WorkspaceImageSource, reader: jspb.BinaryReader): WorkspaceImageSource;
+}
+
+export namespace WorkspaceImageSource {
+    export type AsObject = {
+        docker?: WorkspaceImageSourceDocker.AsObject,
+        reference?: WorkspaceImageSourceReference.AsObject,
+    }
+
+    export enum FromCase {
+        FROM_NOT_SET = 0,
+        DOCKER = 1,
+        REFERENCE = 2,
+    }
+
+}
+
+export class WorkspaceImageSourceReference extends jspb.Message {
+    getBaseimageresolved(): string;
+    setBaseimageresolved(value: string): WorkspaceImageSourceReference;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): WorkspaceImageSourceReference.AsObject;
+    static toObject(includeInstance: boolean, msg: WorkspaceImageSourceReference): WorkspaceImageSourceReference.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: WorkspaceImageSourceReference, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): WorkspaceImageSourceReference;
+    static deserializeBinaryFromReader(message: WorkspaceImageSourceReference, reader: jspb.BinaryReader): WorkspaceImageSourceReference;
+}
+
+export namespace WorkspaceImageSourceReference {
+    export type AsObject = {
+        baseimageresolved: string,
+    }
+}
+
+export class WorkspaceImageSourceDocker extends jspb.Message {
+    getDockerfilepath(): string;
+    setDockerfilepath(value: string): WorkspaceImageSourceDocker;
+    getDockerfilehash(): string;
+    setDockerfilehash(value: string): WorkspaceImageSourceDocker;
+
+    hasDockerfilesource(): boolean;
+    clearDockerfilesource(): void;
+    getDockerfilesource(): Commit | undefined;
+    setDockerfilesource(value?: Commit): WorkspaceImageSourceDocker;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): WorkspaceImageSourceDocker.AsObject;
+    static toObject(includeInstance: boolean, msg: WorkspaceImageSourceDocker): WorkspaceImageSourceDocker.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: WorkspaceImageSourceDocker, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): WorkspaceImageSourceDocker;
+    static deserializeBinaryFromReader(message: WorkspaceImageSourceDocker, reader: jspb.BinaryReader): WorkspaceImageSourceDocker;
+}
+
+export namespace WorkspaceImageSourceDocker {
+    export type AsObject = {
+        dockerfilepath: string,
+        dockerfilehash: string,
+        dockerfilesource?: Commit.AsObject,
+    }
+}
+
+export class Commit extends jspb.Message {
+
+    hasRepository(): boolean;
+    clearRepository(): void;
+    getRepository(): Repository | undefined;
+    setRepository(value?: Repository): Commit;
+    getRevision(): string;
+    setRevision(value: string): Commit;
+
+    hasRef(): boolean;
+    clearRef(): void;
+    getRef(): string | undefined;
+    setRef(value: string): Commit;
+
+    hasReftype(): boolean;
+    clearReftype(): void;
+    getReftype(): RefType | undefined;
+    setReftype(value: RefType): Commit;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): Commit.AsObject;
+    static toObject(includeInstance: boolean, msg: Commit): Commit.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: Commit, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): Commit;
+    static deserializeBinaryFromReader(message: Commit, reader: jspb.BinaryReader): Commit;
+}
+
+export namespace Commit {
+    export type AsObject = {
+        repository?: Repository.AsObject,
+        revision: string,
+        ref?: string,
+        reftype?: RefType,
+    }
+}
+
+export class Repository extends jspb.Message {
+    getHost(): string;
+    setHost(value: string): Repository;
+    getOwner(): string;
+    setOwner(value: string): Repository;
+    getName(): string;
+    setName(value: string): Repository;
+    getCloneurl(): string;
+    setCloneurl(value: string): Repository;
+
+    hasRepokind(): boolean;
+    clearRepokind(): void;
+    getRepokind(): string | undefined;
+    setRepokind(value: string): Repository;
+
+    hasDescription(): boolean;
+    clearDescription(): void;
+    getDescription(): string | undefined;
+    setDescription(value: string): Repository;
+
+    hasAvatarurl(): boolean;
+    clearAvatarurl(): void;
+    getAvatarurl(): string | undefined;
+    setAvatarurl(value: string): Repository;
+
+    hasWeburl(): boolean;
+    clearWeburl(): void;
+    getWeburl(): string | undefined;
+    setWeburl(value: string): Repository;
+
+    hasDefaultbranch(): boolean;
+    clearDefaultbranch(): void;
+    getDefaultbranch(): string | undefined;
+    setDefaultbranch(value: string): Repository;
+
+    hasPrivate(): boolean;
+    clearPrivate(): void;
+    getPrivate(): boolean | undefined;
+    setPrivate(value: boolean): Repository;
+
+    hasFork(): boolean;
+    clearFork(): void;
+    getFork(): ParentRepository | undefined;
+    setFork(value?: ParentRepository): Repository;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): Repository.AsObject;
+    static toObject(includeInstance: boolean, msg: Repository): Repository.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: Repository, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): Repository;
+    static deserializeBinaryFromReader(message: Repository, reader: jspb.BinaryReader): Repository;
+}
+
+export namespace Repository {
+    export type AsObject = {
+        host: string,
+        owner: string,
+        name: string,
+        cloneurl: string,
+        repokind?: string,
+        description?: string,
+        avatarurl?: string,
+        weburl?: string,
+        defaultbranch?: string,
+        pb_private?: boolean,
+        fork?: ParentRepository.AsObject,
+    }
+}
+
+export class ParentRepository extends jspb.Message {
+
+    hasParent(): boolean;
+    clearParent(): void;
+    getParent(): Repository | undefined;
+    setParent(value?: Repository): ParentRepository;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): ParentRepository.AsObject;
+    static toObject(includeInstance: boolean, msg: ParentRepository): ParentRepository.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: ParentRepository, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): ParentRepository;
+    static deserializeBinaryFromReader(message: ParentRepository, reader: jspb.BinaryReader): ParentRepository;
+}
+
+export namespace ParentRepository {
+    export type AsObject = {
+        parent?: Repository.AsObject,
     }
 }
 
@@ -901,4 +1126,10 @@ export namespace GitInitializer {
         remoteUri: string,
         cloneTarget: string,
     }
+}
+
+export enum RefType {
+    BRANCH = 0,
+    TAG = 1,
+    REVISION = 2,
 }
