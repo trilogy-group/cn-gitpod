@@ -34,8 +34,11 @@ const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
 
     // ! if configstring is present, swap tag with digest
     if (payload?.getWorkspace()?.getConfig()?.getImage()?.hasConfigstring()) {
+        console.log(`hookpoint1 - swapping tag with digest`)
         const configString = payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigstring()!;
+        console.log(`hookpoint1 - current configstring: `, configString)
         const newConfigString = await swapTagWithDigest(configString, arch);
+        console.log(`hookpoint1 - updated configstring: `, newConfigString)
         payload?.getWorkspace()?.getConfig()?.getImage()?.setConfigstring(newConfigString);
     }
 

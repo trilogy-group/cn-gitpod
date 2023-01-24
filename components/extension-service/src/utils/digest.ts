@@ -5,7 +5,8 @@
  */
 
 // * helper function to get the digest of an image from its tag
-import { execSync } from "child_process";
+// import { execSync } from "child_process";
+import axios from "axios";
 
 export type Arch = "x86" | "arm";
 const fixArch = (arch: Arch) => {
@@ -19,69 +20,87 @@ const fixArch = (arch: Arch) => {
     }
 };
 
-const getDigestFromImage = (image: string, arch: Arch) => {
+type ImageResponse = {
+    architecture: string;
+    features: string | null;
+    variant: string | null;
+    digest: string;
+    layers: string[];
+    os: string;
+    os_features: string | null;
+    os_version: string | null;
+    size: number;
+    status: string;
+    last_pulled: string;
+    last_pushed: string;
+};
+
+const generateAuthToken = async () => {
+    // ! request to url: https://hub.docker.com/v2/users/login
+    // ! with body: {"username": "gitpod", "password": "gitpod"}
+    // ! to get the token
+    const url = "https://hub.docker.com/v2/users/login";
+    const body = {
+        username: process.env?.DOCKERHUB_USER!,
+        password: process.env?.DOCKERHUB_PASSWORD!,
+    };
+    const response: {
+        data: {
+            token: string;
+        };
+    } = await axios.post(url, body);
+    const token = response.data.token;
+    return token;
+};
+/**
+ * Since the above function uses docker CLI, we run into rate limit issues.
+ * So we use the image API to get the digest.
+ * @param image String
+ * @param arch "arm" | "x86"
+ */
+const getDigestFromImageAPI = async (image: string, arch: Arch) => {
     const fixedArch = fixArch(arch);
-    // * we have to run the command: docker manifest inspect <image>
-    // * example:
-    // docker manifest inspect docker.io/library/alpine:latest
-    // {
-    //   "schemaVersion": 2,
-    //   "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-    //   "manifests": [
-    //     {
-    //       "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-    //       "size": 525,
-    //       "digest": "sha256:25d33..."
-    //       "platform": {
-    //         "architecture": "amd64",
-    //         "os": "linux"
-    //       }
-    //  ],
-    // }
-    // or the response can have config object instead of manifests
-    // {
-    //   "schemaVersion": 2,
-    //   "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-    //   "config": {
-    //     "mediaType": "application/vnd.docker.container.image.v1+json",
-    //     "size": 1512,
-    //     "digest": "sha256:25d33b
-    //   },
-    // }
 
-    const command = `docker manifest inspect ${image}`;
-    try {
-        const response = execSync(command).toString();
-        const parsedResponse = JSON.parse(response);
+    console.log(`Fixed arch: `, arch);
 
-        // ! remove the tag from the image name
-        const lastColonIndex = image.lastIndexOf(":");
-        image = image.substring(0, lastColonIndex);
+    // * the api we are gonna use is:
+    // https://hub.docker.com/v2/repositories/<image>/tags/<tag>
 
-        // * if the response has manifests, we have to get the digest from the first element
-        if (parsedResponse.manifests) {
-            // ! get the digest with the correct arch
-            const manifest = parsedResponse.manifests.find(
-                (manifest: any) => manifest.platform.architecture === fixedArch,
-            );
-            const digest = manifest.digest;
+    // * get the imagename and tag from the image
+    const lastColonIndex = image.lastIndexOf(":");
+    const imageName = image.substring(0, lastColonIndex);
+    const tag = image.substring(lastColonIndex + 1);
 
-            return `${image}@${digest}`;
-        }
+    let fixedImageName = imageName;
+    console.log(`FixedImageName & tag: `, {
+        fixedImageName,
+        tag,
+    });
 
-        // * if the response has config, we have to get the digest from the config object
-        if (parsedResponse.config) {
-            const digest = parsedResponse.config.digest;
-
-            return `${image}@${digest}`;
-        }
-    } catch (err) {
-        console.error(err);
-
-        return image;
+    // * in case the imageName does not contain a "/", we add "library" as default
+    if (!imageName.includes("/")) {
+        fixedImageName = `library/${fixedImageName}`;
     }
 
-    return image;
+    // * now we have a valid imageName and tag, we can get the digest
+    try {
+        const token = await generateAuthToken();
+        const url = `https://hub.docker.com/v2/repositories/${fixedImageName}/tags/${tag}/images`;
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        // ! get the digest with the correct arch
+        const imageResponse = response.data.find((image: ImageResponse) => image.architecture === fixedArch);
+        const digest = imageResponse.digest;
+
+        return `${imageName}@${digest}`;
+    } catch (err) {
+        console.log(`Got error from docker API: `, err?.message);
+        return `${imageName}:${tag}`;
+    }
 };
 
 /**
@@ -89,7 +108,7 @@ const getDigestFromImage = (image: string, arch: Arch) => {
  * @param image string
  * @returns string
  */
-export const swapTagWithDigest = (image: string, arch: Arch) => {
+export const swapTagWithDigest = async (image: string, arch: Arch) => {
     // TODO: handle all cases
 
     // ! in case the image name is already a digest, we dont need to do anything
@@ -110,9 +129,7 @@ export const swapTagWithDigest = (image: string, arch: Arch) => {
         image = `${image}latest`;
     }
 
-    // ! now we have a valid image name, we can get the digest
-    const digest = getDigestFromImage(image, arch);
+    // * now we have a valid image name, we can get the digest
+    const digest = await getDigestFromImageAPI(image, arch);
     return digest;
 };
-
-console.log(swapTagWithDigest("alpine:latest", "arm"));
