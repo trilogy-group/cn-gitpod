@@ -34,11 +34,11 @@ const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
 
     // ! if configstring is present, swap tag with digest
     if (payload?.getWorkspace()?.getConfig()?.getImage()?.hasConfigstring()) {
-        console.log(`hookpoint1 - swapping tag with digest`)
+        console.log(`hookpoint1 - swapping tag with digest`);
         const configString = payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigstring()!;
-        console.log(`hookpoint1 - current configstring: `, configString)
+        console.log(`hookpoint1 - current configstring: `, configString);
         const newConfigString = await swapTagWithDigest(configString, arch);
-        console.log(`hookpoint1 - updated configstring: `, newConfigString)
+        console.log(`hookpoint1 - updated configstring: `, newConfigString);
         payload?.getWorkspace()?.getConfig()?.getImage()?.setConfigstring(newConfigString);
     }
 
@@ -52,13 +52,13 @@ const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
             },
         });
         message = `Workspace instance id created with id: ${wsInstance.instanceId}`;
+        response.setError("");
     } catch (err) {
         message = `Error creating prisma create for id: ${instanceId}`;
         response.setError(err?.message || message);
     }
 
     response.setPayload(payload);
-    response.setError("");
 
     console.log(`hookpoint1 - message: `, message);
     console.log(`hookpoint1 - response: `, JSON.stringify(response.toObject(), null, 1));

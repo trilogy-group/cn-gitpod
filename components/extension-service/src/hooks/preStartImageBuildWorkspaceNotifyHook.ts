@@ -36,7 +36,7 @@ const preStartImageBuildWorkspaceNotifyHook: grpc.handleUnaryCall<
                 hash,
             },
         });
-        console.log(`hookpoint 3 - Got hasharch: `, hashArch)
+        console.log(`hookpoint 3 - Got hasharch: `, hashArch);
         const wsInstance = await prismaClient?.workspaceInstance.create({
             data: {
                 instanceId: buildId,

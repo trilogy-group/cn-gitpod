@@ -24,10 +24,10 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
 
     // ! new implementation:
     const payload = request.getPayload();
-    const buildRequest = payload?.getBuildrequest()
+    const buildRequest = payload?.getBuildrequest();
 
     // ! auth stuff
-    const auth = payload?.getBuildrequest()?.getAuth()
+    const auth = payload?.getBuildrequest()?.getAuth();
 
     // buildRequest?.getSource() -> unique hash
     // ! if input is of form ref -> simply store it
@@ -45,7 +45,7 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
 
         if (!wsInstance) {
             message = `Could not find wsInstance with id: ${payload?.getInstance()?.getId()}`;
-            response.setError(message)
+            response.setError(message);
         } else {
             const hash = getPayloadHash(buildRequest);
             console.log(`hookpoint2 - hash: `, hash);
@@ -58,48 +58,48 @@ const preCallImageBuilderModifyHook: grpc.handleUnaryCall<
 
             let hashArch = await prismaClient.hashArch.findUnique({
                 where: {
-                    hash
-                }
-            })
+                    hash,
+                },
+            });
 
             if (!hashArch) {
                 // If not mark BuildRequest.forceRebuild = True
                 hashArch = await prismaClient.hashArch.create({
                     data: {
                         hash,
-                        arch: wsInstance?.arch
-                    }
-                })
+                        arch: wsInstance?.arch,
+                    },
+                });
                 message = `Created image with hash: ${hashArch.hash} - arch: ${hashArch.arch}`;
-                buildRequest?.setForceRebuild(true)
+                buildRequest?.setForceRebuild(true);
             } else {
                 if (hashArch?.arch !== wsInstance?.arch) {
-                    buildRequest?.setForceRebuild(true)
+                    buildRequest?.setForceRebuild(true);
                     hashArch = await prismaClient.hashArch.update({
                         where: {
-                            hash
+                            hash,
                         },
                         data: {
                             hash,
-                            arch: wsInstance?.arch
-                        }
-                    })
+                            arch: wsInstance?.arch,
+                        },
+                    });
                     message = `Updated with hash: ${hashArch.hash} - arch: ${hashArch.arch}`;
                 } else {
-                    buildRequest?.setForceRebuild(false)
+                    buildRequest?.setForceRebuild(false);
                     message = `Arch is same, no need to update`;
                 }
             }
-            response.setError("")
+            response.setError("");
         }
     } catch (err) {
         message = `Error upserting wsInstance, err: ${err?.message}`;
-        response.setError(message)
+        response.setError(message);
     }
 
-    buildRequest?.setAuth(auth)
+    buildRequest?.setAuth(auth);
     console.log(`hookpoint2 - message: `, message);
-    payload?.setBuildrequest(buildRequest)
+    payload?.setBuildrequest(buildRequest);
     response.setPayload(payload);
     console.log(`hookpoint2 - response: `, JSON.stringify(response.toObject(), null, 1));
     callback(null, response);

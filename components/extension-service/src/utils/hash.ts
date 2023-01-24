@@ -4,7 +4,7 @@
  * See License-AGPL.txt in the project root for license information.
  */
 import * as crypto from "crypto";
-import { BuildRequest, BuildSourceDockerfile,  } from "@cn-gitpod/extension-service-api/lib";
+import { BuildRequest, BuildSourceDockerfile } from "@cn-gitpod/extension-service-api/lib";
 
 // ! utility function to calculate hash that mimics the gitpod's functionality. To be used in hookpoints 2, 3.
 interface IFile {
