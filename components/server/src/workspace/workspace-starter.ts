@@ -62,6 +62,8 @@ import {
     BillingTier,
     Project,
     ImageConfigString,
+    Repository,
+    Commit,
 } from "@gitpod/gitpod-protocol";
 import { IAnalyticsWriter } from "@gitpod/gitpod-protocol/lib/analytics";
 import { log } from "@gitpod/gitpod-protocol/lib/util/logging";
@@ -509,6 +511,73 @@ export class WorkspaceStarter {
         workspaceConfig.setImage(imageConfig);
         workspaceConfig.setArch(arch);
         workspace.setConfig(workspaceConfig);
+        if (actualWorkspace.imageSource) {
+            let imageSource = new ExtServiceApi.WorkspaceImageSource();
+            let actualImageSource = actualWorkspace.imageSource;
+            if (WorkspaceImageSourceDocker.is(actualImageSource)) {
+                let docker = new ExtServiceApi.WorkspaceImageSourceDocker();
+                if (actualImageSource.dockerFileSource) {
+                    let actualDockerFileSource = actualImageSource.dockerFileSource;
+                    let dockerFileSource = new ExtServiceApi.Commit();
+                    function convActualToProtoRepo(actualRepository: Repository): ExtServiceApi.Repository {
+                        let repository = new ExtServiceApi.Repository();
+                        repository.setHost(actualRepository.host);
+                        repository.setOwner(actualRepository.owner);
+                        repository.setName(actualRepository.name);
+                        repository.setCloneurl(actualRepository.cloneUrl);
+                        if (actualRepository.repoKind) {
+                            repository.setRepokind(actualRepository.repoKind);
+                        }
+                        if (actualRepository.description) {
+                            repository.setDescription(actualRepository.description);
+                        }
+                        if (actualRepository.avatarUrl) {
+                            repository.setAvatarurl(actualRepository.avatarUrl);
+                        }
+                        if (actualRepository.webUrl) {
+                            repository.setWeburl(actualRepository.webUrl);
+                        }
+                        if (actualRepository.defaultBranch) {
+                            repository.setDefaultbranch(actualRepository.defaultBranch);
+                        }
+                        if (actualRepository.private) {
+                            repository.setPrivate(actualRepository.private);
+                        }
+                        if (actualRepository.fork) {
+                            let parentRepo = new ExtServiceApi.ParentRepository();
+                            parentRepo.setParent(convActualToProtoRepo(actualRepository.fork.parent));
+                            repository.setFork(parentRepo);
+                        }
+                        return repository;
+                    }
+                    let repository = convActualToProtoRepo(actualDockerFileSource.repository);
+                    dockerFileSource.setRepository(repository);
+                    dockerFileSource.setRevision(actualDockerFileSource.revision);
+                    if (actualDockerFileSource.ref) {
+                        dockerFileSource.setRef(actualDockerFileSource.ref);
+                    }
+                    if (actualDockerFileSource.refType) {
+                        let actualRefType = RefType.getRefType(actualDockerFileSource);
+                        let refTypes: Record<RefType, number> = {
+                            branch: ExtServiceApi.RefType.BRANCH,
+                            tag: ExtServiceApi.RefType.TAG,
+                            revision: ExtServiceApi.RefType.REVISION,
+                        };
+                        let reftype = refTypes[actualRefType];
+                        dockerFileSource.setReftype(reftype);
+                    }
+                    docker.setDockerfilesource(dockerFileSource);
+                }
+                docker.setDockerfilepath(actualImageSource.dockerFilePath);
+                docker.setDockerfilehash(actualImageSource.dockerFileHash);
+                imageSource.setDocker(docker);
+            } else if (WorkspaceImageSourceReference.is(actualImageSource)) {
+                let ref = new ExtServiceApi.WorkspaceImageSourceReference();
+                ref.setBaseimageresolved(actualImageSource.baseImageResolved);
+                imageSource.setReference(ref);
+            }
+            workspace.setImagesource(imageSource);
+        }
         instance.setId(actualInstance.id);
         payload.setInstance(instance);
         payload.setWorkspace(workspace);
@@ -527,20 +596,98 @@ export class WorkspaceStarter {
                 let instance = payload.getInstance()!;
                 actualInstance.id = instance.getId();
             }
-            if (payload.hasWorkspace() && payload.getWorkspace()!.hasConfig()) {
-                let config = payload.getWorkspace()!.getConfig()!;
-                actualWorkspace.config.arch = config.getArch();
-                if (config.hasImage()) {
-                    let imageConfig = config.getImage()!;
-                    if (imageConfig.hasConfigfile()) {
-                        let imageConfigFile = imageConfig.getConfigfile()!;
-                        let actualImageConfigFile: ImageConfigFile = {
-                            file: imageConfigFile.getFile(),
-                            context: imageConfigFile.getContext(),
+            if (payload.hasWorkspace()) {
+                let workspace = payload.getWorkspace()!;
+                if (workspace.hasConfig()) {
+                    let config = workspace.getConfig()!;
+                    actualWorkspace.config.arch = config.getArch();
+                    if (config.hasImage()) {
+                        let imageConfig = config.getImage()!;
+                        if (imageConfig.hasConfigfile()) {
+                            let imageConfigFile = imageConfig.getConfigfile()!;
+                            let actualImageConfigFile: ImageConfigFile = {
+                                file: imageConfigFile.getFile(),
+                                context: imageConfigFile.getContext(),
+                            };
+                            actualWorkspace.config.image = actualImageConfigFile;
+                        } else if (imageConfig.hasConfigstring()) {
+                            actualWorkspace.config.image = imageConfig.getConfigstring();
+                        }
+                    }
+                }
+                if (workspace.hasImagesource()) {
+                    let imageSource = workspace.getImagesource()!;
+                    if (imageSource.hasDocker()) {
+                        let docker = imageSource.getDocker()!;
+                        let actualDocker: WorkspaceImageSourceDocker = {
+                            dockerFilePath: docker.getDockerfilepath(),
+                            dockerFileHash: docker.getDockerfilehash(),
                         };
-                        actualWorkspace.config.image = actualImageConfigFile;
-                    } else if (imageConfig.hasConfigstring()) {
-                        actualWorkspace.config.image = imageConfig.getConfigstring();
+                        if (docker.hasDockerfilesource()) {
+                            let dockerFileSource = docker.getDockerfilesource()!;
+                            function convProtoToActualRepo(repository: ExtServiceApi.Repository): Repository {
+                                let actualRepository: Repository = {
+                                    host: repository.getHost(),
+                                    owner: repository.getOwner(),
+                                    name: repository.getName(),
+                                    cloneUrl: repository.getCloneurl(),
+                                };
+                                if (repository.hasRepokind()) {
+                                    actualRepository.repoKind = repository.getRepokind();
+                                }
+                                if (repository.hasDescription()) {
+                                    actualRepository.description = repository.getDescription();
+                                }
+                                if (repository.hasAvatarurl()) {
+                                    actualRepository.avatarUrl = repository.getAvatarurl();
+                                }
+                                if (repository.hasWeburl()) {
+                                    actualRepository.webUrl = repository.getWeburl();
+                                }
+                                if (repository.hasDefaultbranch()) {
+                                    actualRepository.defaultBranch = repository.getDefaultbranch();
+                                }
+                                if (repository.hasPrivate()) {
+                                    actualRepository.private = repository.getPrivate();
+                                }
+                                if (repository.hasFork()) {
+                                    let fork = repository.getFork()!;
+                                    if (fork.hasParent()) {
+                                        let parent = fork.getParent()!;
+                                        actualRepository.fork = {
+                                            parent: convProtoToActualRepo(parent),
+                                        };
+                                    }
+                                }
+                                return actualRepository;
+                            }
+                            let actualDockerFileSource: Commit = {
+                                // We assert here because the generated TS interface has it optional
+                                // even though the underlying protobuf defn doesn't
+                                repository: convProtoToActualRepo(dockerFileSource.getRepository()!),
+                                revision: dockerFileSource.getRevision(),
+                            };
+                            if (dockerFileSource.hasRef()) {
+                                actualDockerFileSource.ref = dockerFileSource.getRef()!;
+                            }
+                            if (dockerFileSource.hasReftype()) {
+                                let refTypes: Record<number, RefType> = {
+                                    [ExtServiceApi.RefType.BRANCH]: "branch",
+                                    [ExtServiceApi.RefType.TAG]: "tag",
+                                    [ExtServiceApi.RefType.REVISION]: "revision",
+                                };
+                                let reftype = dockerFileSource.getReftype()!;
+                                actualDockerFileSource.refType = refTypes[reftype];
+                            }
+                            actualDocker.dockerFileSource = actualDockerFileSource;
+                        }
+                        actualWorkspace.imageSource = actualDocker;
+                    } else if (imageSource.hasReference()) {
+                        let ref = imageSource.getReference()!;
+                        let actualRef: WorkspaceImageSourceReference = {
+                            baseImageResolved: ref.getBaseimageresolved(),
+                        };
+                        actualWorkspace.imageSource = actualRef;
                     }
                 }
             }
