@@ -6,6 +6,7 @@ packages:
   - "go.mod"
   - "go.sum"
   deps:
+  - components/extension-service-api/go:lib
   - components/common-go:lib
   - components/content-service-api/go:lib
   - components/content-service:lib

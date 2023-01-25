@@ -7,7 +7,12 @@
 import "reflect-metadata";
 import { inject, injectable } from "inversify";
 import { ExtensionServiceClient } from "./service_grpc_pb";
-import { PreStartWorkspaceNotifyRequest, PreStartWorkspaceNotifyResponse } from "./service_pb";
+import {
+    PreCallImageBuilderModifyRequest,
+    PreCallImageBuilderModifyResponse,
+    PreStartWorkspaceModifyRequest,
+    PreStartWorkspaceModifyResponse,
+} from "./service_pb";
 import * as grpc from "@grpc/grpc-js";
 
 export const ExtensionServiceClientConfig = Symbol("ExtensionServiceClientConfig");
@@ -66,12 +71,27 @@ export class PromisifiedExtensionServiceClient {
         );
     }
 
-    public preStartWorkspaceNotifyHook(
-        request: PreStartWorkspaceNotifyRequest,
-    ): Promise<PreStartWorkspaceNotifyResponse> {
-        return new Promise<PreStartWorkspaceNotifyResponse>((resolve, reject) => {
+    public preStartWorkspaceModifyHook(
+        request: PreStartWorkspaceModifyRequest,
+    ): Promise<PreStartWorkspaceModifyResponse> {
+        return new Promise<PreStartWorkspaceModifyResponse>((resolve, reject) => {
             // TODO: pass span to extension-service for better tracing
-            this.client.preStartWorkspaceNotifyHook(request, (err, resp) => {
+            this.client.preStartWorkspaceModifyHook(request, (err, resp) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(resp);
+                }
+            });
+        });
+    }
+
+    public preCallImageBuilderModifyHook(
+        request: PreCallImageBuilderModifyRequest,
+    ): Promise<PreCallImageBuilderModifyResponse> {
+        return new Promise<PreCallImageBuilderModifyResponse>((resolve, reject) => {
+            // TODO: pass span to extension-service for better tracing
+            this.client.preCallImageBuilderModifyHook(request, (err, resp) => {
                 if (err) {
                     reject(err);
                 } else {

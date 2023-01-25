@@ -60,12 +60,21 @@ import (
 	volumesnapshotv1 "github.com/kubernetes-csi/external-snapshotter/client/v4/apis/volumesnapshot/v1"
 	volumesnapshotclientv1 "github.com/kubernetes-csi/external-snapshotter/client/v4/clientset/versioned"
 	watchtools "k8s.io/client-go/tools/watch"
+
+	// Devspaces-specific start
+	extserviceapi "github.com/trilogy-group/cn-gitpod/extension-service/api"
+	// Devspaces-specific end
 )
 
 // Manager is a kubernetes backed implementation of a workspace manager
 type Manager struct {
-	Config               config.Configuration
-	Clientset            client.Client
+	Config    config.Configuration
+	Clientset client.Client
+
+	// Devspaces-specific start
+	extservice extserviceapi.ExtensionServiceClient
+	// Devspaces-specific end
+
 	RawClient            kubernetes.Interface
 	VolumeSnapshotClient volumesnapshotclientv1.Interface
 	Content              *layer.Provider
@@ -145,9 +154,28 @@ func New(config config.Configuration, client client.Client, rawClient kubernetes
 	broadcaster.StartRecordingToSink(&covev1client.EventSinkImpl{Interface: rawClient.CoreV1().Events("")})
 	eventRecorder := broadcaster.NewRecorder(runtime.NewScheme(), corev1.EventSource{Component: "ws-manager"})
 
+	// Devspaces-specific start
+	var extservice extserviceapi.ExtensionServiceClient
+	if c, ok := config.ExtensionService.Client.(extserviceapi.ExtensionServiceClient); ok {
+		extservice = c
+	} else {
+		grpcOpts := common_grpc.DefaultClientOptions()
+
+		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err := grpc.Dial(config.ExtensionService.Address, grpcOpts...)
+		if err != nil {
+			return nil, err
+		}
+		extservice = extserviceapi.NewExtensionServiceClient(conn)
+	}
+	// Devspaces-specific end
+
 	m := &Manager{
-		Config:               config,
-		Clientset:            client,
+		Config:    config,
+		Clientset: client,
+		// Devspaces-specific start
+		extservice: extservice,
+		// Devspaces-specific end
 		RawClient:            rawClient,
 		VolumeSnapshotClient: volumesnapshotClient,
 		Content:              cp,
@@ -176,6 +204,74 @@ func (m *Manager) Close() {
 type (
 	ctxKeyRemainingTime struct{}
 )
+
+// Devspaces-specific start
+
+// TODO: Extend this function when proto Pod is extended
+func (m *Manager) PreparePostCreateWorkspacePodModifyRequest(pod *corev1.Pod, startReq *api.StartWorkspaceRequest) (*extserviceapi.PostCreateWorkspacePodModifyRequest, error) {
+
+	// Utility function to convert using marshal - unmarshal technique
+	actualNodeAffinityToProto := func(ana *corev1.NodeAffinity) (*extserviceapi.NodeAffinity, error) {
+		bana, err := json.Marshal(ana)
+		if err != nil {
+			return nil, err
+		}
+		pna := &extserviceapi.NodeAffinity{}
+		err = json.Unmarshal(bana, &pna)
+		if err != nil {
+			return nil, err
+		}
+		return pna, nil
+
+	}
+	nodeAffinity, err := actualNodeAffinityToProto(pod.Spec.Affinity.NodeAffinity)
+	if err != nil {
+		return nil, err
+	}
+	// Create proto Pod using actual Pod
+	req := &extserviceapi.PostCreateWorkspacePodModifyRequest{
+		WorkspaceInstanceId: startReq.Id,
+		Pod: &extserviceapi.Pod{
+			Metadata: &extserviceapi.ObjectMeta{
+				Annotations: pod.ObjectMeta.Annotations,
+			},
+			Spec: &extserviceapi.PodSpec{
+				Affinity: &extserviceapi.Affinity{
+					NodeAffinity: nodeAffinity,
+				},
+			},
+		},
+	}
+	return req, nil
+}
+
+// TODO: Extend this function when proto Pod is extended
+func (m *Manager) ParsePostCreateWorkspacepodModifyResponse(pod *corev1.Pod, res *extserviceapi.PostCreateWorkspacePodModifyResponse) (*corev1.Pod, error) {
+	// Utility function to convert using marshal - unmarshal technique
+	protoNodeAffinityToActual := func(pna *extserviceapi.NodeAffinity) (*corev1.NodeAffinity, error) {
+		bpna, err := json.Marshal(pna)
+		if err != nil {
+			return nil, err
+		}
+		ana := &corev1.NodeAffinity{}
+		err = json.Unmarshal(bpna, &ana)
+		if err != nil {
+			return nil, err
+		}
+		return ana, nil
+	}
+	// Set new annotations
+	pod.ObjectMeta.Annotations = res.Pod.Metadata.Annotations
+	// Set new NodeAffinity
+	nodeAffinity, err := protoNodeAffinityToActual(res.Pod.Spec.Affinity.NodeAffinity)
+	if err != nil {
+		return nil, err
+	}
+	pod.Spec.Affinity.NodeAffinity = nodeAffinity
+	return pod, nil
+}
+
+// Devspaces-specific end
 
 // StartWorkspace creates a new running workspace within the manager's cluster
 func (m *Manager) StartWorkspace(ctx context.Context, req *api.StartWorkspaceRequest) (res *api.StartWorkspaceResponse, err error) {
@@ -255,11 +351,30 @@ func (m *Manager) StartWorkspace(ctx context.Context, req *api.StartWorkspaceReq
 
 	// create a Pod object for the workspace
 	pod, err := m.createWorkspacePod(startContext)
-	// Hookpoint - 4. Hook notifies extension serivce saying that a "pod" object is created with a "startContext".
-	// pod = postCreateWorkspacePodModifyHook(pod, startContext)
 	if err != nil {
 		return nil, xerrors.Errorf("cannot create workspace pod: %w", err)
 	}
+
+	// Devspaces-specific start
+	hookRequest, err := m.PreparePostCreateWorkspacePodModifyRequest(pod, req)
+	if err != nil {
+		return nil, xerrors.Errorf("error occurred during PreparePostCreateWorkspacePodModifyRequest: %w", err)
+	}
+	// Hookpoint - 4. Hook notifies extension serivce saying that a "pod" object is created for "workspaceInstanceID".)
+	clog.Info("Calling PostCreateWorkspacePodModifyHook")
+	// TODO: Mock this hook for tests to succeed
+	hookResponse, err := m.extservice.PostCreateWorkspacePodModifyHook(ctx, hookRequest)
+	if err != nil {
+		return nil, xerrors.Errorf("error occurred while calling hook PostCreateWorkspacePodModifyHook: %w", err)
+	}
+	// Updates the pod object according to the response
+	pod, err = m.ParsePostCreateWorkspacepodModifyResponse(pod, hookResponse)
+	if err != nil {
+		return nil, xerrors.Errorf("error occurred during ParsePostCreateWorkspacepodModifyResponse: %w", err)
+	}
+	clog.Info("Successfully Received response from PostCreateWorkspacePodModifyHook")
+	// Devspaces-specific end
+
 	span.LogKV("event", "pod created", "name", pod.Name, "namespace", pod.Namespace)
 
 	var (
