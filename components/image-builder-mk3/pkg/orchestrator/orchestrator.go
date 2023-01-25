@@ -240,6 +240,75 @@ func (o *Orchestrator) ResolveWorkspaceImage(ctx context.Context, req *protocol.
 	}, nil
 }
 
+// Devspaces-specific start
+func (o *Orchestrator) preparePreStartImageBuildWorkspaceNotifyRequest(buildID string, actualBuildReq *protocol.BuildRequest) *extserviceapi.PreStartImageBuildWorkspaceNotifyRequest {
+	// actualBuildReq is of type (gitpod's) protocol.BuildRequest{}
+	// buildReq is of type (cn-gitpod's) extserviceapi.BuildRequest{}
+	// Same format is followed for other fields as well
+	buildSource := &extserviceapi.BuildSource{}
+	switch actualBuildSource := actualBuildReq.Source.From.(type) {
+	case *protocol.BuildSource_Ref:
+		buildSource.From = &extserviceapi.BuildSource_Ref{
+			Ref: &extserviceapi.BuildSourceReference{
+				Ref: actualBuildSource.Ref.Ref,
+			},
+		}
+
+	case *protocol.BuildSource_File:
+		actualFile := actualBuildSource.File
+		source := &extserviceapi.WorkspaceInitializer{}
+		switch actualSpec := actualFile.Source.Spec.(type) {
+		case *csapi.WorkspaceInitializer_Git:
+			source.Spec = &extserviceapi.WorkspaceInitializer_Git{
+				Git: &extserviceapi.GitInitializer{
+					RemoteUri:   actualSpec.Git.RemoteUri,
+					CloneTarget: actualSpec.Git.CloneTaget,
+				},
+			}
+		}
+		buildSource.From = &extserviceapi.BuildSource_File{
+			File: &extserviceapi.BuildSourceDockerfile{
+				DockerfileVersion: actualFile.DockerfileVersion,
+				DockerfilePath:    actualFile.DockerfilePath,
+				ContextPath:       actualFile.ContextPath,
+				Source:            source,
+			},
+		}
+	}
+	buildAuth := &extserviceapi.BuildRegistryAuth{
+		Additional: actualBuildReq.Auth.GetAdditional(),
+	}
+	switch actualBuildAuth := actualBuildReq.Auth.Mode.(type) {
+	case *protocol.BuildRegistryAuth_Selective:
+		buildAuth.Mode = &extserviceapi.BuildRegistryAuth_Selective{
+			Selective: &extserviceapi.BuildRegistryAuthSelective{
+				AllowBaserep:      actualBuildAuth.Selective.AllowBaserep,
+				AllowWorkspacerep: actualBuildAuth.Selective.AllowWorkspacerep,
+				AnyOf:             actualBuildAuth.Selective.GetAnyOf(),
+			},
+		}
+	case *protocol.BuildRegistryAuth_Total:
+		buildAuth.Mode = &extserviceapi.BuildRegistryAuth_Total{
+			Total: &extserviceapi.BuildRegistryAuthTotal{
+				AllowAll: actualBuildAuth.Total.AllowAll,
+			},
+		}
+	}
+	buildReq := &extserviceapi.BuildRequest{
+		Source:       buildSource,
+		Auth:         buildAuth,
+		ForceRebuild: actualBuildReq.ForceRebuild,
+		TriggeredBy:  actualBuildReq.TriggeredBy,
+	}
+	req := &extserviceapi.PreStartImageBuildWorkspaceNotifyRequest{
+		BuildRequest: buildReq,
+		BuildId:      buildID,
+	}
+	return req
+}
+
+// Devspaces-specific end
+
 // Build initiates the build of a Docker image using a build configuration. If a build of this
 // configuration is already ongoing no new build will be started.
 func (o *Orchestrator) Build(req *protocol.BuildRequest, resp protocol.ImageBuilder_BuildServer) (err error) {
@@ -373,17 +442,17 @@ func (o *Orchestrator) Build(req *protocol.BuildRequest, resp protocol.ImageBuil
 	// Devspaces-specific start
 	// Hookpoint - 3. Notifies extenstion-service that an ImageBuildWorkspace is gonna be spawned for a (workspaceImageReference, BuildID)
 	// This information would be consumed by hookpoint - 4.
-	hookRequest := &extserviceapi.PreStartImageBuildWorkspaceNotifyRequest{
-		WorkspaceImageRef: wsrefstr,
-		BuildId:           buildID,
-	}
+	hookRequest := o.preparePreStartImageBuildWorkspaceNotifyRequest(buildID, req)
 	log.Info("Calling PreStartImageBuildWorkspaceNotifyHook")
 	// TODO: Mock this hook for tests to succeed
 	hookReponse, err := o.extservice.PreStartImageBuildWorkspaceNotifyHook(ctx, hookRequest)
 	if err != nil {
-		return xerrors.Errorf("error occurred while calling hook PreCallImageBuilderNotifyHook: %w", err)
+		log.Error("error occurred while calling hook PreCallImageBuilderNotifyHook: %w", err)
 	}
-	log.Info("Received successful response from PreStartImageBuildWorkspaceNotifyHook: ", hookReponse.Message)
+	log.Info("PreCallImageBuilderNotifyHook called successfully")
+	if hookReponse.GetError() != "" {
+		log.Error("PreCallImageBuilderNotifyHook returned error response: %w", hookReponse.GetError())
+	}
 	// To be consumed by Hookpoint - 4
 	// Devspaces-specific end
 	var swr *wsmanapi.StartWorkspaceResponse

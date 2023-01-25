@@ -61,6 +61,9 @@ import {
     EnvVarWithValue,
     BillingTier,
     Project,
+    ImageConfigString,
+    Repository,
+    Commit,
 } from "@gitpod/gitpod-protocol";
 import { IAnalyticsWriter } from "@gitpod/gitpod-protocol/lib/analytics";
 import { log } from "@gitpod/gitpod-protocol/lib/util/logging";
@@ -478,23 +481,359 @@ export class WorkspaceStarter {
     }
 
     // Devspaces-specifc start
-    // TODO: When the PreStartWorkspaceNotifyRequest's proto is updated with all necessary fields, update this function accordingly
-    protected preparePreStartWorkspaceNotifyRequest(
-        workspace: Workspace,
-        instance: WorkspaceInstance,
+    // TODO: When the PreStartWorkspaceModifyRequest's proto is updated with all necessary fields, update this function accordingly
+    protected preparePreStartWorkspaceModifyRequest(
+        actualWorkspace: Workspace,
+        actualInstance: WorkspaceInstance,
     ): ExtServiceApi.PreStartWorkspaceModifyRequest {
         let req = new ExtServiceApi.PreStartWorkspaceModifyRequest();
+        let payload = new ExtServiceApi.PreStartWorkspaceModifyPayload();
+        // actualWorkspace is of type (gitpod's) gitpod-protocol.Workspace
+        // workspace is of type (cn-gitpod's) extension-service-api.Workspace
+        // Same format is followed for other fields as well
+        let workspace = new ExtServiceApi.Workspace();
+        let instance = new ExtServiceApi.WorkspaceInstance();
+        let workspaceConfig = new ExtServiceApi.WorkspaceConfig();
+        // TODO: this default value should be handled before and not here.
+        let arch = actualWorkspace.config.arch ? actualWorkspace.config.arch : "x86";
+        let imageConfig = new ExtServiceApi.ImageConfig();
+        let actualImageConfig = actualWorkspace.config.image;
+        if (ImageConfigFile.is(actualImageConfig)) {
+            let imageConfigFile = new ExtServiceApi.ImageConfigFile();
+            imageConfigFile.setFile(actualImageConfig.file);
+            if (actualImageConfig.context) {
+                imageConfigFile.setContext(actualImageConfig.context);
+            }
+            imageConfig.setConfigfile(imageConfigFile);
+        } else if (ImageConfigString.is(actualImageConfig)) {
+            imageConfig.setConfigstring(actualImageConfig);
+        }
+        workspaceConfig.setImage(imageConfig);
+        workspaceConfig.setArch(arch);
+        workspace.setConfig(workspaceConfig);
+        if (actualWorkspace.imageSource) {
+            let imageSource = new ExtServiceApi.WorkspaceImageSource();
+            let actualImageSource = actualWorkspace.imageSource;
+            if (WorkspaceImageSourceDocker.is(actualImageSource)) {
+                let docker = new ExtServiceApi.WorkspaceImageSourceDocker();
+                if (actualImageSource.dockerFileSource) {
+                    let actualDockerFileSource = actualImageSource.dockerFileSource;
+                    let dockerFileSource = new ExtServiceApi.Commit();
+                    function convActualToProtoRepo(actualRepository: Repository): ExtServiceApi.Repository {
+                        let repository = new ExtServiceApi.Repository();
+                        repository.setHost(actualRepository.host);
+                        repository.setOwner(actualRepository.owner);
+                        repository.setName(actualRepository.name);
+                        repository.setCloneurl(actualRepository.cloneUrl);
+                        if (actualRepository.repoKind) {
+                            repository.setRepokind(actualRepository.repoKind);
+                        }
+                        if (actualRepository.description) {
+                            repository.setDescription(actualRepository.description);
+                        }
+                        if (actualRepository.avatarUrl) {
+                            repository.setAvatarurl(actualRepository.avatarUrl);
+                        }
+                        if (actualRepository.webUrl) {
+                            repository.setWeburl(actualRepository.webUrl);
+                        }
+                        if (actualRepository.defaultBranch) {
+                            repository.setDefaultbranch(actualRepository.defaultBranch);
+                        }
+                        if (actualRepository.private) {
+                            repository.setPrivate(actualRepository.private);
+                        }
+                        if (actualRepository.fork) {
+                            let parentRepo = new ExtServiceApi.ParentRepository();
+                            parentRepo.setParent(convActualToProtoRepo(actualRepository.fork.parent));
+                            repository.setFork(parentRepo);
+                        }
+                        return repository;
+                    }
+                    let repository = convActualToProtoRepo(actualDockerFileSource.repository);
+                    dockerFileSource.setRepository(repository);
+                    dockerFileSource.setRevision(actualDockerFileSource.revision);
+                    if (actualDockerFileSource.ref) {
+                        dockerFileSource.setRef(actualDockerFileSource.ref);
+                    }
+                    if (actualDockerFileSource.refType) {
+                        let actualRefType = RefType.getRefType(actualDockerFileSource);
+                        let refTypes: Record<RefType, number> = {
+                            branch: ExtServiceApi.RefType.BRANCH,
+                            tag: ExtServiceApi.RefType.TAG,
+                            revision: ExtServiceApi.RefType.REVISION,
+                        };
+                        let reftype = refTypes[actualRefType];
+                        dockerFileSource.setReftype(reftype);
+                    }
+                    docker.setDockerfilesource(dockerFileSource);
+                }
+                docker.setDockerfilepath(actualImageSource.dockerFilePath);
+                docker.setDockerfilehash(actualImageSource.dockerFileHash);
+                imageSource.setDocker(docker);
+            } else if (WorkspaceImageSourceReference.is(actualImageSource)) {
+                let ref = new ExtServiceApi.WorkspaceImageSourceReference();
+                ref.setBaseimageresolved(actualImageSource.baseImageResolved);
+                imageSource.setReference(ref);
+            }
+            workspace.setImagesource(imageSource);
+        }
+        instance.setId(actualInstance.id);
+        payload.setInstance(instance);
+        payload.setWorkspace(workspace);
+        req.setPayload(payload);
         return req;
     }
 
+    protected parsePreStartWorkspaceModifyResponse(
+        response: ExtServiceApi.PreStartWorkspaceModifyResponse,
+        actualWorkspace: Workspace,
+        actualInstance: WorkspaceInstance,
+    ): { actualWorkspace: Workspace; actualInstance: WorkspaceInstance } {
+        if (response.hasPayload()) {
+            let payload = response.getPayload()!;
+            if (payload.hasInstance()) {
+                let instance = payload.getInstance()!;
+                actualInstance.id = instance.getId();
+            }
+            if (payload.hasWorkspace()) {
+                let workspace = payload.getWorkspace()!;
+                if (workspace.hasConfig()) {
+                    let config = workspace.getConfig()!;
+                    actualWorkspace.config.arch = config.getArch();
+                    if (config.hasImage()) {
+                        let imageConfig = config.getImage()!;
+                        if (imageConfig.hasConfigfile()) {
+                            let imageConfigFile = imageConfig.getConfigfile()!;
+                            let actualImageConfigFile: ImageConfigFile = {
+                                file: imageConfigFile.getFile(),
+                                context: imageConfigFile.getContext(),
+                            };
+                            actualWorkspace.config.image = actualImageConfigFile;
+                        } else if (imageConfig.hasConfigstring()) {
+                            actualWorkspace.config.image = imageConfig.getConfigstring();
+                        }
+                    }
+                }
+                if (workspace.hasImagesource()) {
+                    let imageSource = workspace.getImagesource()!;
+                    if (imageSource.hasDocker()) {
+                        let docker = imageSource.getDocker()!;
+                        let actualDocker: WorkspaceImageSourceDocker = {
+                            dockerFilePath: docker.getDockerfilepath(),
+                            dockerFileHash: docker.getDockerfilehash(),
+                        };
+                        if (docker.hasDockerfilesource()) {
+                            let dockerFileSource = docker.getDockerfilesource()!;
+                            function convProtoToActualRepo(repository: ExtServiceApi.Repository): Repository {
+                                let actualRepository: Repository = {
+                                    host: repository.getHost(),
+                                    owner: repository.getOwner(),
+                                    name: repository.getName(),
+                                    cloneUrl: repository.getCloneurl(),
+                                };
+                                if (repository.hasRepokind()) {
+                                    actualRepository.repoKind = repository.getRepokind();
+                                }
+                                if (repository.hasDescription()) {
+                                    actualRepository.description = repository.getDescription();
+                                }
+                                if (repository.hasAvatarurl()) {
+                                    actualRepository.avatarUrl = repository.getAvatarurl();
+                                }
+                                if (repository.hasWeburl()) {
+                                    actualRepository.webUrl = repository.getWeburl();
+                                }
+                                if (repository.hasDefaultbranch()) {
+                                    actualRepository.defaultBranch = repository.getDefaultbranch();
+                                }
+                                if (repository.hasPrivate()) {
+                                    actualRepository.private = repository.getPrivate();
+                                }
+                                if (repository.hasFork()) {
+                                    let fork = repository.getFork()!;
+                                    if (fork.hasParent()) {
+                                        let parent = fork.getParent()!;
+                                        actualRepository.fork = {
+                                            parent: convProtoToActualRepo(parent),
+                                        };
+                                    }
+                                }
+                                return actualRepository;
+                            }
+                            let actualDockerFileSource: Commit = {
+                                // We assert here because the generated TS interface has it optional
+                                // even though the underlying protobuf defn doesn't
+                                repository: convProtoToActualRepo(dockerFileSource.getRepository()!),
+                                revision: dockerFileSource.getRevision(),
+                            };
+                            if (dockerFileSource.hasRef()) {
+                                actualDockerFileSource.ref = dockerFileSource.getRef()!;
+                            }
+                            if (dockerFileSource.hasReftype()) {
+                                let refTypes: Record<number, RefType> = {
+                                    [ExtServiceApi.RefType.BRANCH]: "branch",
+                                    [ExtServiceApi.RefType.TAG]: "tag",
+                                    [ExtServiceApi.RefType.REVISION]: "revision",
+                                };
+                                let reftype = dockerFileSource.getReftype()!;
+                                actualDockerFileSource.refType = refTypes[reftype];
+                            }
+                            actualDocker.dockerFileSource = actualDockerFileSource;
+                        }
+                        actualWorkspace.imageSource = actualDocker;
+                    } else if (imageSource.hasReference()) {
+                        let ref = imageSource.getReference()!;
+                        let actualRef: WorkspaceImageSourceReference = {
+                            baseImageResolved: ref.getBaseimageresolved(),
+                        };
+                        actualWorkspace.imageSource = actualRef;
+                    }
+                }
+            }
+        }
+
+        return { actualWorkspace, actualInstance };
+    }
+
     protected preparePreCallImageBuilderModifyRequest(
-        workspaceImageRef: string,
-        workspaceInstance: WorkspaceInstance,
+        actualBuildReq: BuildRequest,
+        actualInstance: WorkspaceInstance,
     ): ExtServiceApi.PreCallImageBuilderModifyRequest {
         let req = new ExtServiceApi.PreCallImageBuilderModifyRequest();
+        let payload = new ExtServiceApi.PreCallImageBuilderModifyPayload();
+        // actualBuildReq is of type (gitpod's) image-builder-api.BuildRequest
+        // buildReq is of type (cn-gitpod's) extension-service-api.BuildRequest
+        // Same format is followed for other fields as well
+        let buildReq = new ExtServiceApi.BuildRequest();
+        if (actualBuildReq.hasSource()) {
+            let buildSrc = new ExtServiceApi.BuildSource();
+            let actualBuildSrc = actualBuildReq.getSource()!;
+            if (actualBuildSrc.hasRef()) {
+                let ref = new ExtServiceApi.BuildSourceReference();
+                let actualRef = actualBuildSrc.getRef()!;
+                ref.setRef(actualRef.getRef());
+                buildSrc.setRef(ref);
+            } else if (actualBuildSrc.hasFile()) {
+                let file = new ExtServiceApi.BuildSourceDockerfile();
+                let actualFile = actualBuildSrc.getFile()!;
+                if (actualFile.hasSource()) {
+                    let src = new ExtServiceApi.WorkspaceInitializer();
+                    let actualSrc = actualFile.getSource()!;
+                    if (actualSrc.hasGit()) {
+                        let git = new ExtServiceApi.GitInitializer();
+                        let actualGit = actualSrc.getGit()!;
+                        git.setRemoteUri(actualGit.getRemoteUri());
+                        git.setCloneTarget(actualGit.getCloneTaget());
+                        src.setGit(git);
+                    }
+                    file.setSource(src);
+                    file.setDockerfilePath(actualFile.getDockerfilePath());
+                    file.setContextPath(actualFile.getContextPath());
+                    file.setDockerfileVersion(actualFile.getDockerfileVersion());
+                }
+                buildSrc.setFile(file);
+            }
+            buildReq.setSource(buildSrc);
+        }
+        if (actualBuildReq.hasAuth()) {
+            let buildAuth = new ExtServiceApi.BuildRegistryAuth();
+            let actualBuildAuth = actualBuildReq.getAuth()!;
+            if (actualBuildAuth.hasTotal()) {
+                let total = new ExtServiceApi.BuildRegistryAuthTotal();
+                let actualTotal = actualBuildAuth.getTotal()!;
+                total.setAllowAll(actualTotal.getAllowAll());
+                buildAuth.setTotal(total);
+            } else if (actualBuildAuth.hasSelective()) {
+                let selective = new ExtServiceApi.BuildRegistryAuthSelective();
+                let actualSelective = actualBuildAuth.getSelective()!;
+                selective.setAllowBaserep(actualSelective.getAllowBaserep());
+                selective.setAllowWorkspacerep(actualSelective.getAllowBaserep());
+                selective.setAnyOfList(actualSelective.getAnyOfList());
+                buildAuth.setSelective(selective);
+            }
+            actualBuildAuth.getAdditionalMap().forEach((val, key) => buildAuth.getAdditionalMap().set(key, val));
+            buildReq.setAuth(buildAuth);
+        }
+        let instance = new ExtServiceApi.WorkspaceInstance();
+        instance.setId(actualInstance.id);
+        payload.setBuildrequest(buildReq);
+        payload.setInstance(instance);
+        req.setPayload(payload);
         return req;
     }
-    // Devspaces-specifc end
+
+    protected parsePreCallImageBuilderModifyResponse(
+        response: ExtServiceApi.PreCallImageBuilderModifyResponse,
+        actualBuildReq: BuildRequest,
+        actualInstance: WorkspaceInstance,
+    ): { actualBuildReq: BuildRequest; actualInstance: WorkspaceInstance } {
+        if (response.hasPayload()) {
+            let payload = response.getPayload()!;
+            if (payload.hasBuildrequest()) {
+                // actualBuildReq is of type (gitpod's) image-builder-api.BuildRequest
+                // buildReq is of type (cn-gitpod's) extension-service-api.BuildRequest
+                // Same format is followed for other fields as well
+                let buildReq = payload.getBuildrequest()!;
+                if (actualBuildReq.hasSource()) {
+                    let buildSrc = buildReq.getSource()!;
+                    let actualBuildSrc = actualBuildReq.getSource()!;
+                    if (actualBuildSrc.hasRef()) {
+                        let ref = buildSrc.getRef()!;
+                        let actualRef = actualBuildSrc.getRef()!;
+                        actualRef.setRef(ref.getRef());
+                        actualBuildSrc.setRef(actualRef);
+                    } else if (actualBuildSrc.hasFile()) {
+                        let file = buildSrc.getFile()!;
+                        let actualFile = actualBuildSrc.getFile()!;
+                        if (actualFile.hasSource()) {
+                            let src = file.getSource()!;
+                            let actualSrc = actualFile.getSource()!;
+                            if (actualSrc.hasGit()) {
+                                let git = src.getGit()!;
+                                let actualGit = actualSrc.getGit()!;
+                                actualGit.setRemoteUri(git.getRemoteUri());
+                                actualGit.setCloneTaget(git.getCloneTarget());
+                                actualSrc.setGit(actualGit);
+                            }
+                            actualFile.setSource(actualSrc);
+                        }
+                        actualBuildSrc.setFile(actualFile);
+                    }
+                    actualBuildReq.setSource(actualBuildSrc);
+                }
+                // if (actualBuildReq.hasAuth()) {
+                //     let buildAuth = buildReq.getAuth()!;
+                //     let actualBuildAuth = actualBuildReq.getAuth()!;
+                //     if (actualBuildAuth.hasTotal()) {
+                //         let total = buildAuth.getTotal()!;
+                //         let actualTotal = actualBuildAuth.getTotal()!;
+                //         actualTotal.setAllowAll(total.getAllowAll());
+                //         actualBuildAuth.setTotal(actualTotal);
+                //     } else if (actualBuildAuth.hasSelective()) {
+                //         let selective = new ExtServiceApi.BuildRegistryAuthSelective();
+                //         let actualSelective = actualBuildAuth.getSelective()!;
+                //         actualSelective.setAllowBaserep(selective.getAllowBaserep());
+                //         actualSelective.setAllowWorkspacerep(selective.getAllowBaserep());
+                //         actualSelective.setAnyOfList(selective.getAnyOfList());
+                //         actualBuildAuth.setSelective(actualSelective);
+                //     }
+                //     buildAuth
+                //         .getAdditionalMap()
+                //         .forEach((val, key) => actualBuildAuth.getAdditionalMap().set(key, val));
+                //     actualBuildReq.setAuth(actualBuildAuth);
+                // }
+                // forcebuild
+                actualBuildReq.setForceRebuild(!!payload.getBuildrequest()?.getForceRebuild());
+            }
+            if (payload.hasInstance()) {
+                let instance = response.getPayload()!.getInstance()!;
+                actualInstance.id = instance.getId();
+            }
+        }
+
+        return { actualBuildReq, actualInstance };
+    }
 
     // Note: this function does not expect to be awaited for by its caller. This means that it takes care of error handling itself.
     protected async actuallyStartWorkspace(
@@ -514,15 +853,32 @@ export class WorkspaceStarter {
         // Devpsaces-specifc start
         // Hookpoint - 1. Hook notifies extension service saying that an "instance" of a "workspace" is about to be started.
         // The extension-service returns a possibly modified (instance, worksapce) pair which is updated.
-        // preStartWorkspaceNotifyHook(workspace, instance)
+        // PreStartWorkspaceModifyHook(workspace, instance)
         // To be consumed by Hookpoint - 4.
-        let preStartWorkspaceNotifyRequest = this.preparePreStartWorkspaceNotifyRequest(workspace, instance);
+        let preStartWorkspaceModifyRequest = this.preparePreStartWorkspaceModifyRequest(workspace, instance);
         let extensionServiceClient = await this.extensionServiceClientProvider.getClient();
-        let response = await extensionServiceClient.preStartWorkspaceModifyHook(preStartWorkspaceNotifyRequest);
-        log.info(
-            { workspace: workspace.id, instance: instance.id },
-            `Got response from extensionService: ${response.toString()}`,
-        );
+        let response = await extensionServiceClient.preStartWorkspaceModifyHook(preStartWorkspaceModifyRequest);
+        if (response.getError() === "") {
+            ({ actualWorkspace: workspace, actualInstance: instance } = this.parsePreStartWorkspaceModifyResponse(
+                response,
+                workspace,
+                instance,
+            ));
+            log.info(
+                { workspace: workspace.id, instance: instance.id },
+                `preStartWorkspaceModifyHook: Got a successful response from extensionService. `,
+            );
+            log.info(
+                "Updated Workspace and Instance objects",
+                JSON.stringify(workspace, null, 1),
+                JSON.stringify(instance, null, 1),
+            );
+        } else {
+            log.error(
+                { workspace: workspace.id, instance: instance.id },
+                `preStartWorkspaceModifyHook: Got an error response from extensionService: ${response.getError()}`,
+            );
+        }
         // Devspaces-specifc end
 
         try {
@@ -1333,26 +1689,37 @@ export class WorkspaceStarter {
                     }),
                 );
             // Devspaces-specific start
-            // Let's get wsrefstr from imageBuilder
-            let resolveWorkspaceImageReq = new ResolveWorkspaceImageRequest();
-            resolveWorkspaceImageReq.setAuth(auth);
-            resolveWorkspaceImageReq.setSource(src);
-            let hookWorkspaceImageRef = (
-                await client.resolveWorkspaceImage({ span }, resolveWorkspaceImageReq)
-            ).getRef();
-            let preCallImageBuilderNotifyRequest = this.preparePreCallImageBuilderModifyRequest(
-                hookWorkspaceImageRef,
-                instance,
-            );
+            let preCallImageBuilderNotifyRequest = this.preparePreCallImageBuilderModifyRequest(req, instance);
             let extensionServiceClient = await this.extensionServiceClientProvider.getClient();
             // Hookpoint - 2. Hook notifies the extension service that the ImageBuilder is about to be called for -
-            // build information (workspaceImageReference, workspaceInstance)
+            // build information (buildRequest, workspaceInstance)
+            // The extension-service returns a possibly modified (buildRequest, workspaceInstance) pair which is updated.
             // This information would be consumed by Hookpoint - 3.
             let response = await extensionServiceClient.preCallImageBuilderModifyHook(preCallImageBuilderNotifyRequest);
-            log.info(
-                { workspace: workspace.id, instance: instance.id },
-                `Got response from extensionService: ${response.toString()}`,
-            );
+            if (response.getError() === "") {
+                let resBuildReq = new BuildRequest();
+                // We cannot directly assign to "req" here because it's a constant
+                ({ actualBuildReq: resBuildReq, actualInstance: instance } =
+                    this.parsePreCallImageBuilderModifyResponse(response, req, instance));
+                req.setSource(resBuildReq.getSource());
+                // req.setAuth(resBuildReq.getAuth());
+                req.setForceRebuild(resBuildReq.getForceRebuild());
+                req.setTriggeredBy(resBuildReq.getTriggeredBy());
+                log.info(
+                    { workspace: workspace.id, instance: instance.id },
+                    `preCallImageBuilderModifyHook: Got a successful response from extensionService. `,
+                );
+                log.info(
+                    "Updated BuildRequest and Instance objects",
+                    JSON.stringify(req, null, 1),
+                    JSON.stringify(instance, null, 1),
+                );
+            } else {
+                log.error(
+                    { workspace: workspace.id, instance: instance.id },
+                    `preCallImageBuilderModifyHook: Got an error response from extensionService: ${response.getError()}`,
+                );
+            }
             // Devspaces-specific end
             const result = await client.build({ span }, req, imageBuildLogInfo);
 
