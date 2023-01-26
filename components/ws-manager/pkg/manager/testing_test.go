@@ -24,6 +24,9 @@ import (
 	config "github.com/gitpod-io/gitpod/ws-manager/api/config"
 
 	volumesnapshotclientv1 "github.com/kubernetes-csi/external-snapshotter/client/v4/clientset/versioned"
+	// Devspaces-specific start
+	extserviceapi "github.com/trilogy-group/cn-gitpod/extension-service/api"
+	// Devspaces-specific end
 )
 
 // This file contains test infrastructure for this package. No function in here is meant for consumption outside of tests.
@@ -71,6 +74,11 @@ func forTestingOnlyManagerConfig() config.Configuration {
 			ContentFinalization: util.Duration(55 * time.Minute),
 			Interrupted:         util.Duration(5 * time.Minute),
 		},
+		// Devspaces-specifc start
+		ExtensionService: config.ExtensionServiceConfig{
+			Client: extserviceapi.NewExtensionServiceClient(nil),
+		},
+		// Devspaces-specifc end
 	}
 }
 

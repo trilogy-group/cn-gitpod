@@ -105,14 +105,19 @@ func NewOrchestratingBuilder(cfg config.Configuration) (res *Orchestrator, err e
 	if c, ok := cfg.ExtensionService.Client.(extserviceapi.ExtensionServiceClient); ok {
 		extservice = c
 	} else {
-		grpcOpts := common_grpc.DefaultClientOptions()
-
-		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
-		conn, err := grpc.Dial(cfg.ExtensionService.Address, grpcOpts...)
-		if err != nil {
-			return nil, err
+		if cfg.ExtensionService.Client == nil {
+			grpcOpts := common_grpc.DefaultClientOptions()
+			grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+			addr := cfg.ExtensionService.Address
+			conn, err := grpc.Dial(addr, grpcOpts...)
+			if err != nil {
+				return nil, err
+			}
+			extservice = extserviceapi.NewExtensionServiceClient(conn)
+		} else {
+			extservice = cfg.ExtensionService.Client.(extserviceapi.ExtensionServiceClient)
 		}
-		extservice = extserviceapi.NewExtensionServiceClient(conn)
+
 	}
 	// Devspaces-specific end
 

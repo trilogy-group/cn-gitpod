@@ -160,13 +160,16 @@ func New(config config.Configuration, client client.Client, rawClient kubernetes
 		extservice = c
 	} else {
 		grpcOpts := common_grpc.DefaultClientOptions()
-
-		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
-		conn, err := grpc.Dial(config.ExtensionService.Address, grpcOpts...)
-		if err != nil {
-			return nil, err
+		if config.ExtensionService.Client == nil {
+			addr := config.ExtensionService.Address
+			conn, err := grpc.Dial(addr, grpcOpts...)
+			if err != nil {
+				return nil, err
+			}
+			extservice = extserviceapi.NewExtensionServiceClient(conn)
+		} else {
+			extservice = config.ExtensionService.Client.(extserviceapi.ExtensionServiceClient)
 		}
-		extservice = extserviceapi.NewExtensionServiceClient(conn)
 	}
 	// Devspaces-specific end
 
@@ -1752,6 +1755,7 @@ func newWssyncConnectionFactory(managerConfig config.Configuration) (grpcpool.Fa
 	cfg := managerConfig.WorkspaceDaemon
 	// TODO(cw): add client-side gRPC metrics
 	grpcOpts := common_grpc.DefaultClientOptions()
+	// testfailingpoint1
 	if cfg.TLS.Authority != "" || cfg.TLS.Certificate != "" && cfg.TLS.PrivateKey != "" {
 		tlsConfig, err := common_grpc.ClientAuthTLSConfig(
 			cfg.TLS.Authority, cfg.TLS.Certificate, cfg.TLS.PrivateKey,
