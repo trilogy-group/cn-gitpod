@@ -21,6 +21,10 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	// Devspaces-specific start
+	extserviceapi "github.com/trilogy-group/cn-gitpod/extension-service/api"
+	// Devspaces-specific en
 )
 
 func TestBuild(t *testing.T) {
@@ -138,6 +142,11 @@ func TestBuild(t *testing.T) {
 				BaseImageRepository:      "registry/base",
 				WorkspaceImageRepository: "registry/workspace",
 				BuilderImage:             "builder-image",
+				// Devspaces-specific start
+				ExtensionService: config.ExtensionServiceConfig{
+					Client: extserviceapi.NewExtensionServiceClient(nil),
+				},
+				// Devspaces-specific end
 			})
 			if err != nil {
 				t.Fatal(err)
@@ -188,6 +197,11 @@ func TestResolveBaseImage(t *testing.T) {
 				WorkspaceManager: config.WorkspaceManagerConfig{
 					Client: wsmock.NewMockWorkspaceManagerClient(ctrl),
 				},
+				// Devspaces-specific start
+				ExtensionService: config.ExtensionServiceConfig{
+					Client: extserviceapi.NewExtensionServiceClient(nil),
+				},
+				// Devspaces-specific end
 			})
 			if err != nil {
 				t.Fatal(err)
