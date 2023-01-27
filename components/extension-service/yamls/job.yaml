@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: extension-service-prisma-push
+  namespace: gitpod-infra-test
+spec:
+  ttlSecondsAfterFinished: 10
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: create-db
+          image: 346945241475.dkr.ecr.us-east-1.amazonaws.com/gitpod-infra-test/extension-service:arm-edge-case
+          imagePullPolicy: Always
+          command: ["npx", "prisma","db", "push"]
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-password
+                  key: mysql-root-password
+                  optional: false
+            - name: PRISMA_DB_URL
+              value: mysql://root:$(DB_PASSWORD)@mysql.gitpod-infra-test.svc.cluster.local:3306/extensionservice
+            - name: DOCKERHUB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: dockerhubcreds
+                  key: user
+                  optional: false
+            - name: DOCKERHUB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dockerhubcreds
+                  key: password
+                  optional: false

@@ -73,3 +73,7 @@ spec:
             requests:
               memory: 256Mi
               cpu: "0.2"
+      initContainers:
+        - name: wait-for-db
+          image: busybox
+          command: ['sh', '-c', 'until nslookup mysql.gitpod-infra-test.svc.cluster.local; do echo waiting for mysql; sleep 2; done;']
