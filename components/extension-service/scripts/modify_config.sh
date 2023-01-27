@@ -13,5 +13,8 @@ kubectl create configmap server-config -n "$1" --from-file=config.json -o yaml -
 kubectl get configmaps -n "$1" ws-manager -o json | jq '.data' | jq '.["config.json"] | fromjson' | jq '.manager.extService += {"addr": "'"$EXTENSION_SERVICE_DOMAIN"'"}' > config.json
 kubectl create configmap ws-manager -n "$1" --from-file=config.json -o yaml --dry-run | kubectl apply -f -
 
-kubectl get configmaps -n "$1" image-builder-mk3-config -o json | jq '.data' | jq '.["config.json"] | fromjson' | jq '.orchestrator.extService += {"addr": "'"$EXTENSION_SERVICE_DOMAIN"'"}' > image-builder.json
-kubectl create configmap image-builder-mk3-config -n "$1" --from-file=config.json -o yaml --dry-run | kubectl apply -f -
+kubectl get configmaps -n "$1" image-builder-mk3-config -o json | jq '.data' | jq '.["image-builder.json"] | fromjson' | jq '.orchestrator.extService += {"addr": "'"$EXTENSION_SERVICE_DOMAIN"'"}' > image-builder.json
+kubectl create configmap image-builder-mk3-config -n "$1" --from-file=image-builder.json -o yaml --dry-run | kubectl apply -f -
+
+rm config.json
+rm image-builder.json
