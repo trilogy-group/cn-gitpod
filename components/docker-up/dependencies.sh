@@ -12,5 +12,5 @@ RUNC_VERSION=v1.1.4
 curl -o docker.tgz      -fsSL https://download.docker.com/linux/static/stable/aarch64/docker-${DOCKER_VERSION}.tgz
 # curl -o docker-compose  -fsSL https://github.com/gitpod-io/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-linux-aarch64
 cp /workspace/gitpod/docker-compose .
-cp /workspace/gitpod/docker-compose-linux-aarch64 .
+# cp /workspace/gitpod/docker-compose-linux-aarch64 .
 curl -o runc            -fsSL https://github.com/opencontainers/runc/releases/download/${RUNC_VERSION}/runc.arm64

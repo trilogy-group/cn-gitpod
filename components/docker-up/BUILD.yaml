@@ -48,7 +48,7 @@ packages:
         # - ["curl", "--fail", "-sSL", "https://github.com/gitpod-io/compose/releases/download/v2.10.0-gitpod.0/docker-compose-linux-aarch64", "-o", "docker-compose-linux-aarch64"]
         # - ["curl", "--fail", "-sSL", "https://github.com/gitpod-io/compose/releases/download/v2.10.0-gitpod.0/checksums.txt", "-o", "checksums.txt"]
         # - ["sha256sum", "-c", "checksums.txt"]
-        - ["cp", "/workspace/gitpod/docker-compose-linux-aarch64", "docker-compose"]
+        - ["cp", "/workspace/gitpod/docker-compose", "docker-compose"]
         - ["chmod", "+x", "docker-compose"]
         # - ["rm", "checksums.txt"]
   - name: docker
