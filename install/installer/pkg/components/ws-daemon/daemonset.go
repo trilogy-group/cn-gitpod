@@ -245,7 +245,7 @@ fi
 						MountPath: "/mnt/sync-tmp",
 					},
 				},
-				ImagePullPolicy: corev1.PullIfNotPresent,
+				ImagePullPolicy: corev1.PullAlways,
 				SecurityContext: &corev1.SecurityContext{
 					Privileged: pointer.Bool(true),
 				},
@@ -289,7 +289,7 @@ fi
 					common.NodeNameEnv(ctx),
 					common.ProxyEnv(&ctx.Config),
 				)),
-				ImagePullPolicy: corev1.PullIfNotPresent,
+				ImagePullPolicy: corev1.PullAlways,
 				Lifecycle: &corev1.Lifecycle{
 					PreStop: &corev1.LifecycleHandler{
 						Exec: &corev1.ExecAction{
@@ -308,7 +308,7 @@ fi
 		DNSPolicy:                     "ClusterFirst",
 		ServiceAccountName:            Component,
 		HostPID:                       true,
-		Affinity:                      common.NodeAffinity(cluster.AffinityLabelWorkspacesRegular, cluster.AffinityLabelWorkspacesHeadless),
+		Affinity:                      common.NodeAffinity(cluster.AffinityLabelWorkspacesRegular, cluster.AffinityLabelWorkspacesHeadless, cluster.AffinityLabelArmWorkspacesHeadless, cluster.AffinityLabelArmWorkspacesRegular),
 		Tolerations: []corev1.Toleration{
 			{
 				Key:      "node.kubernetes.io/disk-pressure",

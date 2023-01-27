@@ -78,7 +78,7 @@ func job(ctx *common.RenderContext) ([]runtime.Object, error) {
 					Containers: []corev1.Container{{
 						Name:            fmt.Sprintf("%s-session", Component),
 						Image:           ctx.ImageName(common.ThirdPartyContainerRepo(ctx.Config.Repository, ""), dbSessionsImage, dbSessionsTag),
-						ImagePullPolicy: corev1.PullIfNotPresent,
+						ImagePullPolicy: corev1.PullAlways,
 						Env: common.MergeEnv(
 							common.DatabaseEnv(&ctx.Config),
 						),

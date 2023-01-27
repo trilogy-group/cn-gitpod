@@ -40,7 +40,7 @@ var Helm = common.CompositeHelmFunc(
 					helm.KeyValue("mysql.metrics.image.registry", ""),
 					helm.KeyValue("mysql.metrics.image.repository", cfg.RepoName(common.ThirdPartyContainerRepo(cfg.Config.Repository, common.DockerRegistryURL), "bitnami/mysqld-exporter")),
 					helm.ImagePullSecrets("mysql.volumePermissions.image.pullSecrets", cfg),
-					helm.KeyValue("mysql.volumePermissions.image.pullPolicy", "IfNotPresent"),
+					helm.KeyValue("mysql.volumePermissions.image.pullPolicy", "Always"),
 					helm.KeyValue("mysql.volumePermissions.image.registry", ""),
 					helm.KeyValue("mysql.volumePermissions.image.repository", cfg.RepoName(common.ThirdPartyContainerRepo(cfg.Config.Repository, common.DockerRegistryURL), "bitnami/bitnami-shell")),
 
