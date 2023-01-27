@@ -374,35 +374,35 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 		rc           io.ReadCloser
 		mediaType    = desc.MediaType
 	)
-	if opts.Store != nil {
-		func() {
-			nfo, err := opts.Store.Info(ctx, desc.Digest)
-			if errors.Is(err, errdefs.ErrNotFound) {
-				// not in store yet
-				return
-			}
-			if err != nil {
-				log.WithError(err).WithField("desc", desc).Warn("cannot get manifest from store")
-				return
-			}
-			if nfo.Labels["Content-Type"] == "" {
-				// we have broken data in the store - ignore it and overwrite
-				return
-			}
+	// if opts.Store != nil {
+	// 	func() {
+	// 		nfo, err := opts.Store.Info(ctx, desc.Digest)
+	// 		if errors.Is(err, errdefs.ErrNotFound) {
+	// 			// not in store yet
+	// 			return
+	// 		}
+	// 		if err != nil {
+	// 			log.WithError(err).WithField("desc", desc).Warn("cannot get manifest from store")
+	// 			return
+	// 		}
+	// 		if nfo.Labels["Content-Type"] == "" {
+	// 			// we have broken data in the store - ignore it and overwrite
+	// 			return
+	// 		}
 
-			r, err := opts.Store.ReaderAt(ctx, desc)
-			if errors.Is(err, errdefs.ErrNotFound) {
-				// not in store yet
-				return
-			}
-			if err != nil {
-				log.WithError(err).WithField("desc", desc).Warn("cannot get manifest from store")
-				return
-			}
+	// 		r, err := opts.Store.ReaderAt(ctx, desc)
+	// 		if errors.Is(err, errdefs.ErrNotFound) {
+	// 			// not in store yet
+	// 			return
+	// 		}
+	// 		if err != nil {
+	// 			log.WithError(err).WithField("desc", desc).Warn("cannot get manifest from store")
+	// 			return
+	// 		}
 
-			mediaType, rc = nfo.Labels["Content-Type"], &reader{ReaderAt: r}
-		}()
-	}
+	// 		mediaType, rc = nfo.Labels["Content-Type"], &reader{ReaderAt: r}
+	// 	}()
+	// }
 	if rc == nil {
 		// did not find in store, or there was no store. Either way, let's fetch this
 		// thing from the remote.
@@ -457,6 +457,19 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 
 		// TODO(cw): choose by platform, not just the first manifest
 		md := list.Manifests[0]
+		// Devspaces-specific start
+		for _, mf := range list.Manifests {
+			if mf.Platform == nil {
+				continue
+			}
+			// TODO(bilal): choose according to the OS of the node of this POD
+			if fmt.Sprintf("%s-%s", mf.Platform.OS, mf.Platform.Architecture) == "linux-amd64" {
+				md = mf
+				break
+			}
+		}
+		// Devspaces-specific end
+
 		rc, err = fetcher.Fetch(ctx, md)
 		if err != nil {
 			err = xerrors.Errorf("cannot download config: %w", err)
