@@ -10,8 +10,8 @@ rm leeway
 rm LICENSE
 
 # golang & golangci-lint install
-curl -L https://go.dev/dl/go1.19.4.linux-arm64.tar.gz -o go1.19.4.linux-arm64.tar.gz
-sudo tar -C /home/gitpod -xzf go*.linux-arm64.tar.gz
+# curl -L https://go.dev/dl/go1.19.4.linux-arm64.tar.gz -o go1.19.4.linux-arm64.tar.gz
+# sudo tar -C /home/gitpod -xzf go*.linux-arm64.tar.gz
 curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.50.1
 sudo sh -c 'echo "export PATH=$PATH:/home/ubuntu/go/bin" >> /etc/profile'
 export PATH=$PATH:/home/ubuntu/go/bin
