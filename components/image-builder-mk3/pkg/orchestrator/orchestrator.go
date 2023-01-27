@@ -282,6 +282,7 @@ func (o *Orchestrator) preparePreStartImageBuildWorkspaceNotifyRequest(buildID s
 	buildAuth := &extserviceapi.BuildRegistryAuth{
 		Additional: actualBuildReq.Auth.GetAdditional(),
 	}
+	// ! actualBuildReq does not contain "Auth" for tests env, so we need to check if it is nil
 	if actualBuildReq.Auth != nil {
 		switch actualBuildAuth := actualBuildReq.Auth.Mode.(type) {
 		case *protocol.BuildRegistryAuth_Selective:
@@ -451,6 +452,7 @@ func (o *Orchestrator) Build(req *protocol.BuildRequest, resp protocol.ImageBuil
 	hookRequest := o.preparePreStartImageBuildWorkspaceNotifyRequest(buildID, req)
 	// TODO: Mock this hook for tests to succeed
 	if o.Config.ExtensionService.Address != "" {
+		// ! Only call the hook for prod, not for tests
 		hookReponse, err := o.extservice.PreStartImageBuildWorkspaceNotifyHook(ctx, hookRequest)
 		if err != nil {
 			log.Error("error occurred while calling hook PreCallImageBuilderNotifyHook: %w", err)

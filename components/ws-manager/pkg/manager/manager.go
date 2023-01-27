@@ -161,6 +161,7 @@ func New(config config.Configuration, client client.Client, rawClient kubernetes
 	} else {
 		grpcOpts := common_grpc.DefaultClientOptions()
 		if config.ExtensionService.Client == nil {
+			// ! This is to connect to the extension service in prod
 			grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 			conn, err := grpc.Dial(config.ExtensionService.Address, grpcOpts...)
 			if err != nil {
@@ -168,6 +169,7 @@ func New(config config.Configuration, client client.Client, rawClient kubernetes
 			}
 			extservice = extserviceapi.NewExtensionServiceClient(conn)
 		} else {
+			// ! This is to connect to mock extension service in test env
 			extservice = config.ExtensionService.Client.(extserviceapi.ExtensionServiceClient)
 		}
 	}
@@ -1755,7 +1757,6 @@ func newWssyncConnectionFactory(managerConfig config.Configuration) (grpcpool.Fa
 	cfg := managerConfig.WorkspaceDaemon
 	// TODO(cw): add client-side gRPC metrics
 	grpcOpts := common_grpc.DefaultClientOptions()
-	// testfailingpoint1
 	if cfg.TLS.Authority != "" || cfg.TLS.Certificate != "" && cfg.TLS.PrivateKey != "" {
 		tlsConfig, err := common_grpc.ClientAuthTLSConfig(
 			cfg.TLS.Authority, cfg.TLS.Certificate, cfg.TLS.PrivateKey,

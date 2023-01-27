@@ -43,6 +43,7 @@ func TestBuild(t *testing.T) {
 			t.Cleanup(srv.Close)
 
 			pushUpdate := make(chan struct{})
+
 			resolver := resolve.MockRefResolver{
 				baseRef: baseRef,
 			}
@@ -96,7 +97,6 @@ func TestBuild(t *testing.T) {
 					From: &api.BuildSource_Ref{Ref: &api.BuildSourceReference{Ref: "source-image:latest"}},
 				},
 			}, resp)
-
 			if err != nil {
 				t.Fatal(err)
 			}
