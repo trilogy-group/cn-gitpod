@@ -161,8 +161,8 @@ func New(config config.Configuration, client client.Client, rawClient kubernetes
 	} else {
 		grpcOpts := common_grpc.DefaultClientOptions()
 		if config.ExtensionService.Client == nil {
-			addr := config.ExtensionService.Address
-			conn, err := grpc.Dial(addr, grpcOpts...)
+			grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+			conn, err := grpc.Dial(config.ExtensionService.Address, grpcOpts...)
 			if err != nil {
 				return nil, err
 			}

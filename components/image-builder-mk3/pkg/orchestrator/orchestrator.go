@@ -106,19 +106,15 @@ func NewOrchestratingBuilder(cfg config.Configuration) (res *Orchestrator, err e
 		extservice = c
 	} else {
 		if cfg.ExtensionService.Client == nil {
-			log.Info("In here 1")
 			grpcOpts := common_grpc.DefaultClientOptions()
 			grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 			addr := cfg.ExtensionService.Address
-			log.Info("In here 2")
 			conn, err := grpc.Dial(addr, grpcOpts...)
 			if err != nil {
-				log.Info("In here 3")
 				return nil, err
 			}
 			extservice = extserviceapi.NewExtensionServiceClient(conn)
 		} else {
-			log.Info("In here 4")
 			extservice = cfg.ExtensionService.Client.(extserviceapi.ExtensionServiceClient)
 		}
 	}

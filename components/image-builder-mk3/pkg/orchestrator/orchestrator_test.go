@@ -11,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gitpod-io/gitpod/common-go/log"
 	"github.com/gitpod-io/gitpod/image-builder/api"
 	"github.com/gitpod-io/gitpod/image-builder/api/config"
 	apimock "github.com/gitpod-io/gitpod/image-builder/api/mock"
@@ -51,7 +50,6 @@ func TestBuild(t *testing.T) {
 				resolver[workspaceImageRef] = resultRef
 			}
 			builder.RefResolver = resolver
-
 			wsman.EXPECT().StartWorkspace(gomock.Any(), gomock.Any(), gomock.Any()).
 				DoAndReturn(func(ctx context.Context, req *wsmanapi.StartWorkspaceRequest, _ ...interface{}) (*wsmanapi.StartWorkspaceResponse, error) {
 					close(pushUpdate)
@@ -78,25 +76,18 @@ func TestBuild(t *testing.T) {
 						OwnerToken: "foobar",
 					}, nil
 				}).MaxTimes(1)
-
 			wsman.EXPECT().GetWorkspaces(gomock.Any(), gomock.Any()).Return(&wsmanapi.GetWorkspacesResponse{
 				Status: []*wsmanapi.WorkspaceStatus{},
 			}, nil).MaxTimes(1)
-
 			resp := apimock.NewMockImageBuilder_BuildServer(ctrl)
-
 			resp.EXPECT().Context().Return(context.Background()).AnyTimes()
-
 			if failure {
-
 				resp.EXPECT().Send(&api.BuildResponse{
 					Ref:     resultRef,
 					Status:  api.BuildStatus_done_failure,
 					Message: "image build did not produce a workspace image",
 				}).Return(nil).AnyTimes()
 			} else {
-
-				log.Info("below success")
 				resp.EXPECT().Send(&api.BuildResponse{Ref: workspaceImageRef, BaseRef: baseRef, Status: api.BuildStatus_done_success}).Return(nil).AnyTimes()
 			}
 
@@ -106,9 +97,7 @@ func TestBuild(t *testing.T) {
 				},
 			}, resp)
 
-			log.Info("below builder.Build")
 			if err != nil {
-				log.Info("below err")
 				t.Fatal(err)
 			}
 		}
