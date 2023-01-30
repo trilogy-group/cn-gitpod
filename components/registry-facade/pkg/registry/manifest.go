@@ -106,7 +106,9 @@ func (mh *manifestHandler) getManifest(w http.ResponseWriter, r *http.Request) {
 	err := func() error {
 		log.WithFields(logFields).Debug("get manifest")
 		tracing.LogMessageSafe(span, "spec", mh.Spec)
-
+		// Devspaces-specific start
+		log.WithFields(logFields).Info("Request reached get manifest")
+		// Devspaces-specific end
 		var (
 			acceptType string
 			err        error
@@ -365,6 +367,9 @@ func AsFetcherFunc(f remotes.Fetcher) FetcherFunc {
 // DownloadManifest downloads and unmarshals the manifest of the given desc. If the desc points to manifest list
 // we choose the first manifest in that list.
 func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descriptor, options ...ManifestDownloadOption) (cfg *ociv1.Manifest, rdesc *ociv1.Descriptor, err error) {
+	// Devspaces-specific start
+	log.Info("Request reached Download Manifest func")
+	// Devspaces-specific end
 	var opts manifestDownloadOptions
 	for _, o := range options {
 		o(&opts)
@@ -435,6 +440,9 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 
 	switch rdesc.MediaType {
 	case images.MediaTypeDockerSchema2ManifestList, ociv1.MediaTypeImageIndex:
+		// Devspaces-specific start
+		log.Info("Request reached Download Manifest rdesc.MediaType switch")
+		// Devspaces-specific end
 		log.WithField("desc", rdesc).Debug("resolving image index")
 
 		// we received a manifest list which means we'll pick the default platform
