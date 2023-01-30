@@ -375,6 +375,8 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 		rc           io.ReadCloser
 		mediaType    = desc.MediaType
 	)
+
+	// Devspaces-specific start
 	// if opts.Store != nil {
 	// 	func() {
 	// 		nfo, err := opts.Store.Info(ctx, desc.Digest)
@@ -404,6 +406,8 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 	// 		mediaType, rc = nfo.Labels["Content-Type"], &reader{ReaderAt: r}
 	// 	}()
 	// }
+	// Devspaces-specific end
+
 	if rc == nil {
 		// did not find in store, or there was no store. Either way, let's fetch this
 		// thing from the remote.
@@ -463,9 +467,10 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 			if mf.Platform == nil {
 				continue
 			}
-			log.Error("Manifest OS - arch: ", mf.Platform.OS, "-", mf.Platform.Architecture)
-			log.Error("GO OS - arch: ", runtime.GOOS, "-", runtime.GOARCH)
+			log.WithField("platform", mf.Platform).Info("Manifest OS - arch: ", mf.Platform.OS, "-", mf.Platform.Architecture)
+			log.Info("GO OS - arch: ", runtime.GOOS, "-", runtime.GOARCH)
 			if fmt.Sprintf("%s-%s", mf.Platform.OS, mf.Platform.Architecture) == fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH) {
+				log.Info("Chosen: Manifest OS - arch: ", mf.Platform.OS, "-", mf.Platform.Architecture)
 				md = mf
 			}
 		}
