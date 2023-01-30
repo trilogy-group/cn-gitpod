@@ -464,7 +464,7 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 				continue
 			}
 			log.Error("Manifest OS - arch: ", mf.Platform.OS, "-", mf.Platform.Architecture)
-			log.Error("GO OS - arch: ", runtime.GOOS, runtime.GOARCH)
+			log.Error("GO OS - arch: ", runtime.GOOS, "-", runtime.GOARCH)
 			if fmt.Sprintf("%s-%s", mf.Platform.OS, mf.Platform.Architecture) == fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH) {
 				md = mf
 			}
