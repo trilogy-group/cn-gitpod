@@ -12,6 +12,7 @@ import (
 	"io"
 	"mime"
 	"net/http"
+	"runtime"
 	"strings"
 	"time"
 
@@ -462,9 +463,9 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 			if mf.Platform == nil {
 				continue
 			}
-			// TODO(bilal): choose according to the OS of the node of this POD
-			if fmt.Sprintf("%s-%s", mf.Platform.OS, mf.Platform.Architecture) == "linux-amd64" {
+			if fmt.Sprintf("%s-%s", mf.Platform.OS, mf.Platform.Architecture) == fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH) {
 				md = mf
+				log.Error("Got OS - arch: ", mf.Platform.OS, "-", mf.Platform.Architecture)
 				break
 			}
 		}
