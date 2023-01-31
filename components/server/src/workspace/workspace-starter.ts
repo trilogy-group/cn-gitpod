@@ -802,6 +802,7 @@ export class WorkspaceStarter {
                     }
                     actualBuildReq.setSource(actualBuildSrc);
                 }
+                // TODO: Parsing the buildAuth back to gitpod's interface is buggy, so we have commented this out for now.
                 // if (actualBuildReq.hasAuth()) {
                 //     let buildAuth = buildReq.getAuth()!;
                 //     let actualBuildAuth = actualBuildReq.getAuth()!;
