@@ -6,7 +6,9 @@ packages:
   - "go.mod"
   - "go.sum"
   deps:
+  # Devspaces-specific start
   - components/extension-service-api/go:lib
+  # Devspaces-specific end
   - components/common-go:lib
   - components/content-service-api/go:lib
   - components/content-service:lib

@@ -113,7 +113,9 @@ import { prometheusClientMiddleware } from "@gitpod/gitpod-protocol/lib/util/nic
 import { UsageService, UsageServiceImpl } from "./user/usage-service";
 import { OpenPrebuildPrefixContextParser } from "./workspace/open-prebuild-prefix-context-parser";
 import { contentServiceBinder } from "./util/content-service-sugar";
+// Devspaces-specific start
 import { ExtensionServiceClientConfig, ExtensionServiceClientProvider } from "@cn-gitpod/extension-service-api/lib";
+// Devspaces-specific end
 
 export const productionContainerModule = new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(Config).toConstantValue(ConfigFile.fromFile());

@@ -8,7 +8,9 @@ packages:
       - package.json
       - mocha.opts
     deps:
+      # Devspaces-specific start
       - components/extension-service-api/typescript:lib
+      # Devspaces-specific end
       - components/content-service-api/typescript:lib
       - components/gitpod-db:lib
       - components/gitpod-messagebus:lib
@@ -49,7 +51,9 @@ packages:
       - mocha.opts
       - tslint.yaml
     deps:
+      # Devspaces-specific start
       - components/extension-service-api/typescript:lib
+      # Devspaces-specific end
       - components/content-service-api/typescript:lib
       - components/gitpod-db:lib
       - components/gitpod-messagebus:lib
