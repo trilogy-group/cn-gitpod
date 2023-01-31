@@ -1,0 +1,9 @@
+packages:
+  - name: dependencies_builder
+    type: docker
+    srcs:
+    deps:
+    config:
+      dockerfile: leeway.Dockerfile
+      image:
+        - ${imageRepoBase}/ide/code-dependencies-builder:${version}

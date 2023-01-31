@@ -1,0 +1,33 @@
+diff -ur a/extensions/gitpod-web/src/extension.ts b/extensions/gitpod-web/src/extension.ts
+--- a/extensions/gitpod-web/src/extension.ts	2023-01-12 00:19:00.446282126 +0000
++++ b/extensions/gitpod-web/src/extension.ts	2023-01-12 00:22:57.403176992 +0000
+@@ -24,7 +24,7 @@
+ import { download } from './util/download';
+ import { getManifest } from './util/extensionManagmentUtill';
+ import { ReleaseNotes } from './releaseNotes';
+-import { registerWelcomeWalkthroughContribution, WELCOME_WALKTROUGH_KEY } from './welcomeWalktrough';
++import { WELCOME_WALKTROUGH_KEY } from './welcomeWalktrough';
+ import { ExperimentalSettings, isUserOverrideSetting } from './experiments';
+ import { GitpodPortViewProvider } from './portViewProvider';
+ 
+@@ -49,8 +49,6 @@
+ 
+ 	registerIpcHookCli(gitpodContext);
+ 	registerExtensionManagement(gitpodContext);
+-	registerWelcomeWalkthroughContribution(gitpodContext);
+-	context.subscriptions.push(new ReleaseNotes(context));
+ 
+ 	await gitpodContext.active;
+ }
+diff -ur a/src/vs/workbench/contrib/welcomeGettingStarted/browser/gettingStarted.contribution.ts b/src/vs/workbench/contrib/welcomeGettingStarted/browser/gettingStarted.contribution.ts
+--- a/src/vs/workbench/contrib/welcomeGettingStarted/browser/gettingStarted.contribution.ts	2023-01-12 00:19:00.798283454 +0000
++++ b/src/vs/workbench/contrib/welcomeGettingStarted/browser/gettingStarted.contribution.ts	2023-01-12 00:21:18.746804204 +0000
+@@ -321,7 +321,7 @@
+ 				localize({ comment: ['This is the description for a setting. Values surrounded by single quotes are not to be translated.'], key: 'workbench.startupEditor.newUntitledFile' }, "Open a new untitled file (only applies when opening an empty window)."),
+ 				localize({ comment: ['This is the description for a setting. Values surrounded by single quotes are not to be translated.'], key: 'workbench.startupEditor.welcomePageInEmptyWorkbench' }, "Open the Welcome page when opening an empty workbench."),
+ 			],
+-			'default': 'welcomePage',
++			'default': 'readme',
+ 			'description': localize('workbench.startupEditor', "Controls which editor is shown at startup, if none are restored from the previous session.")
+ 		},
+ 		'workbench.welcomePage.preferReducedMotion': {
