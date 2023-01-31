@@ -35,15 +35,17 @@ type SyscallHandler interface {
 	Umount(req *libseccomp.ScmpNotifReq) (val uint64, errno int32, flags uint32)
 	Bind(req *libseccomp.ScmpNotifReq) (val uint64, errno int32, flags uint32)
 	Chown(req *libseccomp.ScmpNotifReq) (val uint64, errno int32, flags uint32)
+	FchownAt(req *libseccomp.ScmpNotifReq) (val uint64, errno int32, flags uint32)
 }
 
 func mapHandler(h SyscallHandler) map[string]syscallHandler {
 	return map[string]syscallHandler{
-		"mount":   h.Mount,
-		"umount":  h.Umount,
-		"umount2": h.Umount,
-		"bind":    h.Bind,
-		"chown":   h.Chown,
+		"mount":    h.Mount,
+		"umount":   h.Umount,
+		"umount2":  h.Umount,
+		"bind":     h.Bind,
+		"chown":    h.Chown,
+		"fchownat": h.FchownAt, // Devspaces-specific: Needed for arm64
 	}
 }
 
@@ -457,6 +459,35 @@ func (h *InWorkspaceHandler) Chown(req *libseccomp.ScmpNotifReq) (val uint64, er
 	defer memFile.Close()
 
 	pth, err := readarg.ReadString(memFile, int64(req.Data.Args[0]))
+	if err != nil {
+		log.WithError(err).Error("cannot open mem")
+		return
+	}
+
+	if strings.HasPrefix(pth, "/dev/pts") {
+		return 0, 0, 0
+	}
+
+	return 0, 0, libseccomp.NotifRespFlagContinue
+}
+
+// Devspaces-specific: Needed for arm64:
+func (h *InWorkspaceHandler) FchownAt(req *libseccomp.ScmpNotifReq) (val uint64, errno int32, flags uint32) {
+	log := log.WithFields(map[string]interface{}{
+		"syscall":          "fchownat",
+		log.WorkspaceField: h.WorkspaceId,
+		"pid":              req.Pid,
+		"id":               req.ID,
+	})
+
+	memFile, err := readarg.OpenMem(req.Pid)
+	if err != nil {
+		log.WithError(err).Error("cannot open mem")
+		return
+	}
+	defer memFile.Close()
+
+	pth, err := readarg.ReadString(memFile, int64(req.Data.Args[1]))
 	if err != nil {
 		log.WithError(err).Error("cannot open mem")
 		return
