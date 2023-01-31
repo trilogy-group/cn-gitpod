@@ -21,10 +21,10 @@ output "registry" {
   value     = module.eks.registry
 }
 
-output "database" {
-  sensitive = true
-  value     = module.eks.database
-}
+# output "database" {
+#   sensitive = true
+#   value     = module.eks.database
+# }
 
 output "nameservers" {
   sensitive = false

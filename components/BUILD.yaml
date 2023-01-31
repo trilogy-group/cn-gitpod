@@ -37,9 +37,9 @@ packages:
       - components/ee/db-sync:docker
       - components/ee/payment-endpoint:docker
       - components/gitpod-db:docker
-      # - components/ide/code-desktop:docker
-      # - components/ide/code-desktop:docker-insiders
-      # - components/ide/code:docker
+      - components/ide/code-desktop:docker
+      - components/ide/code-desktop:docker-insiders
+      - components/ide/code:docker
       # - components/ide/jetbrains/backend-plugin:stable
       # - components/ide/jetbrains/backend-plugin:latest
       # - components/ide/jetbrains/image:goland
