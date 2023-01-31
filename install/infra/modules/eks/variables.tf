@@ -6,7 +6,7 @@ variable "cluster_name" {
 variable "cluster_version" {
   type        = string
   description = "Kubernetes version to create the cluster with"
-  default     = "1.22"
+  default     = "1.23"
 }
 
 variable "kubeconfig" {
@@ -32,14 +32,20 @@ variable "workspace_machine_type" {
   default     = "m6i.2xlarge"
 }
 
+variable "arm_workspace_machine_type" {
+  type        = string
+  description = "Machine type for ARM workspace workload node pool"
+  default     = "m6g.2xlarge"
+}
+
 variable "region" {
   type    = string
-  default = "eu-west-1"
+  default = "us-east-1"
 }
 
 variable "vpc_availability_zones" {
   type    = list(string)
-  default = ["eu-west-1c", "eu-west-1b"]
+  default = ["us-east-1c", "us-east-1b"]
 }
 
 variable "domain_name" {
@@ -52,7 +58,7 @@ variable "vpc_cidr" {
 }
 
 variable "create_external_database" {
-  default     = true
+  default     = false
   description = "Create a mysql RDS database"
 }
 

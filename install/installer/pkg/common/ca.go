@@ -31,7 +31,7 @@ func InternalCAContainer(ctx *RenderContext, mod ...func(*corev1.Container)) *co
 		Name: "update-ca-certificates",
 		// It's not possible to use images based on alpine due to errors running update-ca-certificates
 		Image:           ctx.ImageName(ctx.Config.Repository, "ca-updater", ctx.VersionManifest.Components.CAUpdater.Version),
-		ImagePullPolicy: corev1.PullIfNotPresent,
+		ImagePullPolicy: corev1.PullAlways,
 		Command: []string{
 			"bash", "-c",
 			"set -e; update-ca-certificates -f; cp /etc/ssl/certs/* /ssl-certs; echo 'OK'",
