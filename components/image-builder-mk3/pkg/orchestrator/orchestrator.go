@@ -105,14 +105,18 @@ func NewOrchestratingBuilder(cfg config.Configuration) (res *Orchestrator, err e
 	if c, ok := cfg.ExtensionService.Client.(extserviceapi.ExtensionServiceClient); ok {
 		extservice = c
 	} else {
-		grpcOpts := common_grpc.DefaultClientOptions()
-
-		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
-		conn, err := grpc.Dial(cfg.ExtensionService.Address, grpcOpts...)
-		if err != nil {
-			return nil, err
+		if cfg.ExtensionService.Client == nil {
+			grpcOpts := common_grpc.DefaultClientOptions()
+			grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+			addr := cfg.ExtensionService.Address
+			conn, err := grpc.Dial(addr, grpcOpts...)
+			if err != nil {
+				return nil, err
+			}
+			extservice = extserviceapi.NewExtensionServiceClient(conn)
+		} else {
+			extservice = cfg.ExtensionService.Client.(extserviceapi.ExtensionServiceClient)
 		}
-		extservice = extserviceapi.NewExtensionServiceClient(conn)
 	}
 	// Devspaces-specific end
 
@@ -278,20 +282,23 @@ func (o *Orchestrator) preparePreStartImageBuildWorkspaceNotifyRequest(buildID s
 	buildAuth := &extserviceapi.BuildRegistryAuth{
 		Additional: actualBuildReq.Auth.GetAdditional(),
 	}
-	switch actualBuildAuth := actualBuildReq.Auth.Mode.(type) {
-	case *protocol.BuildRegistryAuth_Selective:
-		buildAuth.Mode = &extserviceapi.BuildRegistryAuth_Selective{
-			Selective: &extserviceapi.BuildRegistryAuthSelective{
-				AllowBaserep:      actualBuildAuth.Selective.AllowBaserep,
-				AllowWorkspacerep: actualBuildAuth.Selective.AllowWorkspacerep,
-				AnyOf:             actualBuildAuth.Selective.GetAnyOf(),
-			},
-		}
-	case *protocol.BuildRegistryAuth_Total:
-		buildAuth.Mode = &extserviceapi.BuildRegistryAuth_Total{
-			Total: &extserviceapi.BuildRegistryAuthTotal{
-				AllowAll: actualBuildAuth.Total.AllowAll,
-			},
+	// ! actualBuildReq does not contain "Auth" for tests env, so we need to check if it is nil
+	if actualBuildReq.Auth != nil {
+		switch actualBuildAuth := actualBuildReq.Auth.Mode.(type) {
+		case *protocol.BuildRegistryAuth_Selective:
+			buildAuth.Mode = &extserviceapi.BuildRegistryAuth_Selective{
+				Selective: &extserviceapi.BuildRegistryAuthSelective{
+					AllowBaserep:      actualBuildAuth.Selective.AllowBaserep,
+					AllowWorkspacerep: actualBuildAuth.Selective.AllowWorkspacerep,
+					AnyOf:             actualBuildAuth.Selective.GetAnyOf(),
+				},
+			}
+		case *protocol.BuildRegistryAuth_Total:
+			buildAuth.Mode = &extserviceapi.BuildRegistryAuth_Total{
+				Total: &extserviceapi.BuildRegistryAuthTotal{
+					AllowAll: actualBuildAuth.Total.AllowAll,
+				},
+			}
 		}
 	}
 	buildReq := &extserviceapi.BuildRequest{
@@ -443,16 +450,19 @@ func (o *Orchestrator) Build(req *protocol.BuildRequest, resp protocol.ImageBuil
 	// Hookpoint - 3. Notifies extenstion-service that an ImageBuildWorkspace is gonna be spawned for a (workspaceImageReference, BuildID)
 	// This information would be consumed by hookpoint - 4.
 	hookRequest := o.preparePreStartImageBuildWorkspaceNotifyRequest(buildID, req)
-	log.Info("Calling PreStartImageBuildWorkspaceNotifyHook")
 	// TODO: Mock this hook for tests to succeed
-	hookReponse, err := o.extservice.PreStartImageBuildWorkspaceNotifyHook(ctx, hookRequest)
-	if err != nil {
-		log.Error("error occurred while calling hook PreCallImageBuilderNotifyHook: %w", err)
+	if o.Config.ExtensionService.Address != "" {
+		// ! Only call the hook for prod, not for tests
+		hookReponse, err := o.extservice.PreStartImageBuildWorkspaceNotifyHook(ctx, hookRequest)
+		if err != nil {
+			log.Error("error occurred while calling hook PreCallImageBuilderNotifyHook: %w", err)
+		}
+		log.Info("PreCallImageBuilderNotifyHook called successfully")
+		if hookReponse.GetError() != "" {
+			log.Error("PreCallImageBuilderNotifyHook returned error response: %w", hookReponse.GetError())
+		}
 	}
-	log.Info("PreCallImageBuilderNotifyHook called successfully")
-	if hookReponse.GetError() != "" {
-		log.Error("PreCallImageBuilderNotifyHook returned error response: %w", hookReponse.GetError())
-	}
+
 	// To be consumed by Hookpoint - 4
 	// Devspaces-specific end
 	var swr *wsmanapi.StartWorkspaceResponse

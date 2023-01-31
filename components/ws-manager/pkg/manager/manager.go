@@ -160,13 +160,18 @@ func New(config config.Configuration, client client.Client, rawClient kubernetes
 		extservice = c
 	} else {
 		grpcOpts := common_grpc.DefaultClientOptions()
-
-		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
-		conn, err := grpc.Dial(config.ExtensionService.Address, grpcOpts...)
-		if err != nil {
-			return nil, err
+		if config.ExtensionService.Client == nil {
+			// ! This is to connect to the extension service in prod
+			grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+			conn, err := grpc.Dial(config.ExtensionService.Address, grpcOpts...)
+			if err != nil {
+				return nil, err
+			}
+			extservice = extserviceapi.NewExtensionServiceClient(conn)
+		} else {
+			// ! This is to connect to mock extension service in test env
+			extservice = config.ExtensionService.Client.(extserviceapi.ExtensionServiceClient)
 		}
-		extservice = extserviceapi.NewExtensionServiceClient(conn)
 	}
 	// Devspaces-specific end
 
