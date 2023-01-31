@@ -24,7 +24,7 @@ import (
 
 	// Devspaces-specific start
 	extserviceapi "github.com/trilogy-group/cn-gitpod/extension-service/api"
-	// Devspaces-specific en
+	// Devspaces-specific end
 )
 
 func TestBuild(t *testing.T) {
