@@ -88,6 +88,9 @@ packages:
       - components/kots-config-check/storage:docker
       - test:docker
       - dev/version-manifest:app
+      # Devspaces-specific start
+      - components/extension-service:docker
+      # Devspaces-specific end
     config:
       commands:
         - ["sh", "-c", "echo \"commit: ${__git_commit}\" > versions.yaml"]
@@ -132,6 +135,9 @@ packages:
       - components/ws-manager:app
       - components/ide-metrics:app
       - components/ide-service:app
+      # Devspaces-specific start
+      - components/extension-service:app
+      # Devspaces-specific end
 scripts:
   - name: update-license-header
     description: Updates the license header in all source files

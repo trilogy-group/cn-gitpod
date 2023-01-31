@@ -1,6 +1,8 @@
 {
     "folders": [
         { "path": "." },
+        { "path": "components/extension-service" },
+        { "path": "components/extension-service-api" },
         { "path": "components/blobserve" },
         { "path": "components/common-go" },
         { "path": "components/content-service" },

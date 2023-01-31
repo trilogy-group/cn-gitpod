@@ -1,0 +1,290 @@
+syntax = "proto3";
+
+package extension_service;
+
+option go_package = "github.com/trilogy-group/cn-gitpod/extension-service/api";
+
+service ExtensionService {
+    // Hook point 1
+    rpc preStartWorkspaceModifyHook(PreStartWorkspaceModifyRequest) returns (PreStartWorkspaceModifyResponse) {}
+    // Hook point 4
+    rpc PostCreateWorkspacePodModifyHook(PostCreateWorkspacePodModifyRequest) returns (PostCreateWorkspacePodModifyResponse) {}
+    // Hook point 3
+    rpc preStartImageBuildWorkspaceNotifyHook(PreStartImageBuildWorkspaceNotifyRequest) returns (PreStartImageBuildWorkspaceNotifyResponse) {}
+    // Hook point 2
+    rpc preCallImageBuilderModifyHook(PreCallImageBuilderModifyRequest) returns (PreCallImageBuilderModifyResponse) {}
+}
+
+message PreStartWorkspaceModifyPayload {
+    Workspace workspace = 1;
+    WorkspaceInstance instance = 2;
+}
+
+message PreStartWorkspaceModifyRequest {
+    PreStartWorkspaceModifyPayload payload = 1;
+}
+
+message PreStartWorkspaceModifyResponse {
+    PreStartWorkspaceModifyPayload payload = 1;
+    string error = 2;
+}
+
+message Workspace {
+    WorkspaceConfig config = 1;
+    WorkspaceImageSource imageSource = 2;
+}
+
+message WorkspaceConfig {
+    string arch = 1;
+    ImageConfig image = 2;
+}
+
+message WorkspaceImageSource {
+    oneof from {
+        WorkspaceImageSourceDocker docker  = 1;
+        WorkspaceImageSourceReference reference = 2;
+    }
+}
+
+message WorkspaceImageSourceReference {
+    string baseImageResolved = 1;
+}
+
+message WorkspaceImageSourceDocker {
+    string dockerFilePath = 1;
+    string dockerFileHash = 2;
+    optional Commit dockerFileSource = 3;
+}
+
+message Commit {
+    Repository repository = 1;
+    string revision = 2;
+    optional string ref = 3;
+    optional RefType refType = 4;
+}
+
+enum RefType {
+    branch = 0;
+    tag = 1;
+    revision = 2;
+}
+
+message Repository {
+    string host = 1;
+    string owner = 2;
+    string name = 3;
+    string cloneUrl = 4;
+    optional string repoKind = 5;
+    optional string description = 6;
+    optional string avatarUrl = 7;
+    optional string webUrl = 8;
+    optional string defaultBranch = 9;
+    optional bool private = 10;
+    optional ParentRepository fork  = 11;
+}
+
+message ParentRepository {
+    Repository parent = 1;
+}
+
+message ImageConfig {
+    oneof from {
+        string configString  = 1;
+        ImageConfigFile configFile = 2;
+    }
+}
+
+message ImageConfigFile {
+    string file = 1;
+    optional string context = 2;
+}
+
+message WorkspaceInstance {
+    string id = 1;
+}
+
+message PostCreateWorkspacePodModifyRequest {
+    string workspaceInstanceId = 1;
+    Pod pod = 2;
+}
+
+message PostCreateWorkspacePodModifyResponse {
+    Pod pod = 1;
+}
+
+// TODO: expand this interface for a more generic hookpoint payload
+message Pod {
+    // Standard object's metadata.
+    // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+    // +optional
+    optional ObjectMeta metadata = 1;
+
+    // Specification of the desired behavior of the pod.
+    // More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+    // +optional
+    optional PodSpec spec = 2;
+
+}
+
+message ObjectMeta {
+
+    // Annotations is an unstructured key value map stored with a resource that may be
+    // set by external tools to store and retrieve arbitrary metadata. They are not
+    // queryable and should be preserved when modifying objects.
+    // More info: http://kubernetes.io/docs/user-guide/annotations
+    // +optional
+    map<string, string> annotations = 12;
+}
+
+message PodSpec {
+    // If specified, the pod's scheduling constraints
+    // +optional
+    optional Affinity affinity = 18;
+}
+
+message Affinity {
+    // Describes node affinity scheduling rules for the pod.
+    // +optional
+    optional NodeAffinity nodeAffinity = 1;
+}
+
+message NodeAffinity {
+    // If the affinity requirements specified by this field are not met at
+    // scheduling time, the pod will not be scheduled onto the node.
+    // If the affinity requirements specified by this field cease to be met
+    // at some point during pod execution (e.g. due to an update), the system
+    // may or may not try to eventually evict the pod from its node.
+    // +optional
+    optional NodeSelector requiredDuringSchedulingIgnoredDuringExecution = 1;
+
+    // The scheduler will prefer to schedule pods to nodes that satisfy
+    // the affinity expressions specified by this field, but it may choose
+    // a node that violates one or more of the expressions. The node that is
+    // most preferred is the one with the greatest sum of weights, i.e.
+    // for each node that meets all of the scheduling requirements (resource
+    // request, requiredDuringScheduling affinity expressions, etc.),
+    // compute a sum by iterating through the elements of this field and adding
+    // "weight" to the sum if the node matches the corresponding matchExpressions; the
+    // node(s) with the highest sum are the most preferred.
+    // +optional
+    repeated PreferredSchedulingTerm preferredDuringSchedulingIgnoredDuringExecution = 2;
+}
+
+message NodeSelector {
+    // Required. A list of node selector terms. The terms are ORed.
+    repeated NodeSelectorTerm nodeSelectorTerms = 1;
+}
+
+message NodeSelectorTerm {
+    // A list of node selector requirements by node's labels.
+    // +optional
+    repeated NodeSelectorRequirement matchExpressions = 1;
+
+    // A list of node selector requirements by node's fields.
+    // +optional
+    repeated NodeSelectorRequirement matchFields = 2;
+}
+
+message NodeSelectorRequirement {
+    // The label key that the selector applies to.
+    optional string key = 1;
+
+    // Represents a key's relationship to a set of values.
+    // Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+    optional string operator = 2;
+
+    // An array of string values. If the operator is In or NotIn,
+    // the values array must be non-empty. If the operator is Exists or DoesNotExist,
+    // the values array must be empty. If the operator is Gt or Lt, the values
+    // array must have a single element, which will be interpreted as an integer.
+    // This array is replaced during a strategic merge patch.
+    // +optional
+    repeated string values = 3;
+}
+
+message PreferredSchedulingTerm {
+    // Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.
+    optional int32 weight = 1;
+
+    // A node selector term, associated with the corresponding weight.
+    optional NodeSelectorTerm preference = 2;
+}
+
+message PreStartImageBuildWorkspaceNotifyRequest {
+    BuildRequest buildRequest = 1;
+    string buildId = 2;
+}
+
+message PreStartImageBuildWorkspaceNotifyResponse {
+    string error = 1;
+}
+
+message PreCallImageBuilderModifyPayload {
+    BuildRequest buildRequest = 1;
+    WorkspaceInstance instance = 2;
+}
+
+message PreCallImageBuilderModifyRequest {
+    PreCallImageBuilderModifyPayload payload = 1;
+}
+
+message PreCallImageBuilderModifyResponse {
+    PreCallImageBuilderModifyPayload payload = 1;
+    string error = 2;
+}
+
+message BuildRequest {
+    BuildSource source = 1;
+    BuildRegistryAuth auth = 2;
+    bool force_rebuild = 3;
+    string triggered_by = 4;
+}
+
+message BuildSource {
+    oneof from {
+        BuildSourceReference ref = 1;
+        BuildSourceDockerfile file = 2;
+    };
+}
+
+message BuildRegistryAuth {
+    oneof mode {
+        BuildRegistryAuthTotal total = 1;
+        BuildRegistryAuthSelective selective = 2;
+    }
+    map<string, string> additional = 3;
+}
+
+message BuildRegistryAuthTotal {
+    bool allow_all = 1;
+}
+
+message BuildRegistryAuthSelective {
+    bool allow_baserep = 1;
+    bool allow_workspacerep = 2;
+    repeated string any_of = 3;
+}
+
+message BuildSourceReference {
+    string ref = 1;
+}
+
+message BuildSourceDockerfile {
+    WorkspaceInitializer source = 1;
+    string dockerfile_version = 2;
+    string dockerfile_path = 3;
+    string context_path = 4;
+}
+
+message WorkspaceInitializer {
+    oneof spec {
+        GitInitializer git = 2;
+    }
+}
+
+message GitInitializer {
+    // remote_uri is the Git remote origin
+    string remote_uri = 1;
+	// the value for the clone target mode - use depends on the target mode
+	string clone_target = 2;
+}

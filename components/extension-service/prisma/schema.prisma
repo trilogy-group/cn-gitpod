@@ -1,0 +1,18 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("PRISMA_DB_URL")
+}
+
+model WorkspaceInstance {
+  instanceId String  @id @default(uuid())
+  arch       String? @default("x86")
+}
+
+model HashArch {
+  hash String  @id
+  arch String? @default("x86")
+}
