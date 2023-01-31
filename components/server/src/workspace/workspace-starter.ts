@@ -293,7 +293,7 @@ export class WorkspaceStarter {
     // Devspaces-specific start
     @inject(ExtServiceApi.ExtensionServiceClientProvider)
     protected readonly extensionServiceClientProvider: ExtServiceApi.ExtensionServiceClientProvider;
-    // Devspaces-specifc end
+    // Devspaces-specific end
 
     public async startWorkspace(
         ctx: TraceContext,
@@ -480,7 +480,7 @@ export class WorkspaceStarter {
         throw new Error(`${contextURL} is blocklisted on Gitpod.`);
     }
 
-    // Devspaces-specifc start
+    // Devspaces-specific start
     // TODO: When the PreStartWorkspaceModifyRequest's proto is updated with all necessary fields, update this function accordingly
     protected preparePreStartWorkspaceModifyRequest(
         actualWorkspace: Workspace,
@@ -835,6 +835,7 @@ export class WorkspaceStarter {
 
         return { actualBuildReq, actualInstance };
     }
+    // Devspaces-specific end
 
     // Note: this function does not expect to be awaited for by its caller. This means that it takes care of error handling itself.
     protected async actuallyStartWorkspace(
@@ -851,7 +852,7 @@ export class WorkspaceStarter {
     ): Promise<StartWorkspaceResult> {
         const span = TraceContext.startSpan("actuallyStartWorkspace", ctx);
 
-        // Devpsaces-specifc start
+        // Devspaces-specific start
         // Hookpoint - 1. Hook notifies extension service saying that an "instance" of a "workspace" is about to be started.
         // The extension-service returns a possibly modified (instance, worksapce) pair which is updated.
         // PreStartWorkspaceModifyHook(workspace, instance)
@@ -880,7 +881,7 @@ export class WorkspaceStarter {
                 `preStartWorkspaceModifyHook: Got an error response from extensionService: ${response.getError()}`,
             );
         }
-        // Devspaces-specifc end
+        // Devspaces-specific end
 
         try {
             // build workspace image
