@@ -379,7 +379,9 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 		mediaType    = desc.MediaType
 	)
 
-	// Devspaces-specific start
+	// Devspaces-specific start (commenting out to prevent reg-facade from using stored manifests.
+	// As it cheats by resolving an index to a particular manifest and stores it. )
+
 	// if opts.Store != nil {
 	// 	func() {
 	// 		nfo, err := opts.Store.Info(ctx, desc.Digest)
