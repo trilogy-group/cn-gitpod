@@ -12,6 +12,10 @@ import (
 	"io"
 	"mime"
 	"net/http"
+
+	// Devspaces-specific start
+	"runtime"
+	// Devspaces-specific end
 	"strings"
 	"time"
 
@@ -374,35 +378,41 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 		rc           io.ReadCloser
 		mediaType    = desc.MediaType
 	)
-	if opts.Store != nil {
-		func() {
-			nfo, err := opts.Store.Info(ctx, desc.Digest)
-			if errors.Is(err, errdefs.ErrNotFound) {
-				// not in store yet
-				return
-			}
-			if err != nil {
-				log.WithError(err).WithField("desc", desc).Warn("cannot get manifest from store")
-				return
-			}
-			if nfo.Labels["Content-Type"] == "" {
-				// we have broken data in the store - ignore it and overwrite
-				return
-			}
 
-			r, err := opts.Store.ReaderAt(ctx, desc)
-			if errors.Is(err, errdefs.ErrNotFound) {
-				// not in store yet
-				return
-			}
-			if err != nil {
-				log.WithError(err).WithField("desc", desc).Warn("cannot get manifest from store")
-				return
-			}
+	// Devspaces-specific start (commenting out to prevent reg-facade from using stored manifests.
+	// As it cheats by resolving an index to a particular manifest and stores it. )
 
-			mediaType, rc = nfo.Labels["Content-Type"], &reader{ReaderAt: r}
-		}()
-	}
+	// if opts.Store != nil {
+	// 	func() {
+	// 		nfo, err := opts.Store.Info(ctx, desc.Digest)
+	// 		if errors.Is(err, errdefs.ErrNotFound) {
+	// 			// not in store yet
+	// 			return
+	// 		}
+	// 		if err != nil {
+	// 			log.WithError(err).WithField("desc", desc).Warn("cannot get manifest from store")
+	// 			return
+	// 		}
+	// 		if nfo.Labels["Content-Type"] == "" {
+	// 			// we have broken data in the store - ignore it and overwrite
+	// 			return
+	// 		}
+
+	// 		r, err := opts.Store.ReaderAt(ctx, desc)
+	// 		if errors.Is(err, errdefs.ErrNotFound) {
+	// 			// not in store yet
+	// 			return
+	// 		}
+	// 		if err != nil {
+	// 			log.WithError(err).WithField("desc", desc).Warn("cannot get manifest from store")
+	// 			return
+	// 		}
+
+	// 		mediaType, rc = nfo.Labels["Content-Type"], &reader{ReaderAt: r}
+	// 	}()
+	// }
+	// Devspaces-specific end
+
 	if rc == nil {
 		// did not find in store, or there was no store. Either way, let's fetch this
 		// thing from the remote.
@@ -457,6 +467,20 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 
 		// TODO(cw): choose by platform, not just the first manifest
 		md := list.Manifests[0]
+		// Devspaces-specific start
+		for _, mf := range list.Manifests {
+			if mf.Platform == nil {
+				continue
+			}
+			log.WithField("platform", mf.Platform).Info("Manifest OS - arch: ", mf.Platform.OS, "-", mf.Platform.Architecture)
+			log.Info("GO OS - arch: ", runtime.GOOS, "-", runtime.GOARCH)
+			if fmt.Sprintf("%s-%s", mf.Platform.OS, mf.Platform.Architecture) == fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH) {
+				log.Info("Chosen: Manifest OS - arch: ", mf.Platform.OS, "-", mf.Platform.Architecture)
+				md = mf
+			}
+		}
+		// Devspaces-specific end
+
 		rc, err = fetcher.Fetch(ctx, md)
 		if err != nil {
 			err = xerrors.Errorf("cannot download config: %w", err)
