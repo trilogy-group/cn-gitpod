@@ -50,13 +50,13 @@ aws ecr-public get-login-password --region us-east-1 | docker login --username A
 ```
 4. Run the following commands
 ```bash
-leeway build components/registry-facade:docker -Dversion=arm64 -D__git_commit=\<current commit-sha\>
-leeway build components/registry-facade/ca-updater:docker -Dversion=arm64 -D__git_commit=\<current commit-sha\>
-leeway build components/ws-daemon:docker -Dversion=arm64 -D__git_commit=\<current commit-sha\>
-leeway build components/ws-daemon/seccomp-profiler-installer:docker -Dversion=arm64 -D__git_commit=\<current commit-sha\>
-leeway build components/ws-daemon/shiftfs-module-loader:docker -Dversion=arm64 -D__git_commit=\<current commit-sha\>
-leeway build components/supervisor:docker -Dversion=arm64 -D__git_commit=\<current commit-sha\>
-leeway build components/workspacekit:docker -Dversion=arm64 -D__git_commit=\<current commit-sha\>
+leeway build components/registry-facade:docker -Dversion=arm64 -D__git_commit=<current commit-sha>
+leeway build components/registry-facade/ca-updater:docker -Dversion=arm64 -D__git_commit=<current commit-sha>
+leeway build components/ws-daemon:docker -Dversion=arm64 -D__git_commit=<current commit-sha>
+leeway build components/ws-daemon/seccomp-profiler-installer:docker -Dversion=arm64 -D__git_commit=<current commit-sha>
+leeway build components/ws-daemon/shiftfs-module-loader:docker -Dversion=arm64 -D__git_commit=<current commit-sha>
+leeway build components/supervisor:docker -Dversion=arm64 -D__git_commit=<current commit-sha>
+leeway build components/workspacekit:docker -Dversion=arm64 -D__git_commit=<current commit-sha>
 ```
 
 ### IDE Code build
@@ -88,9 +88,9 @@ docker buildx build --platform linux/arm64 --build-arg CODE_VERSION=$CODE_VERSIO
 ### Creating Manifests
 For each fo the cross architecture builds, pull the amd64 and arm64 images on the same machine and run the following steps
 ```bash
-docker manifest create public.ecr.aws/k1t8c0v2/bilal-cn-gp/\<component name\> public.ecr.aws/k1t8c0v2/bilal-cn-gp/\<component name\>:amd64 public.ecr.aws/k1t8c0v2/bilal-cn-gp/\<component name\>:arm64
+docker manifest create public.ecr.aws/k1t8c0v2/bilal-cn-gp/<component name> public.ecr.aws/k1t8c0v2/bilal-cn-gp/<component name>:amd64 public.ecr.aws/k1t8c0v2/bilal-cn-gp/<component name>:arm64
 
-docker manifest annotate --arch arm64 public.ecr.aws/k1t8c0v2/bilal-cn-gp/\<component name\>:arm64
+docker manifest annotate --arch arm64 public.ecr.aws/k1t8c0v2/bilal-cn-gp/<component name>:arm64
 
-docker manifest push public.ecr.aws/k1t8c0v2/bilal-cn-gp/\<component name\>
+docker manifest push public.ecr.aws/k1t8c0v2/bilal-cn-gp/<component name>
 ```

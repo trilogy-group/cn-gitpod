@@ -10,7 +10,7 @@
 1.
 ```bash
 cd install/kots
-bash install-kots.sh \<cluster-name\>
+bash install-kots.sh <cluster-name>
 ```
 
 ## Configure KOTS applications
@@ -25,5 +25,14 @@ Due to an as yet unidentified bug, the statefulsets installed by the KOTS applic
 After you have deployed the application, wait until admin dashboard goes to the main page which shows you a status of the deployment
 Then, run
 ```bash
-bash statefulset-path.sh \<cluster-namespace\>
+bash statefulset-path.sh <cluster-namespace>
+```
+
+## Installing ARM extension service
+1. Set the value of the secrets in [components/extension-service/yamls/secret.example.yaml](components/extension-service/yamls/secret.example.yaml) to the value of actual dockerhub creds. `Note: Free user credentials will also work, but it's recommended to use docker pro account creds`
+2. Run the following commands
+```bash
+cd components/extension-service
+
+bash scripts/install-extension.sh <namespace>
 ```
