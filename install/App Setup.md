@@ -6,8 +6,33 @@
 3. Install helm
 4. Setup AWS credentials in environment variables
 
-## Run
+## Install KOTS application
+1.
 ```bash
 cd install/kots
-bash install-kots.sh
+bash install-kots.sh <cluster-name>
+```
+
+## Configure KOTS applications
+- After the app installation is completed, you will see a message on the CLI that says admin console available at localhost:8800
+- Open the admin console on http://localhost:8800 and enter password `12345678`
+- Configure the domain name of the installation to be the same as the domain name set during provisioning the EKS cluster
+- Scroll down over to advanced configurations, enable advanced configurations and set installer timeout to 2 hours
+- Save config and deploy the application
+
+## Fixing the Statefulsets
+Due to an as yet unidentified bug, the statefulsets installed by the KOTS application have an incorrect reference image.
+After you have deployed the application, wait until admin dashboard goes to the main page which shows you a status of the deployment
+Then, run
+```bash
+bash statefulset-path.sh <cluster-namespace>
+```
+
+## Installing ARM extension service
+1. Set the value of the secrets in [components/extension-service/yamls/secret.example.yaml](components/extension-service/yamls/secret.example.yaml) to the value of actual dockerhub creds. `Note: Free user credentials will also work, but it's recommended to use docker pro account creds`
+2. Run the following commands
+```bash
+cd components/extension-service
+
+bash scripts/install-extension.sh <namespace>
 ```

@@ -1,7 +1,7 @@
 # this file makes this a leeway workspace
 defaultTarget: components:all
 defaultArgs:
-  imageRepoBase: "public.ecr.aws/k1t8c0v2/bilal-cn-gp"
+  imageRepoBase: "346945241475.dkr.ecr.us-east-1.amazonaws.com/gitpod-infra-test"
   coreYarnLockBase: ../..
   npmPublishTrigger: "false"
   publishToNPM: true
