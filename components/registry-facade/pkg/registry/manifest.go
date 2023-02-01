@@ -468,12 +468,11 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 		// TODO(cw): choose by platform, not just the first manifest
 		md := list.Manifests[0]
 		// Devspaces-specific start
+		log.WithField("desc", desc).Info("Resolving manifest for descriptor..")
 		for _, mf := range list.Manifests {
 			if mf.Platform == nil {
 				continue
 			}
-			log.WithField("platform", mf.Platform).Info("Manifest OS - arch: ", mf.Platform.OS, "-", mf.Platform.Architecture)
-			log.Info("GO OS - arch: ", runtime.GOOS, "-", runtime.GOARCH)
 			if fmt.Sprintf("%s-%s", mf.Platform.OS, mf.Platform.Architecture) == fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH) {
 				log.Info("Chosen: Manifest OS - arch: ", mf.Platform.OS, "-", mf.Platform.Architecture)
 				md = mf

@@ -2084,6 +2084,10 @@ export class WorkspaceStarter {
         spec.setPortsList(ports);
         spec.setInitializer((await initializerPromise).initializer);
         const startWorkspaceSpecIDEImage = new IDEImage();
+        log.info(
+            { ideImage: ideImage },
+            `Got ide Image`,
+        );
         startWorkspaceSpecIDEImage.setWebRef(ideImage);
         startWorkspaceSpecIDEImage.setDesktopRef(instance.configuration?.desktopIdeImage || "");
         startWorkspaceSpecIDEImage.setDesktopPluginRef(instance.configuration?.desktopIdePluginImage || "");
