@@ -19,7 +19,7 @@ packages:
     type: generic
     config:
       commands:
-        - ["sh", "-c", "curl -o fuse-overlayfs -L https://github.com/containers/fuse-overlayfs/releases/download/v1.7.1/fuse-overlayfs-x86_64 && chmod +x fuse-overlayfs"]
+        - ["sh", "-c", "ARCH=$(uname -m); if [ \"$ARCH\" == \"x86_64\" ]; then curl -o fuse-overlayfs -L https://github.com/containers/fuse-overlayfs/releases/download/v1.7.1/fuse-overlayfs-x86_64; else curl -o fuse-overlayfs -L https://github.com/containers/fuse-overlayfs/releases/download/v1.7.1/fuse-overlayfs-aarch64; fi && chmod +x fuse-overlayfs"]
   - name: lib
     type: go
     srcs:
