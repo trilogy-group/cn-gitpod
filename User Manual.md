@@ -43,5 +43,5 @@ Snapshots save the exact state of the current workspace, even uncommited files a
 2. Create a new team
 ![Create Team](images/team.png)
 3. Add a project and add your repository to the project.
-4. Prebuilds will now be enabled for this repository
+4. Prebuilds will now be enabled for this repository. Prebuilds save alot of time by running workspace tasks in advance, shaving off the time required to run builds or other initialization tasks
 ![Prebuilds](images/prebuilds.png)
