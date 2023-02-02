@@ -395,7 +395,7 @@ spec:
         - name: installer_timeout
           title: Installer timeout
           type: select_one
-          default: 5m
+          default: 2h
           when: '{{repl ConfigOptionEquals "advanced_mode_enabled" "1" }}'
           help_text: Override the timeout for the Installer.
           items:
