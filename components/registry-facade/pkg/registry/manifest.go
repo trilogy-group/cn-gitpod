@@ -472,8 +472,6 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 			if mf.Platform == nil {
 				continue
 			}
-			log.WithField("platform", mf.Platform).Info("Manifest OS - arch: ", mf.Platform.OS, "-", mf.Platform.Architecture)
-			log.Info("GO OS - arch: ", runtime.GOOS, "-", runtime.GOARCH)
 			if fmt.Sprintf("%s-%s", mf.Platform.OS, mf.Platform.Architecture) == fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH) {
 				log.Info("Chosen: Manifest OS - arch: ", mf.Platform.OS, "-", mf.Platform.Architecture)
 				md = mf
