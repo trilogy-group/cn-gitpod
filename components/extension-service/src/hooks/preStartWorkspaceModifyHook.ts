@@ -20,36 +20,14 @@ const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
     const request = call.request;
     const response = new PreStartWorkspaceModifyResponse();
 
-    // ! previous implementation
     let message = ``;
 
-    // ! new implementation:
     const payload = request.getPayload();
     const instanceId = payload?.getInstance()?.getId();
     const arch = payload?.getWorkspace()?.getConfig()?.getArch() as Arch;
 
-    // TODO: imageSource image:tag -> image@sha...
-    // payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigstring();
-    // payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigfile()?.getFile();
-
-    // ! if configstring is present, swap tag with digest
-    // ws.getimagesource.hasref
-    // ignore hasdocker
-    // if (payload?.getWorkspace()?.getConfig()?.getImage()?.hasConfigstring()) {
-    // ! previous implementation:
-    // console.log(`hookpoint1 - swapping tag with digest`);
-    // const configString = payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigstring()!;
-    // console.log(`hookpoint1 - current configstring: `, configString);
-    // const newConfigString = await swapTagWithDigest(configString, arch);
-    // console.log(`hookpoint1 - updated configstring: `, newConfigString);
-    // payload?.getWorkspace()?.getConfig()?.getImage()?.setConfigstring(newConfigString);
-
-    // ! updated implementation:
-    // const configString = payload?.getWorkspace()?.getImagesource()?.get;
-    // }
     if (payload?.getWorkspace()?.getImagesource()?.hasReference()) {
         console.log(`hookpoint1 - swapping tag with digest`);
-        // const configString = payload?.getWorkspace()?.getConfig()?.getImage()?.getConfigstring()!;
         const baseImgResolved = payload?.getWorkspace()?.getImagesource()?.getReference()?.getBaseimageresolved()!;
         console.log(`hookpoint1 - current baseImgResolved: `, baseImgResolved);
         const newBaseImage = await swapTagWithDigest(baseImgResolved, arch);
