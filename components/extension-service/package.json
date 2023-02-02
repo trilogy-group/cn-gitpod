@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Typescript Express.js server for Extension Service",
   "scripts": {
+    "test": "echo leave",
     "p:push": "npx prisma db push",
     "p:deploy": "npx prisma migrate deploy",
     "p:generate": "npx prisma generate",
