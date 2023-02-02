@@ -2084,9 +2084,6 @@ export class WorkspaceStarter {
         spec.setPortsList(ports);
         spec.setInitializer((await initializerPromise).initializer);
         const startWorkspaceSpecIDEImage = new IDEImage();
-        // Devspaces-specific start
-        log.info({ ideImage: ideImage }, `Setting  ideImage in createSpec()`);
-        // Devspaces-specific end
         startWorkspaceSpecIDEImage.setWebRef(ideImage);
         startWorkspaceSpecIDEImage.setDesktopRef(instance.configuration?.desktopIdeImage || "");
         startWorkspaceSpecIDEImage.setDesktopPluginRef(instance.configuration?.desktopIdePluginImage || "");

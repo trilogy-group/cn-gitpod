@@ -468,7 +468,6 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 		// TODO(cw): choose by platform, not just the first manifest
 		md := list.Manifests[0]
 		// Devspaces-specific start
-		log.WithField("desc", desc).Info("Resolving manifest for descriptor..")
 		for _, mf := range list.Manifests {
 			if mf.Platform == nil {
 				continue
