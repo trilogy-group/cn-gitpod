@@ -1,5 +1,12 @@
 #!/bin/bash
-component=$1
+
+if [[ -z "$1" ]]
+then
+    echo "Please enter component name as first CLI argument"
+    exit 1
+fi
+
+component="$1"
 
 full_repo=public.ecr.aws/k1t8c0v2/bilal-cn-gp/"$component"
 arm_ref="$full_repo":arm64
