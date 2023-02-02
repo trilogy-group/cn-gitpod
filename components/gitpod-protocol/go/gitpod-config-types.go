@@ -51,10 +51,8 @@ type GitpodConfig struct {
 	// List of additional repositories that are part of this project.
 	AdditionalRepositories []*AdditionalRepositoriesItems `yaml:"additionalRepositories,omitempty"`
 
-	// Devspaces-specific start
 	// Architecture to run the workspace on.
 	Arch string `yaml:"arch,omitempty"`
-	// Devspaces-specific end
 
 	// Path to where the repository should be checked out relative to `/workspace`. Defaults to the simple repository name.
 	CheckoutLocation string `yaml:"checkoutLocation,omitempty"`
@@ -424,8 +422,6 @@ func (strct *GitpodConfig) MarshalJSON() ([]byte, error) {
 		buf.Write(tmp)
 	}
 	comma = true
-
-	// Devspaces-specific start
 	// Marshal the "arch" field
 	if comma {
 		buf.WriteString(",")
@@ -437,8 +433,6 @@ func (strct *GitpodConfig) MarshalJSON() ([]byte, error) {
 		buf.Write(tmp)
 	}
 	comma = true
-	// Devspaces-specific end
-
 	// Marshal the "checkoutLocation" field
 	if comma {
 		buf.WriteString(",")
@@ -589,12 +583,10 @@ func (strct *GitpodConfig) UnmarshalJSON(b []byte) error {
 			if err := json.Unmarshal([]byte(v), &strct.AdditionalRepositories); err != nil {
 				return err
 			}
-		// Devspaces-specific start
 		case "arch":
 			if err := json.Unmarshal([]byte(v), &strct.Arch); err != nil {
 				return err
 			}
-		// Devspaces-specific end
 		case "checkoutLocation":
 			if err := json.Unmarshal([]byte(v), &strct.CheckoutLocation); err != nil {
 				return err

@@ -72,15 +72,18 @@ const getDigestFromImageAPI = async (image: string, arch: Arch) => {
     const tag = image.substring(lastColonIndex + 1);
 
     let fixedImageName = imageName;
+    // * in case the imageName does not contain a "/", we add "library" as default
+    if (!imageName.includes("/")) {
+        fixedImageName = `library/${fixedImageName}`;
+    } else if (imageName.includes("docker.io")) {
+        // * in case the imageName contains "docker.io", we remove it
+        fixedImageName = imageName.replace("docker.io/", "");
+    }
+
     console.log(`FixedImageName & tag: `, {
         fixedImageName,
         tag,
     });
-
-    // * in case the imageName does not contain a "/", we add "library" as default
-    if (!imageName.includes("/")) {
-        fixedImageName = `library/${fixedImageName}`;
-    }
 
     // * now we have a valid imageName and tag, we can get the digest
     try {
@@ -93,9 +96,16 @@ const getDigestFromImageAPI = async (image: string, arch: Arch) => {
         });
 
         // ! get the digest with the correct arch
-        const imageResponse = response.data.find((image: ImageResponse) => image.architecture === fixedArch);
+        if (!response.data) {
+            throw new Error("No data returned from docker api");
+        }
+        const imageResponse: ImageResponse = response.data.find(
+            (image: ImageResponse) => image.architecture === fixedArch,
+        );
+        if (!imageResponse) {
+            console.log(`No arch found in docker api response`);
+        }
         const digest = imageResponse.digest;
-
         return `${imageName}@${digest}`;
     } catch (err) {
         console.log(`Got error from docker API: `, err?.message);
@@ -106,6 +116,7 @@ const getDigestFromImageAPI = async (image: string, arch: Arch) => {
 /**
  * Get the digest for an image with a tag and swap
  * @param image string
+ * @param arch: "x86" | "arm"
  * @returns string
  */
 export const swapTagWithDigest = async (image: string, arch: Arch) => {
