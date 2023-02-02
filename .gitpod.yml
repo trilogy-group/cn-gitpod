@@ -1,5 +1,4 @@
 image: eu.gcr.io/gitpod-core-dev/dev/dev-environment:mads-dont-include-previewctl-in-image.12
-arch: arm
 workspaceLocation: gitpod/gitpod-ws.code-workspace
 checkoutLocation: gitpod
 ports:
