@@ -1,4 +1,3 @@
-image: eu.gcr.io/gitpod-core-dev/dev/dev-environment:mads-dont-include-previewctl-in-image.12
 workspaceLocation: gitpod/gitpod-ws.code-workspace
 checkoutLocation: gitpod
 ports:
@@ -34,31 +33,33 @@ ports:
   - port: 8022
     onOpen: ignore
 tasks:
-  - name: Preview environment configuration
-    init: |
-      leeway run dev/preview/previewctl:install
+  - name: Setup
+    init: bash setup.sh
     command: |
-      previewctl get-credentials
-      previewctl install-context --watch
+      gp sync-done setup
   - name: Installer dependencies
     init: |
+      gp sync-await setup
       (cd install/installer && make deps)
       exit 0
-  - name: Java
-    command: |
-      if [ -z "$RUN_GRADLE_TASK" ]; then
-        read -r -p "Press enter to continue Java gradle task"
-      fi
-      leeway exec --package components/supervisor-api/java:lib --package components/gitpod-protocol/java:lib -- ./gradlew build
-      leeway exec --package components/ide/jetbrains/backend-plugin:plugin-latest --package components/ide/jetbrains/gateway-plugin:publish-latest --parallel -- ./gradlew buildPlugin
-  - name: TypeScript
-    init: yarn --network-timeout 100000 && yarn build
-  - name: Go
-    before: pre-commit install --install-hooks
+  - name: Typescript
     init: |
-      ./components/gitpod-protocol/go/scripts/generate-config.sh
-      leeway exec --filter-type go -v -- go mod verify
-    openMode: split-right
+      gp sync-await setup
+      yarn --network-timeout 100000 && yarn build
+      echo $?
+    command: |
+      gp sync-done node_modules
+  - name: grpc-tools
+    init: |
+      gp sync-await node_modules
+      curl -L https://github.com/trilogy-group/grpc-node/releases/download/v1.11.2-arm64/node-package-linux-aarch64.tar.gz -o grpc-tools.tar.gz
+      cd node_modules || exit
+      mkdir grpc-tools
+      cd /workspace/gitpod || exit
+      tar xvf grpc-tools.tar.gz -C /workspace/gitpod/node_modules/grpc-tools
+      rm grpc-tools.tar.gz
+    command: |
+      echo "Installed grpc-tools for ARM in node_modules"
 vscode:
   extensions:
     - EditorConfig.EditorConfig
@@ -74,7 +75,3 @@ vscode:
     - fwcd.kotlin
     - dbaeumer.vscode-eslint
     - esbenp.prettier-vscode
-jetbrains:
-  goland:
-    prebuilds:
-      version: stable

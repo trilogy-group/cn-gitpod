@@ -1,0 +1,9 @@
+packages:
+  - name: code_builder
+    type: docker
+    srcs:
+    deps:
+    config:
+      dockerfile: leeway.Dockerfile
+      image:
+        - ${imageRepoBase}/ide/code-code-builder:${version}

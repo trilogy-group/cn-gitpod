@@ -13,7 +13,7 @@ fi
 
 mkdir -p lib
 
-DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+DIR="/workspace/gitpod"
 
 protoc \
     -I"$THIRD_PARTY_INCLUDES"/third_party -I/usr/lib/protoc/include \

@@ -1,4 +1,65 @@
 packages:
+  - name: dependencies
+    type: docker
+    srcs:
+      - "devspaces.patch"
+    deps:
+    argdeps:
+      - codeCommit
+      - codeQuality
+      - version
+    config:
+      dockerfile: dependencies.Dockerfile
+      metadata:
+      buildArgs:
+        CODE_COMMIT: ${codeCommit}
+        CODE_QUALITY: ${codeQuality}
+      image:
+        - ${imageRepoBase}/ide/code-dependencies:${version}
+  - name: base_amd64
+    type: docker
+    srcs:
+      - "xvfb-init.sh"
+      - "devspaces.patch"
+    deps:
+    argdeps:
+      - codeCommit
+      - codeQuality
+      - baseVersion
+    config:
+      dockerfile: base.Dockerfile
+      metadata:
+      buildArgs:
+        CODE_COMMIT: ${codeCommit}
+        CODE_QUALITY: ${codeQuality}
+        IMAGE_REPO_BASE: ${imageRepoBase}
+        BASE_VERSION: ${baseVersion}
+        TARGET_PLATFORM: amd64
+        TARGET_PLATFORM_VSCODE: x64
+      image:
+        - ${imageRepoBase}/ide/code-base:${baseVersion}-amd64
+  - name: base_arm64
+    type: docker
+    srcs:
+      - "xvfb-init.sh"
+      - "devspaces.patch"
+    deps:
+    argdeps:
+      - codeCommit
+      - codeQuality
+      - baseVersion
+    config:
+      dockerfile: base.Dockerfile
+      metadata:
+      buildArgs:
+        CODE_COMMIT: ${codeCommit}
+        CODE_QUALITY: ${codeQuality}
+        IMAGE_REPO_BASE: ${imageRepoBase}
+        BASE_VERSION: ${baseVersion}
+        TARGET_PLATFORM: arm64
+        TARGET_PLATFORM_VSCODE: arm64
+      image:
+        - ${imageRepoBase}/ide/code-base:${baseVersion}-arm64
   - name: docker
     type: docker
     srcs:
@@ -7,18 +68,14 @@ packages:
     deps:
       - components/ide/code/codehelper:app
     argdeps:
+      - version
       - imageRepoBase
-      - codeCommit
-      - codeQuality
-      - codeVersion
     config:
-      dockerfile: leeway.Dockerfile
+      dockerfile: multiplatform.Dockerfile
       metadata:
         helm-component: workspace.codeImage
       buildArgs:
-        CODE_COMMIT: ${codeCommit}
-        CODE_QUALITY: ${codeQuality}
-        CODE_VERSION: ${codeVersion}
+        VERSION: ${version}
+        IMAGE_REPO_BASE: ${imageRepoBase}
       image:
         - ${imageRepoBase}/ide/code:${version}
-        - ${imageRepoBase}/ide/code:commit-${__git_commit}

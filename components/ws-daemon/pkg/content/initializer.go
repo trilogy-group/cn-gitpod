@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"syscall"
 	"time"
@@ -178,8 +179,17 @@ func RunInitializer(ctx context.Context, destination string, initializer *csapi.
 
 	spec := specconv.Example()
 
+	// DEVSPACES-SPECIFIC - ROOT FOLDERS ARE DIFFERENT ON ARM
+	var rootFolders []string
+	if runtime.GOARCH == "arm64" {
+		rootFolders = []string{"app", "bin", "dev", "etc", "lib", "opt", "sbin", "sys", "usr", "var"}
+	} else {
+		rootFolders = []string{"app", "bin", "dev", "etc", "lib", "opt", "sbin", "sys", "usr", "var", "lib32", "lib64"}
+	}
+	// END DEVSPACES-SPECIFIC
+
 	// we assemble the root filesystem from the ws-daemon container
-	for _, d := range []string{"app", "bin", "dev", "etc", "lib", "opt", "sbin", "sys", "usr", "var", "lib32", "lib64", "tmp"} {
+	for _, d := range rootFolders {
 		spec.Mounts = append(spec.Mounts, specs.Mount{
 			Destination: "/" + d,
 			Source:      "/" + d,

@@ -5,9 +5,9 @@
 FROM alpine:3.16 as dl
 WORKDIR /dl
 RUN apk add --no-cache curl file \
-  && curl -OsSL https://github.com/opencontainers/runc/releases/download/v1.1.4/runc.amd64 \
-  && chmod +x runc.amd64 \
-  && if ! file runc.amd64 | grep -iq "ELF 64-bit LSB executable"; then echo "runc.amd64 is not a binary file"; exit 1;fi
+  && curl -OsSL https://github.com/opencontainers/runc/releases/download/v1.1.4/runc.arm64 \
+  && chmod +x runc.arm64 \
+  && if ! file runc.arm64 | grep -iq "ELF 64-bit LSB executable"; then echo "runc.arm64 is not a binary file"; exit 1;fi
 
 FROM ubuntu:22.04
 
@@ -45,7 +45,7 @@ RUN apt update \
     /tmp/* \
     /var/tmp/*
 
-COPY --from=dl /dl/runc.amd64 /usr/bin/runc
+COPY --from=dl /dl/runc.arm64 /usr/bin/runc
 
 # Add gitpod user for operations (e.g. checkout because of the post-checkout hook!)
 RUN groupadd -r -g 33333 gitpod \
