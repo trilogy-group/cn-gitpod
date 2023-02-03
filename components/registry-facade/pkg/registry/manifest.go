@@ -466,8 +466,9 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 		}
 
 		// TODO(cw): choose by platform, not just the first manifest
-		md := list.Manifests[0]
+		// md := list.Manifests[0]
 		// Devspaces-specific start
+		md := ociv1.Descriptor{}
 		for _, mf := range list.Manifests {
 			if mf.Platform == nil {
 				continue
@@ -476,6 +477,11 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 				log.Info("Chosen: Manifest OS - arch: ", mf.Platform.OS, "-", mf.Platform.Architecture)
 				md = mf
 			}
+		}
+		// ! if we didn't find a match, we'll throw an error
+		if md.Digest == "" {
+			err = xerrors.Errorf("cannot find manifest for platform %s-%s", runtime.GOOS, runtime.GOARCH)
+			return
 		}
 		// Devspaces-specific end
 
