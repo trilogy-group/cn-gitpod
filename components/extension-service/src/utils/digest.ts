@@ -72,12 +72,16 @@ const getDigestFromImageAPI = async (image: string, arch: Arch) => {
     const tag = image.substring(lastColonIndex + 1);
 
     let fixedImageName = imageName;
+
     // * in case the imageName does not contain a "/", we add "library" as default
     if (!imageName.includes("/")) {
         fixedImageName = `library/${fixedImageName}`;
     } else if (imageName.includes("docker.io")) {
         // * in case the imageName contains "docker.io", we remove it
         fixedImageName = imageName.replace("docker.io/", "");
+        if (!fixedImageName.includes("/")) {
+            fixedImageName = `library/${fixedImageName}`;
+        }
     }
 
     console.log(`FixedImageName & tag: `, {
