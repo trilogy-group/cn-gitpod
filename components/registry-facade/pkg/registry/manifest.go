@@ -468,20 +468,25 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 		// TODO(cw): choose by platform, not just the first manifest
 		md := list.Manifests[0]
 		// Devspaces-specific start
+		log.Info("DS: 1: ")
+		// ! print out each of the manifest and its platform
+		for _, mf_temp := range list.Manifests {
+			if mf_temp.Platform == nil {
+				continue
+			}
+			log.Info("DS: 2: ", mf_temp.Digest, " : ", mf_temp.Platform.OS, "-", mf_temp.Platform.Architecture)
+		}
 		for _, mf := range list.Manifests {
 			if mf.Platform == nil {
 				continue
 			}
+			log.Info("DS: 2: ", mf.Digest, " : ", mf.Platform.OS, "-", mf.Platform.Architecture)
+			log.Info("DS: 3: ", runtime.GOOS, "-", runtime.GOARCH)
 			if fmt.Sprintf("%s-%s", mf.Platform.OS, mf.Platform.Architecture) == fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH) {
-				log.Info("DS: Chosen: Manifest OS - arch: ", mf.Platform.OS, "-", mf.Platform.Architecture)
+				log.Info("DS: 4, found match!")
 				md = mf
 			}
 		}
-		// ! if we didn't find a match, we'll throw an error
-		// if md.Digest == "" {
-		// 	err = xerrors.Errorf("DS: cannot find manifest for platform %s-%s", runtime.GOOS, runtime.GOARCH)
-		// 	return
-		// }
 		// Devspaces-specific end
 
 		rc, err = fetcher.Fetch(ctx, md)
@@ -502,8 +507,9 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 	case images.MediaTypeDockerSchema2Manifest, ociv1.MediaTypeImageManifest:
 		// ! in case of mismatch between platform and manifest OS - arch we'll throw an error. Platform can be nil so handle accordingly
 		if rdesc.Platform != nil {
-			log.Info("DS: Manifest OS - arch: ", rdesc.Platform.OS, "-", rdesc.Platform.Architecture, "")
+			log.Info("DS: 5: ", rdesc.Platform.OS, "-", rdesc.Platform.Architecture, "")
 			if fmt.Sprintf("%s-%s", rdesc.Platform.OS, rdesc.Platform.Architecture) != fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH) {
+				log.Info("DS: 6: ", rdesc.Platform.OS, "-", rdesc.Platform.Architecture)
 				err = xerrors.Errorf("DS: cannot find manifest for platform %s-%s", runtime.GOOS, runtime.GOARCH)
 				return
 			}
