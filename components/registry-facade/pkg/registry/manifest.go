@@ -480,7 +480,7 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 		}
 		// ! if we didn't find a match, we'll throw an error
 		if md.Digest == "" {
-			err = xerrors.Errorf("cannot find manifest for platform %s-%s", runtime.GOOS, runtime.GOARCH)
+			err = xerrors.Errorf("DS: cannot find manifest for platform %s-%s", runtime.GOOS, runtime.GOARCH)
 			return
 		}
 		// Devspaces-specific end
