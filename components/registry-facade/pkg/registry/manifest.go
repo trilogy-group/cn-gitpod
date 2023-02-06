@@ -466,23 +466,22 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 		}
 
 		// TODO(cw): choose by platform, not just the first manifest
-		// md := list.Manifests[0]
+		md := list.Manifests[0]
 		// Devspaces-specific start
-		md := ociv1.Descriptor{}
 		for _, mf := range list.Manifests {
 			if mf.Platform == nil {
 				continue
 			}
 			if fmt.Sprintf("%s-%s", mf.Platform.OS, mf.Platform.Architecture) == fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH) {
-				log.Info("Chosen: Manifest OS - arch: ", mf.Platform.OS, "-", mf.Platform.Architecture)
+				log.Info("DS: Chosen: Manifest OS - arch: ", mf.Platform.OS, "-", mf.Platform.Architecture)
 				md = mf
 			}
 		}
 		// ! if we didn't find a match, we'll throw an error
-		if md.Digest == "" {
-			err = xerrors.Errorf("DS: cannot find manifest for platform %s-%s", runtime.GOOS, runtime.GOARCH)
-			return
-		}
+		// if md.Digest == "" {
+		// 	err = xerrors.Errorf("DS: cannot find manifest for platform %s-%s", runtime.GOOS, runtime.GOARCH)
+		// 	return
+		// }
 		// Devspaces-specific end
 
 		rc, err = fetcher.Fetch(ctx, md)
@@ -501,6 +500,15 @@ func DownloadManifest(ctx context.Context, fetch FetcherFunc, desc ociv1.Descrip
 
 	switch rdesc.MediaType {
 	case images.MediaTypeDockerSchema2Manifest, ociv1.MediaTypeImageManifest:
+		// ! in case of mismatch between platform and manifest OS - arch we'll throw an error. Platform can be nil so handle accordingly
+		if rdesc.Platform != nil {
+			log.Info("DS: Manifest OS - arch: ", rdesc.Platform.OS, "-", rdesc.Platform.Architecture, "")
+			if fmt.Sprintf("%s-%s", rdesc.Platform.OS, rdesc.Platform.Architecture) != fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH) {
+				err = xerrors.Errorf("DS: cannot find manifest for platform %s-%s", runtime.GOOS, runtime.GOARCH)
+				return
+			}
+		}
+
 	default:
 		err = xerrors.Errorf("unsupported media type: %s", rdesc.MediaType)
 		return
