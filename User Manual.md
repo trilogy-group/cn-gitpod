@@ -26,9 +26,6 @@ uname -m
 ```
 ![Architecture output](images/arch.png)
 
-### **IMPORTANT**
-
-You can also specify a custom image to be used to run the workspace or as the base for a dockerfile. However, the users must ensure this base image exists for the architecture they are trying to run the workspace in. If the base image does not exist for the specified architecture, the workspace will fail silently and be stuck in initializing mode
 
 ## Snapshots
 You can create and share snapshots of the workspace by clicking on the hamburger menu on top left and selecting share workspace snapshot
