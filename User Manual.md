@@ -6,8 +6,7 @@
 3. Click on Open workspace and enter URL of a github repository that you want to open in the workspace
 
 **IMPORTANT**
-- If you want specify a custom image or dockerfile, ensure the the image or the dockerfile base has a relevant tag for the architecture you are targeting. Otherwise the Workspace will be stuck on the loading screen.
-- In future releases, we will ensure that the workspace errors out with a clear message 
+- If you want specify a custom image or dockerfile, ensure the the image or the dockerfile base has a relevant tag for the architecture you are targeting. Otherwise the Workspace will fail
 - We recommend using the following [repo](https://github.com/bilalafzal-ti/bilalafzal-ti) for testing out basic functionalities
 
 ## Switching between Arch
