@@ -6,7 +6,7 @@
 
 // * helper function to get the digest of an image from its tag
 // import { execSync } from "child_process";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { IMAGE_ARCH_MISMATCH_ERROR } from "./constants";
 
 export type Arch = "x86" | "arm";
@@ -60,68 +60,37 @@ const generateAuthToken = async () => {
  * @param arch "arm" | "x86"
  */
 const getDigestFromImageAPI = async (image: string, arch: Arch) => {
-    const fixedArch = fixArch(arch);
+    const [fixedImageName, tag] = parseImageNameAndTag(image);
+    let digest: string;
 
-    console.log(`Fixed arch: `, arch);
-
-    // * the api we are gonna use is:
-    // https://hub.docker.com/v2/repositories/<image>/tags/<tag>
-
-    // * get the imagename and tag from the image
-    const lastColonIndex = image.lastIndexOf(":");
-    const imageName = image.substring(0, lastColonIndex);
-    const tag = image.substring(lastColonIndex + 1);
-
-    let fixedImageName = imageName;
-
-    // * in case the imageName does not contain a "/", we add "library" as default
-    if (!imageName.includes("/")) {
-        fixedImageName = `library/${fixedImageName}`;
-    } else if (imageName.includes("docker.io")) {
-        // * in case the imageName contains "docker.io", we remove it
-        fixedImageName = imageName.replace("docker.io/", "");
-        if (!fixedImageName.includes("/")) {
-            fixedImageName = `library/${fixedImageName}`;
-        }
-    }
-
-    console.log(`FixedImageName & tag: `, {
-        fixedImageName,
-        tag,
-    });
-
-    // * now we have a valid imageName and tag, we can get the digest
+    let response: AxiosResponse<ImageResponse[]>;
     try {
         const token = await generateAuthToken();
         const url = `https://hub.docker.com/v2/repositories/${fixedImageName}/tags/${tag}/images`;
-        const response = await axios.get(url, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-
-        // * get the digest with the correct arch
-        if (!response.data) {
-            throw new Error("No data returned from docker api");
-        }
-        const imageResponse: ImageResponse = response.data.find(
-            (image: ImageResponse) => image.architecture === fixedArch,
-        );
-        if (!imageResponse) {
-            // ! in this case we want to throw an Error that we can catch later, imageArchMismatchError
-            throw new Error(IMAGE_ARCH_MISMATCH_ERROR);
-        }
-        const digest = imageResponse.digest;
-        return `${imageName}@${digest}`;
+        response = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
+        const imageResponse = response.data.find((image) => image.architecture === fixArch(arch));
+        // * only the case where we do get a valid response from the API, but it just doesn't contain the matching architecture, we throw the IMAGE_ARCH_MISMATCH_ERROR
+        if (!imageResponse) throw new Error(IMAGE_ARCH_MISMATCH_ERROR);
+        // ! its possible that the response doesn't contain digest for an architecture
+        digest = imageResponse?.digest || "";
     } catch (err) {
-        // * in case of DS: Image arch mismatch, we want to throw the error
-        if (err?.message === IMAGE_ARCH_MISMATCH_ERROR) {
-            throw err;
-        }
-        // * in other cases we just return the image name with the tag
+        if (err?.message === IMAGE_ARCH_MISMATCH_ERROR) throw err;
+
+        // * for rest of the cases we can fallback to the initial tag
         console.log(`Got error from docker API: `, err?.message);
-        return `${imageName}:${tag}`;
+        digest = "";
     }
+
+    return digest ? `${fixedImageName}@${digest}` : `${fixedImageName}:${tag}`;
+};
+
+const parseImageNameAndTag = (image: string) => {
+    const lastColonIndex = image.lastIndexOf(":");
+    let imageName = image.substring(0, lastColonIndex);
+    if (!imageName.includes("/")) imageName = `library/${imageName}`;
+    else if (imageName.includes("docker.io"))
+        imageName = imageName.replace("docker.io/", "").includes("/") ? imageName : `library/${imageName}`;
+    return [imageName, image.substring(lastColonIndex + 1)];
 };
 
 /**

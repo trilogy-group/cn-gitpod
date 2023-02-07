@@ -135,6 +135,9 @@ import { AttributionId } from "@gitpod/gitpod-protocol/lib/attribution";
 import { BillingMode } from "@gitpod/gitpod-protocol/lib/billing-mode";
 import { LogContext } from "@gitpod/gitpod-protocol/lib/util/logging";
 import { repeat } from "@gitpod/gitpod-protocol/lib/util/repeat";
+// Devspaces-specific start
+import { IMAGE_ARCH_MISMATCH_ERROR } from "../devspaces-constants";
+// Devspaces-specific end
 
 export interface StartWorkspaceOptions {
     rethrow?: boolean;
@@ -881,7 +884,6 @@ export class WorkspaceStarter {
                 `preStartWorkspaceModifyHook: Got an error response from extensionService: ${response.getError()}`,
             );
             // ! check if error === IMAGE_ARCH_MISMATCH_ERROR, if yes we should not throw an error
-            const IMAGE_ARCH_MISMATCH_ERROR = "DS: Image arch mismatch";
             if (response.getError() === IMAGE_ARCH_MISMATCH_ERROR) {
                 throw new StartInstanceError(
                     "imageBuildFailed",

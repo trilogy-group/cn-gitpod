@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/containerd/containerd/content"
@@ -100,12 +99,6 @@ func TestDownloadManifest(t *testing.T) {
 			}
 			_, _, err = DownloadManifest(context.Background(), fetcher, desc, WithStore(test.Store))
 			if err != nil {
-				// Devspaces-specific start
-				// * if err includes "DS: ", it's a digest mismatch and we can ignore it
-				if strings.Contains(err.Error(), "DS: ") {
-					return
-				}
-				// Devspaces-specific end
 				t.Fatal(err)
 			}
 		})
