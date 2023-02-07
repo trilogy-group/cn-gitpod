@@ -148,7 +148,7 @@ export default function () {
     };
 
     useEffect(() => {
-        document.title = "Prebuild — Gitpod";
+        document.title = "Prebuild — Devspaces";
     }, []);
 
     return (

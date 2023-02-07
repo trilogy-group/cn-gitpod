@@ -450,7 +450,7 @@ function RepositoryNotFoundView(p: { error: StartWorkspaceError }) {
                 setStatusMessage(
                     <div className="mt-2 flex flex-col space-y-8">
                         <p className="text-base text-gray-400 w-96">
-                            The repository may be private. Please authorize Gitpod to access to private repositories.
+                            The repository may be private. Please authorize Devspaces to access to private repositories.
                         </p>
                         <a className="mx-auto" href={authorizeURL}>
                             <button>Grant Access</button>
@@ -484,10 +484,10 @@ function RepositoryNotFoundView(p: { error: StartWorkspaceError }) {
                     <div className="mt-2 flex flex-col space-y-8">
                         <p className="text-base text-gray-400 w-96">
                             Permission to access private repositories has been granted. If you are a member of{" "}
-                            <code>{owner}</code>, please try to request access for Gitpod.
+                            <code>{owner}</code>, please try to request access for Devspaces.
                         </p>
                         <a className="mx-auto" href={authorizeURL}>
-                            <button>Request Access for Gitpod</button>
+                            <button>Request Access for Devspaces</button>
                         </a>
                     </div>,
                 );
@@ -497,8 +497,8 @@ function RepositoryNotFoundView(p: { error: StartWorkspaceError }) {
             setStatusMessage(
                 <div className="mt-2 flex flex-col space-y-8">
                     <p className="text-base text-gray-400 w-96">
-                        Your access token was updated recently. Please try again if the repository exists and Gitpod was
-                        approved for <code>{owner}</code>.
+                        Your access token was updated recently. Please try again if the repository exists and Devspaces
+                        was approved for <code>{owner}</code>.
                     </p>
                     <a className="mx-auto" href={authorizeURL}>
                         <button>Try Again</button>

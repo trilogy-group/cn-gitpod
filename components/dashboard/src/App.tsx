@@ -321,7 +321,7 @@ function App() {
     if (window.location.pathname.startsWith("/blocked")) {
         return (
             <div className="mt-48 text-center">
-                <img src={gitpodIcon} className="h-16 mx-auto" alt="Gitpod's logo" />
+                <img src={gitpodIcon} className="h-16 mx-auto" alt="Devspaces's logo" />
                 <h1 className="mt-12 text-gray-500 text-3xl">Your account has been blocked.</h1>
                 <p className="mt-4 mb-8 text-lg w-96 mx-auto">
                     Please contact support if you think this is an error. See also{" "}
@@ -381,7 +381,7 @@ function App() {
                             >
                                 contact sales
                             </a>{" "}
-                            to get a professional license for running Gitpod in production.
+                            to get a professional license for running Devspaces in production.
                         </Alert>
                     </div>
                 )}

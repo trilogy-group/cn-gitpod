@@ -408,7 +408,7 @@ function UsageView({ attributionId }: UsageViewProps) {
                                                             {(usage.metadata as WorkspaceInstanceUsageData)
                                                                 .workspaceType === "prebuild" ? (
                                                                 <span className="text-sm text-gray-400 dark:text-gray-500">
-                                                                    Gitpod
+                                                                    Devspaces
                                                                 </span>
                                                             ) : (
                                                                 <div className="flex">

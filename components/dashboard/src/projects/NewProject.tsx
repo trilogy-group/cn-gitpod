@@ -440,7 +440,7 @@ export default function NewProject() {
                             <div>
                                 <div className="px-12 py-20 text-center text-gray-500 bg-gray-50 dark:bg-gray-800 rounded-xl">
                                     <span className="dark:text-gray-400">
-                                        Additional authorization is required for Gitpod to watch your GitHub
+                                        Additional authorization is required for Devspaces to watch your GitHub
                                         repositories and trigger prebuilds.
                                     </span>
                                     <br />
@@ -450,7 +450,7 @@ export default function NewProject() {
                                         </button>
                                     ) : (
                                         <button className="mt-6" onClick={() => reconfigure()}>
-                                            Configure Gitpod App
+                                            Configure Devspaces App
                                         </button>
                                     )}
                                 </div>
