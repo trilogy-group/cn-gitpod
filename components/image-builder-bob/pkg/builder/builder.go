@@ -91,6 +91,10 @@ func (b *Builder) buildWorkspaceImage(ctx context.Context, cl *client.Client) (e
 		return err
 	}
 
+	// Devspaces-specific start
+	log.Info("DS: BaseRef is: ", b.Config.BaseRef)
+	// Devspaces-specific end
+
 	err = ioutil.WriteFile(filepath.Join(contextDir, "Dockerfile"), []byte(fmt.Sprintf("FROM %v", b.Config.BaseRef)), 0644)
 	if err != nil {
 		return xerrors.Errorf("unexpected error creating temporal directory: %w", err)
