@@ -6,8 +6,12 @@
 if [[ -z "$1" ]]
 then
     echo "provide k8s namespace as an argument"
+    exit 1
 fi
 
 kubectl set image -n "$1" statefulset/mysql mysql=docker.io/bitnami/mysql:5.7.34-debian-10-r55
 kubectl set image -n "$1" statefulset/mysql volume-permissions=docker.io/bitnami/bitnami-shell:11-debian-11-r70
 kubectl set image -n "$1" statefulset/messagebus rabbitmq=docker.io/bitnami/rabbitmq:3.11.6-debian-11-r0
+
+kubectl delete pod -n "$1" mysql-0
+kubectl delete pod -n "$1" messagebus-0

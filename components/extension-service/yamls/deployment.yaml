@@ -76,4 +76,7 @@ spec:
       initContainers:
         - name: wait-for-db
           image: busybox
-          command: ['sh', '-c', 'until nslookup mysql.gitpod-infra-test.svc.cluster.local; do echo waiting for mysql; sleep 2; done;']
+          args:
+            - sh
+            - -c
+            - until nslookup mysql.gitpod-infra-test.svc.cluster.local; do echo waiting for mysql; sleep 2; done;
