@@ -149,7 +149,7 @@ export function Login() {
                                 <img src={gitpodDark} className="h-8 hidden dark:block" alt="Gitpod dark theme logo" />
                             </div>
                             <div className="mb-10">
-                                <h1 className="text-5xl mb-3">Welcome to Gitpod</h1>
+                                <h1 className="text-5xl mb-3">Welcome to Devspaces</h1>
                                 <div className="text-gray-400 text-lg">
                                     Spin up fresh, automated dev environments for each task in the cloud, in seconds.
                                 </div>

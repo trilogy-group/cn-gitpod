@@ -38,11 +38,11 @@ export default function Settings() {
 
     return (
         <div>
-            <PageWithAdminSubMenu title="Settings" subtitle="Configure settings for your Gitpod cluster.">
+            <PageWithAdminSubMenu title="Settings" subtitle="Configure settings for your Devspaces cluster.">
                 <h3>Usage Statistics</h3>
                 <p className="text-base text-gray-500 pb-4 max-w-2xl">
-                    We collect usage telemetry to gain insights on how you use your Gitpod instance, so we can provide a
-                    better overall experience.
+                    We collect usage telemetry to gain insights on how you use your Devspaces instance, so we can
+                    provide a better overall experience.
                 </p>
                 <p>
                     <a className="gp-link" href="https://www.gitpod.io/privacy">
@@ -53,7 +53,7 @@ export default function Settings() {
                     title="Enable usage telemetry"
                     desc={
                         <span>
-                            Enable usage telemetry on your Gitpod instance. A preview of your telemetry is available
+                            Enable usage telemetry on your Devspaces instance. A preview of your telemetry is available
                             below.
                         </span>
                     }

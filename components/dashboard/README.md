@@ -49,7 +49,7 @@ You are not expected to update the values of these variables for a long time aft
 You can always go to your account settings and edit the scope for each variable to something like `*/gitpod`.
 
 ```bash
-# Use "gitpod.io" for the SaaS version of Gitpod, or specify the host of your self-hosted gitpod
+# Use "gitpod.io" for the SaaS version of Devspaces, or specify the host of your self-hosted gitpod
 GP_DEV_HOST=gitpod.io
 
 # Notice the cookie name (_gitpod_io_) may be different if self-hosted.
@@ -57,7 +57,7 @@ GP_DEV_HOST=gitpod.io
 GP_DEV_COOKIE="_gitpod_io_=AUTHENTICATION_COOKIE_VALUE"
 ```
 
-Replace `AUTHENTICATION_COOKIE_VALUE` with the value of your auth cookie taken from your browser's dev tools while visiting your target Gitpod host (e.g. `s%3Axxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.XXXXXXXXXXXXXXX`).
+Replace `AUTHENTICATION_COOKIE_VALUE` with the value of your auth cookie taken from your browser's dev tools while visiting your target Devspaces host (e.g. `s%3Axxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.XXXXXXXXXXXXXXX`).
 
 | ℹ️ How to get the cookie name and value                                    |
 | -------------------------------------------------------------------------- |
