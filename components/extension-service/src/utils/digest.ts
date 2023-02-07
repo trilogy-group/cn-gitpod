@@ -7,6 +7,7 @@
 // * helper function to get the digest of an image from its tag
 // import { execSync } from "child_process";
 import axios from "axios";
+import { IMAGE_ARCH_MISMATCH_ERROR } from "./constants";
 
 export type Arch = "x86" | "arm";
 const fixArch = (arch: Arch) => {
@@ -99,7 +100,7 @@ const getDigestFromImageAPI = async (image: string, arch: Arch) => {
             },
         });
 
-        // ! get the digest with the correct arch
+        // * get the digest with the correct arch
         if (!response.data) {
             throw new Error("No data returned from docker api");
         }
@@ -107,11 +108,17 @@ const getDigestFromImageAPI = async (image: string, arch: Arch) => {
             (image: ImageResponse) => image.architecture === fixedArch,
         );
         if (!imageResponse) {
-            console.log(`No arch found in docker api response`);
+            // ! in this case we want to throw an Error that we can catch later, imageArchMismatchError
+            throw new Error(IMAGE_ARCH_MISMATCH_ERROR);
         }
         const digest = imageResponse.digest;
         return `${imageName}@${digest}`;
     } catch (err) {
+        // * in case of DS: Image arch mismatch, we want to throw the error
+        if (err?.message === IMAGE_ARCH_MISMATCH_ERROR) {
+            throw err;
+        }
+        // * in other cases we just return the image name with the tag
         console.log(`Got error from docker API: `, err?.message);
         return `${imageName}:${tag}`;
     }
@@ -124,27 +131,29 @@ const getDigestFromImageAPI = async (image: string, arch: Arch) => {
  * @returns string
  */
 export const swapTagWithDigest = async (image: string, arch: Arch) => {
-    // TODO: handle all cases
+    try {
+        // ! in case the image name is already a digest, we dont need to do anything
+        if (image.includes("@sha256")) {
+            return image;
+        }
 
-    // ! in case the image name is already a digest, we dont need to do anything
-    if (image.includes("@sha256")) {
-        return image;
+        // The image may be what Docker calls a "familiar" name, e.g. ubuntu:latest instead of docker.io/library/ubuntu:latest.
+        // To make this a valid digested form we first need to normalize that familiar name.
+        // We cant split the image name by ":" because the image name can contain a port number.
+        // So we split the image name by the last occurrence of ":".
+        const lastColonIndex = image.lastIndexOf(":");
+        if (lastColonIndex === -1) {
+            // ! no tag found, add latest tag
+            image = `${image}:latest`;
+        } else if (lastColonIndex === image.length - 1) {
+            // ! tag is empty, add latest tag
+            image = `${image}latest`;
+        }
+
+        // * now we have a valid image name, we can get the digest
+        const digest = await getDigestFromImageAPI(image, arch);
+        return digest;
+    } catch (err) {
+        throw err;
     }
-
-    // The image may be what Docker calls a "familiar" name, e.g. ubuntu:latest instead of docker.io/library/ubuntu:latest.
-    // To make this a valid digested form we first need to normalize that familiar name.
-    // We cant split the image name by ":" because the image name can contain a port number.
-    // So we split the image name by the last occurrence of ":".
-    const lastColonIndex = image.lastIndexOf(":");
-    if (lastColonIndex === -1) {
-        // ! no tag found, add latest tag
-        image = `${image}:latest`;
-    } else if (lastColonIndex === image.length - 1) {
-        // ! tag is empty, add latest tag
-        image = `${image}latest`;
-    }
-
-    // * now we have a valid image name, we can get the digest
-    const digest = await getDigestFromImageAPI(image, arch);
-    return digest;
 };

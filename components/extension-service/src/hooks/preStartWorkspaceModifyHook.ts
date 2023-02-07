@@ -9,6 +9,7 @@ import { PreStartWorkspaceModifyRequest, PreStartWorkspaceModifyResponse } from 
 import { prismaClient } from "../utils/prisma";
 import { WorkspaceInstance } from "@prisma/client";
 import { Arch, swapTagWithDigest } from "../utils/digest";
+import { IMAGE_ARCH_MISMATCH_ERROR } from "../utils/constants";
 
 const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
     PreStartWorkspaceModifyRequest,
@@ -30,9 +31,16 @@ const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
         console.log(`hookpoint1 - swapping tag with digest`);
         const baseImgResolved = payload?.getWorkspace()?.getImagesource()?.getReference()?.getBaseimageresolved()!;
         console.log(`hookpoint1 - current baseImgResolved: `, baseImgResolved);
-        const newBaseImage = await swapTagWithDigest(baseImgResolved, arch);
-        console.log(`hookpoint1 - updated baseImgResolved: `, newBaseImage);
-        payload?.getWorkspace()?.getImagesource()?.getReference()?.setBaseimageresolved(newBaseImage);
+        try {
+            const newBaseImage = await swapTagWithDigest(baseImgResolved, arch);
+            console.log(`hookpoint1 - updated baseImgResolved: `, newBaseImage);
+            payload?.getWorkspace()?.getImagesource()?.getReference()?.setBaseimageresolved(newBaseImage);
+        } catch (err) {
+            if (err?.message === IMAGE_ARCH_MISMATCH_ERROR) {
+                message = `Error swapping tag with digest: ${IMAGE_ARCH_MISMATCH_ERROR}`;
+                response.setError(err?.message || message);
+            }
+        }
     }
 
     // * save in db
@@ -45,7 +53,6 @@ const preStartWorkspaceModifyHook: grpc.handleUnaryCall<
             },
         });
         message = `Workspace instance id created with id: ${wsInstance.instanceId}`;
-        response.setError("");
     } catch (err) {
         message = `Error creating prisma create for id: ${instanceId}`;
         response.setError(err?.message || message);
