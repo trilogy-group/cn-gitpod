@@ -1,7 +1,7 @@
 # User Manual
 
 ## Initial Setup
-1. Go to [Mixed Devspaces](https://mixed-devspaces.k8.devfactory.com/) which has a devspaces instance capable of hosting both ARM and x86 workspaces
+1. Go to [Hybrid Devspaces](https://hybrid-devspaces.k8.devfactory.com/) which has a devspaces instance capable of hosting both ARM and x86 workspaces
 2. Authenticate with your Github
 3. Click on Open workspace and enter URL of a github repository that you want to open in the workspace
 
