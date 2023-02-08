@@ -1,5 +1,4 @@
 workspaceLocation: gitpod/gitpod-ws.code-workspace
-arch: arm
 checkoutLocation: gitpod
 ports:
   - port: 1337
