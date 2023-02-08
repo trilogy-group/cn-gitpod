@@ -15,7 +15,7 @@
     "build:clean": "yarn clean && yarn build",
     "rebuild": "yarn build:clean",
     "lint": "yarn tslint -p .",
-    "updatearm": "yarn rebuild && leeway build components/extension-service:docker -D version=arm-edge-case --dont-test",
+    "updatelatest": "yarn rebuild && leeway build components/extension-service:docker -D version=latest",
     "testdigest": "npx ts-node src/utils/digest.ts"
   },
   "license": "UNLICENSED",

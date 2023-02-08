@@ -883,7 +883,7 @@ export class WorkspaceStarter {
                 { workspace: workspace.id, instance: instance.id },
                 `preStartWorkspaceModifyHook: Got an error response from extensionService: ${response.getError()}`,
             );
-            // ! check if error === IMAGE_ARCH_MISMATCH_ERROR, if yes we should not throw an error
+            // ! check if error === IMAGE_ARCH_MISMATCH_ERROR, if yes we should throw an error that image build failed
             if (response.getError() === IMAGE_ARCH_MISMATCH_ERROR) {
                 throw new StartInstanceError(
                     "imageBuildFailed",
