@@ -177,7 +177,7 @@ require (
 	github.com/ipfs/bbloom v0.0.4 // indirect
 	github.com/ipfs/go-block-format v0.0.3 // indirect
 	github.com/ipfs/go-blockservice v0.3.0 // indirect
-	github.com/ipfs/go-cid v0.1.0 // indirect
+	github.com/ipfs/go-cid v0.3.2 // indirect
 	github.com/ipfs/go-datastore v0.5.0 // indirect
 	github.com/ipfs/go-ipfs-blockstore v1.2.0 // indirect
 	github.com/ipfs/go-ipfs-cmds v0.7.0 // indirect
@@ -198,7 +198,7 @@ require (
 	github.com/ipfs/go-verifcid v0.0.1 // indirect
 	github.com/ipfs/interface-go-ipfs-core v0.7.0 // indirect
 	github.com/ipld/go-codec-dagpb v1.3.0 // indirect
-	github.com/ipld/go-ipld-prime v0.11.0 // indirect
+	github.com/ipld/go-ipld-prime v0.19.0 // indirect
 	github.com/jbenet/goprocess v0.1.4 // indirect
 	github.com/jinzhu/copier v0.3.5 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
@@ -250,8 +250,8 @@ require (
 	github.com/multiformats/go-base36 v0.1.0 // indirect
 	github.com/multiformats/go-multiaddr v0.6.0 // indirect
 	github.com/multiformats/go-multibase v0.0.3 // indirect
-	github.com/multiformats/go-multicodec v0.4.1 // indirect
-	github.com/multiformats/go-multihash v0.1.0 // indirect
+	github.com/multiformats/go-multicodec v0.6.0 // indirect
+	github.com/multiformats/go-multihash v0.2.1 // indirect
 	github.com/multiformats/go-varint v0.0.6 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
