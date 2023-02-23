@@ -7,6 +7,7 @@
 // * helper function to get the digest of an image from its tag
 // import { execSync } from "child_process";
 import axios from "axios";
+import { IMAGE_ARCH_MISMATCH_ERROR } from "./constants";
 
 export type Arch = "x86" | "arm";
 const fixArch = (arch: Arch) => {
@@ -108,10 +109,15 @@ const getDigestFromImageAPI = async (image: string, arch: Arch) => {
         );
         if (!imageResponse) {
             console.log(`No arch found in docker api response`);
+            throw new Error(IMAGE_ARCH_MISMATCH_ERROR);
         }
         const digest = imageResponse.digest;
         return `${imageName}@${digest}`;
     } catch (err) {
+        // * in case of DS: Image arch mismatch, we want to throw the error
+        if (err?.message === IMAGE_ARCH_MISMATCH_ERROR) {
+            throw err;
+        }
         console.log(`Got error from docker API: `, err?.message);
         return `${imageName}:${tag}`;
     }
