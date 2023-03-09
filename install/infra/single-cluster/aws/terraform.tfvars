@@ -1,5 +1,5 @@
 # the cluster_name should be of length less than 15 characters and surrounded by double quotes
-cluster_name = "gitpod-devspaces"
+cluster_name = "hybrid-devspaces"
 
 # a route53 zone and certificate request will be created for this domain; surround the domain name within double quotes
 domain_name = "hybrid-devspaces.k8.devfactory.com"

@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "gitpod-devspaces-tf"
+    bucket = "hybrid-devspaces-tf"
     key    = "aws/terraform.state"
   }
 }
