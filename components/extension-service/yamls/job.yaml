@@ -7,12 +7,21 @@ spec:
   ttlSecondsAfterFinished: 10
   template:
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
       restartPolicy: Never
       containers:
         - name: create-db
           image: 346945241475.dkr.ecr.us-east-1.amazonaws.com/gitpod-infra-test/extension-service:arm-edge-case
           imagePullPolicy: Always
-          command: ["npx", "prisma","db", "push"]
+          command: ["npx", "prisma", "db", "push"]
           env:
             - name: DB_PASSWORD
               valueFrom:

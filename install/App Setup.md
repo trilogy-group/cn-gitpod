@@ -13,6 +13,17 @@ cd install/kots
 bash install-kots.sh <cluster-name>
 ```
 
+## Architecture Comptability Issues with KOTS Admin Components
+- KOTS Admin components like kots-rqlite by default only run on x86 architecture
+- Since these components are part of the gitpod public helm chart, we cannot modify the yamls to add node affinity to them before hand. It has to be done after the application is installed.
+- In this case, adding node affinity may not be required. If a pod fails due to exec format error (i.e. being placed on the wrong arch) one simple fix is to just keep terminating the pod until it get's scheduled on an appropriate node
+- If that doesn't work you may need to add a node affinity to the appropriate statefulset/deployment
+- One more corner case that can occur is due to the distribution of nodes across availability zones. It is possible that the nodes get scheduled in a manner than all x86 nodes are in a single AZ (out of min 2 required by the EKS cluster).
+- rqlite and minio admin pods both have pvc which are provisioned as EBS blocks. The pods needs to be scheduled in the same AZ as the PV. In case the PV is scheduled in a AZ which has no x86 nodes the pod will refuse to run
+- In such a scenario, one hacky fix would be to keep deleting the Ec2 nodes until one get's spun up in the right AZ
+- Alternatively, you could add AZ restrictions to the storage class used by the PVC
+- A more robust solution would be to modify the terraform code to ensure that both regions have atleast one x86 node
+
 ## Configure KOTS applications
 - After the app installation is completed, you will see a message on the CLI that says admin console available at localhost:8800
 - Open the admin console on http://localhost:8800 and enter password `12345678`
