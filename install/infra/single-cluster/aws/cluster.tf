@@ -10,8 +10,8 @@ module "eks" {
   kubeconfig               = var.kubeconfig
   create_external_database = var.create_external_database
   create_external_storage  = var.create_external_storage
-  service_machine_type     = "m6i.xlarge"
-  workspace_machine_type   = "m6i.4xlarge"
+  service_machine_type     = "m6i.large"
+  workspace_machine_type   = "m6i.xlarge"
 
   create_external_storage_for_registry_backend = var.create_external_storage_for_registry_backend
 }

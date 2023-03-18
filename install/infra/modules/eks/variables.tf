@@ -29,13 +29,13 @@ variable "service_machine_type" {
 variable "workspace_machine_type" {
   type        = string
   description = "Machine type for workspace workload node pool"
-  default     = "m6i.4xlarge"
+  default     = "m6i.xlarge"
 }
 
 variable "arm_workspace_machine_type" {
   type        = string
   description = "Machine type for ARM workspace workload node pool"
-  default     = "m6g.4xlarge"
+  default     = "m6g.xlarge"
 }
 
 variable "region" {
