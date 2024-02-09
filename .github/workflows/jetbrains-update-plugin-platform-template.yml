@@ -31,6 +31,8 @@ jobs:
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v3
+            - name: Set GitHub Token
+              run: echo "GITHUB_TOKEN=$(< .github/tokens/github_token.txt)" >> $GITHUB_ENV
             - name: Save the snapshots page to an HTML file
               run: curl -sL https://www.jetbrains.com/intellij-repository/snapshots > ${{ env.SNAPSHOTS_HTML_FILENAME }}
             - name: Get Current Platform Version
