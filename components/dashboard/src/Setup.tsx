@@ -40,15 +40,15 @@ export default function Setup() {
             {!showModal && (
                 // TODO: Use title and buttons props
                 <Modal visible={true} onClose={() => {}} closeable={false}>
-                    <h3 className="pb-2">Welcome to Gitpod 🎉</h3>
+                    <h3 className="pb-2">Welcome to Devspaces 🎉</h3>
                     <div className="border-t border-b border-gray-200 dark:border-gray-800 mt-2 -mx-6 px-6 py-4">
                         <p className="pb-4 text-gray-500 text-base">
-                            To start using Gitpod, you will need to set up a Git integration.
+                            To start using Devspaces, you will need to set up a Git integration.
                         </p>
 
                         <div className="flex">
                             <span className="text-gray-500">
-                                By using Gitpod, you agree to our{" "}
+                                By using Devspaces, you agree to our{" "}
                                 <a
                                     className="gp-link"
                                     target="gitpod-terms"

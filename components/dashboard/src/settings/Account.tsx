@@ -92,7 +92,7 @@ export default function Account() {
                 </form>
                 <h3 className="mt-12">Delete Account</h3>
                 <p className="text-base text-gray-500 pb-4">
-                    This action will remove all the data associated with your account in Gitpod.
+                    This action will remove all the data associated with your account in Devspaces.
                 </p>
                 <button className="danger secondary" onClick={() => setModal(true)}>
                     Delete Account
